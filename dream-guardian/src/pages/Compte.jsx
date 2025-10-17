@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import ArcticBackground from '../shared/ArcticBackground';
 import { getCurrentUser, setCurrentUser } from '../shared/store';
 
 export default function Compte() {
@@ -22,7 +23,8 @@ export default function Compte() {
   };
 
   return (
-    <div className="home-container arctic-night" style={{ alignItems: 'stretch' }}>
+    <div className="home-container arctic-night" style={{ alignItems: 'stretch', position: 'relative' }}>
+      <ArcticBackground />
       <div className="side-panel" style={{ maxWidth: 720, margin: '0 auto' }}>
         <h2 style={{ marginTop: 0 }}>Compte</h2>
         <div style={{ display: 'grid', gap: 8 }}>

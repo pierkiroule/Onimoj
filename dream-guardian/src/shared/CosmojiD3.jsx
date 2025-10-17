@@ -41,6 +41,26 @@ export default function CosmojiD3({
     // add a few cross links for constellation feel
     links.push({ source: 0, target: 5 }, { source: 2, target: 7 });
 
+    // If exactly 3 emojis are selected, fix them at triangle vertices
+    const selectedNodes = Array.isArray(selectedEmojis)
+      ? selectedEmojis.map((e) => nodes.find((n) => n.emoji === e)).filter(Boolean)
+      : [];
+    const hasTriangle = selectedNodes.length === 3;
+    if (hasTriangle) {
+      const cx = width / 2;
+      const cy = height / 2;
+      const radius = Math.min(width, height) * 0.34;
+      for (let i = 0; i < 3; i++) {
+        const angleDeg = -90 + i * 120;
+        const angle = (angleDeg * Math.PI) / 180;
+        const n = selectedNodes[i];
+        if (n) {
+          n.fx = cx + radius * Math.cos(angle);
+          n.fy = cy + radius * Math.sin(angle);
+        }
+      }
+    }
+
     const svg = d3
       .select(container)
       .append('svg')
@@ -74,6 +94,10 @@ export default function CosmojiD3({
       .data(links)
       .enter()
       .append('line');
+
+    if (hasTriangle) {
+      link.style('opacity', 0.25);
+    }
 
     // One group per emoji: halo circle + text label
     const nodeGroup = svg
@@ -125,6 +149,29 @@ export default function CosmojiD3({
           : 1
       );
 
+    // Triangle overlay between the 3 selected emojis
+    let triangleLines = null;
+    if (hasTriangle) {
+      const triEdges = [
+        [selectedNodes[0], selectedNodes[1]],
+        [selectedNodes[1], selectedNodes[2]],
+        [selectedNodes[2], selectedNodes[0]],
+      ];
+      triangleLines = svg
+        .append('g')
+        .attr('class', 'onimoji-triangle')
+        .selectAll('line.tri-edge')
+        .data(triEdges)
+        .enter()
+        .append('line')
+        .attr('class', 'tri-edge')
+        .attr('stroke', haloStroke)
+        .attr('stroke-width', 2.4)
+        .attr('stroke-linecap', 'round')
+        .attr('filter', 'url(#emojiGlow)')
+        .attr('opacity', 0.95);
+    }
+
     const simulation = d3
       .forceSimulation(nodes)
       .force('charge', d3.forceManyBody().strength(-60))
@@ -142,6 +189,14 @@ export default function CosmojiD3({
           .attr('y2', (d) => d.target.y);
 
         nodeGroup.attr('transform', (d) => `translate(${d.x}, ${d.y})`);
+
+        if (hasTriangle && triangleLines) {
+          triangleLines
+            .attr('x1', (d) => d[0].x)
+            .attr('y1', (d) => d[0].y)
+            .attr('x2', (d) => d[1].x)
+            .attr('y2', (d) => d[1].y);
+        }
       });
 
     // Small pop animation for newly selected emojis

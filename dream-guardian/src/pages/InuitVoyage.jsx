@@ -157,6 +157,7 @@ export default function InuitVoyage() {
   const [shareText, setShareText] = useState('');
   const [onimojiText, setOnimojiText] = useState('');
   const [shareToCommunity, setShareToCommunity] = useState(false);
+  const [selectedEmojis, setSelectedEmojis] = useState([]);
 
   // load persisted state
   useEffect(() => {
@@ -186,7 +187,24 @@ export default function InuitVoyage() {
     setOnimojiText('');
     setShareToCommunity(false);
     setPhase('quiz');
+    setSelectedEmojis([]);
   }, [currentStep]);
+
+  // When entering share phase, auto-fill onimoji from current selection
+  useEffect(() => {
+    if (phase === 'share') {
+      setOnimojiText(selectedEmojis.join(' '));
+    }
+  }, [phase]);
+
+  const toggleEmoji = useCallback((emoji) => {
+    setSelectedEmojis((prev) => {
+      const already = prev.includes(emoji);
+      if (already) return prev.filter((e) => e !== emoji);
+      if (prev.length >= 3) return prev; // cap at 3 selections
+      return [...prev, emoji];
+    });
+  }, []);
 
   // Quiz helpers
 
@@ -294,7 +312,16 @@ export default function InuitVoyage() {
                 <div className="guide-emoji">{GUIDE_EMOJI[guide.id]}</div>
               </div>
             ) : (
-              <div style={{ fontSize: '2rem', opacity: 0.9 }}>🛰️</div>
+              <div style={{ width: 320, height: 320 }}>
+                <CosmojiD3
+                  width={320}
+                  height={320}
+                  emojis={BASE_EMOJIS}
+                  interactive={true}
+                  selectedEmojis={selectedEmojis}
+                  onToggleEmoji={toggleEmoji}
+                />
+              </div>
             )}
           </div>
         </div>
@@ -437,7 +464,7 @@ export default function InuitVoyage() {
             <p className="muted">Carte des émojis — consultation seulement</p>
             <div className="hublot-wrapper" style={{ marginTop: 12 }}>
               <div className="hublot" style={{ width: 320, height: 320 }}>
-                <CosmojiD3 width={280} height={280} emojis={BASE_EMOJIS} interactive={false} selectedEmojis={[]} />
+                <CosmojiD3 width={280} height={280} emojis={BASE_EMOJIS} interactive={false} selectedEmojis={selectedEmojis} />
               </div>
             </div>
           </div>

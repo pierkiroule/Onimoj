@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
+import ArcticBackground from './shared/ArcticBackground';
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
-    <div className="home-container galaxy">
+    <div className="home-container galaxy arctic-night">
+      <ArcticBackground />
       <header className="hero" aria-labelledby="hero-title">
         <h1 id="hero-title" className="cosmic-title">🌙 Onimojis</h1>
         <p className="kicker">Vous entrez dans l’espace vivant du rêve, là où les ✨️ oniriques des cultures de notre 🌍 résonnent encore.</p>

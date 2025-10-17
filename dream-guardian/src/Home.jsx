@@ -7,10 +7,10 @@ export default function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="home-container">
+    <div className="home-container galaxy">
       <header className="hero" aria-labelledby="hero-title">
-        <h1 id="hero-title">🌙 Bienvenue dans le monde résonant des Onimojis</h1>
-        <p className="kicker">Là où rêver redevient un acte de lien, et non de performance.</p>
+        <h1 id="hero-title" className="cosmic-title">🌙 Bienvenue, gardiens et gardiennes de la galaxie des Onimojis</h1>
+        <p className="kicker">Vous entrez dans l’espace vivant du rêve, là où les étoiles oniriques résonnent encore.</p>
       </header>
 
       <hr className="divider" />

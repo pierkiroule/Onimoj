@@ -16,69 +16,75 @@ export default function Home() {
       <hr className="divider" />
 
       <main className="narrative" aria-label="Présentation d'Onimoji">
+        <section className="narrative-section" aria-labelledby="s-preserver-galaxie">
+          <h2 id="s-preserver-galaxie" className="cosmic-heading">🌌 Préserver la galaxie du rêve</h2>
+          <p>Chaque nuit, des milliers d’étoiles s’éteignent dans nos imaginaires. Nos rythmes s’accélèrent, nos nuits se contractent — le rêve se perd.</p>
+          <p><strong>Onimoji</strong> naît pour préserver cette galaxie fragile : un écosystème d’images, de symboles et de cultures qui relient les humains au monde vivant.</p>
+        </section>
+
+        <hr className="divider" />
+
         <section className="narrative-section" aria-labelledby="s-oni-moji">
-          <h2 id="s-oni-moji">✨ Oni + Moji</h2>
-          <p><strong>Oni</strong>, pour onirique — le souffle du rêve.</p>
-          <p><strong>Moji</strong>, pour emoji, mojo, magie — le signe vivant, l’énergie du sens.</p>
+          <h2 id="s-oni-moji" className="cosmic-heading">✨ Oni + Moji</h2>
+          <p><strong>Oni</strong> pour onirique, le souffle du rêve.</p>
+          <p><strong>Moji</strong> pour emoji, mojo, magie — le signe vivant, la vibration du sens.</p>
           <blockquote>
-            Ensemble, Onimoji, les petits génies du rêve, nés de la rencontre entre imaginaire et culture.
+            <p>Ensemble : Onimoji, les petits génies du rêve,</p>
+            <p>tisseurs de liens entre les cultures et les consciences.</p>
           </blockquote>
         </section>
 
         <hr className="divider" />
 
-        <section className="narrative-section" aria-labelledby="s-langage-universel">
-          <h2 id="s-langage-universel">💫 Le rêve, un langage universel</h2>
-          <p>Depuis toujours, les peuples du monde savent que le rêve relie :</p>
+        <section className="narrative-section" aria-labelledby="s-constellations-culturelles">
+          <h2 id="s-constellations-culturelles" className="cosmic-heading">🌍 Tisser les constellations culturelles</h2>
+          <p>Les Onimojis portent la mémoire des sagesses du monde :</p>
           <ul className="emoji-list">
-            <li>🌿 les Aborigènes à la Terre et aux ancêtres,</li>
-            <li>❄️ les Inuits aux esprits de la nature,</li>
-            <li>🕯️ les Grecs à la guérison,</li>
-            <li>🪶 les Africains aux ancêtres,</li>
-            <li>🕊️ les Tibétains à la clarté intérieure.</li>
+            <li>🌿 les Aborigènes et leur Terre du rêve,</li>
+            <li>❄️ les Inuits et les esprits du vent,</li>
+            <li>🕯️ les Grecs et la guérison par le sommeil,</li>
+            <li>🪶 les Africains et la parole des ancêtres,</li>
+            <li>🕊️ les Tibétains et la clarté de la conscience.</li>
           </ul>
-          <p>Chaque culture y voit une forme de résonance — entre soi, le monde et le vivant.</p>
+          <p>Chaque tradition est une étoile onirique : ensemble, elles forment la grande toile culturelle du rêve.</p>
         </section>
 
         <hr className="divider" />
 
-        <section className="narrative-section" aria-labelledby="s-ce-que-change">
-          <h2 id="s-ce-que-change">🌌 Ce que change Onimoji</h2>
-          <p>Les applis de bien-être cherchent à mesurer, optimiser, contrôler. Onimoji fait l’inverse :</p>
-          <blockquote>écouter, ralentir, relier.</blockquote>
-          <p>Ici, pas de performance, juste une écologie du rêve. Un espace culturel et poétique pour retrouver l’art d’habiter la nuit.</p>
-        </section>
-
-        <hr className="divider" />
-
-        <section className="narrative-section" aria-labelledby="s-experience">
-          <h2 id="s-experience">🎶 Une expérience sensible et résonante</h2>
-          <p>Les Onimojis sont des esprits-symboles :</p>
-          <ul className="emoji-list">
-            <li>porteurs de récits et d’émotions,</li>
-            <li>inspirés des traditions du monde,</li>
-            <li>reliés en constellation sonore et visuelle.</li>
-          </ul>
-          <p>Chaque Onimoji t’aide à te réaccorder à ton monde intérieur et au vivant autour de toi.</p>
-        </section>
-
-        <hr className="divider" />
-
-        <section className="narrative-section" aria-labelledby="s-promesse">
-          <h2 id="s-promesse">🌙 Notre promesse</h2>
+        <section className="narrative-section" aria-labelledby="s-mission">
+          <h2 id="s-mission" className="cosmic-heading">💫 Votre mission</h2>
+          <p>Préserver ce ciel intérieur. Tisser les résonances entre les rêves anciens et les rêves d’aujourd’hui. Réapprendre à écouter la nuit comme un espace de soin et de lien.</p>
           <blockquote>
-            Onimoji ne t’aide pas à « mieux dormir » — il t’aide à mieux rêver.
+            <p>Ici, pas de performance : seulement la résonance.</p>
+            <p>Pas de contrôle : seulement la connexion.</p>
           </blockquote>
-          <p>Rêver comme un acte de santé, de culture et de lien. Rêver pour se réaccorder au monde.</p>
+        </section>
+
+        <hr className="divider" />
+
+        <section className="narrative-section" aria-labelledby="s-vibrer">
+          <h2 id="s-vibrer" className="cosmic-heading">🎶 Faites vibrer les étoiles</h2>
+          <p>Explorez les constellations d’Onimojis, composez votre carte céleste, laissez les sons, les symboles et les cultures s’accorder en vous.</p>
+          <p>Chaque Onimoji rencontré rallume une étoile — une part de vous, une mémoire du monde.</p>
+        </section>
+
+        <hr className="divider" />
+
+        <section className="narrative-section" aria-labelledby="s-onimoji">
+          <h2 id="s-onimoji" className="cosmic-heading">🌙 Onimoji</h2>
+          <blockquote>
+            <p>Préserver le rêve, c’est préserver la résonance du vivant.</p>
+            <p>Tissons ensemble la galaxie des Onimojis : un univers de sens, d’émotions et d’étoiles culturelles.</p>
+          </blockquote>
         </section>
 
         <hr className="divider" />
 
         <section className="cta-area" aria-labelledby="s-cta">
           <h2 id="s-cta" className="visually-hidden">Commencer l’exploration</h2>
-          <p className="cta-sub">Onimoji — l’app qui change le rêve : de la performance individuelle à la résonance culturelle.</p>
+          <p className="cta-sub">Compose ta constellation, et choisis où commencer ton voyage.</p>
           <button className="primary-button" onClick={() => setIsOpen(true)}>
-            choisir ta mission
+            choisir votre mission
           </button>
         </section>
       </main>
@@ -91,8 +97,8 @@ export default function Home() {
             </button>
             <div className="modal-content">
               <p>
-                Partons ensemble découvrir comment les cultures du monde prennent soin du sommeil et de leur vie onirique.
-                Tes rêves sont des ressources. Les guides du cosmoniris t'enseignerons les sagesses et vertues utiles à ta
+                Partons découvrir comment les cultures du monde prennent soin du sommeil et de leur vie onirique.
+                Tes rêves sont des ressources. Les guides du cosmoniris t'enseigneront les sagesses et vertus utiles à ta
                 santé onirique.
               </p>
               <h2 style={{ marginTop: '0.75rem', fontSize: '1.25rem' }}>Choisis ta destination</h2>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import ArcticBackground from '../shared/ArcticBackground';
 import { getCurrentUser, getMyAtlas, getMyDreamteam } from '../shared/store';
 
 export default function Dreamteam() {
@@ -13,7 +14,8 @@ export default function Dreamteam() {
   const atlas = getMyAtlas(me.id);
 
   return (
-    <div className="home-container arctic-night" style={{ alignItems: 'stretch' }}>
+    <div className="home-container arctic-night" style={{ alignItems: 'stretch', position: 'relative' }}>
+      <ArcticBackground />
       <div className="side-panel" style={{ maxWidth: 720, margin: '0 auto' }}>
         <h2 style={{ marginTop: 0 }}>Dreamteam</h2>
         <p className="muted">Contributeurs à tes onimojis (par leurs échos).</p>

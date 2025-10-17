@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import ArcticBackground from '../shared/ArcticBackground';
 import { clearNotifications, getCurrentUser, getMyAtlas, listNotifications } from '../shared/store';
 
 export default function Atlas() {
@@ -21,7 +22,8 @@ export default function Atlas() {
   }, [onimojis]);
 
   return (
-    <div className="home-container arctic-night" style={{ alignItems: 'stretch' }}>
+    <div className="home-container arctic-night" style={{ alignItems: 'stretch', position: 'relative' }}>
+      <ArcticBackground />
       <div className="side-panel" style={{ maxWidth: 900, margin: '0 auto' }}>
         <h2 style={{ marginTop: 0 }}>Mon Atlas</h2>
         {onimojis.length === 0 && <div className="muted">Aucun onimoji encore. Partage depuis un voyage.</div>}

@@ -299,14 +299,6 @@ export default function InuitVoyage() {
       {!showSummary && (
         <div style={{ position: 'relative' }}>
           <StepHeader current={currentStep} total={TOTAL_STEPS} />
-          {/* Local radial menu around the hublot replaces global nav */}
-          <div className="tool-dock" aria-label="Outils du voyage">
-            <button className="tool-button" onClick={() => setShowCosmoji(true)}>🪐 Cosmoji</button>
-            <button className="tool-button" onClick={() => setShowEchomoji(true)}>🌀 Échomoji</button>
-            <Link to="/atlas" className="tool-button">📚 Atlas</Link>
-            <Link to="/dreamteam" className="tool-button">👥 Dreamteam</Link>
-            <Link to="/" className="tool-button">🏠 Accueil</Link>
-          </div>
         </div>
       )}
 

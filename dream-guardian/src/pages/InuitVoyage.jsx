@@ -123,6 +123,8 @@ const QUIZZES = {
   ],
 };
 
+const QUESTIONS_PER_QUIZ = 3;
+
 function determineGuideByStep(step) {
   // Cycle guides by step for a curated progression
   const idx = (step - 1) % GUIDE_DEFS.length;
@@ -209,7 +211,10 @@ export default function InuitVoyage() {
 
   // Quiz helpers
 
-  const quizForGuide = useMemo(() => (guide ? QUIZZES[guide.id] : []), [guide]);
+  const quizForGuide = useMemo(
+    () => (guide ? QUIZZES[guide.id].slice(0, QUESTIONS_PER_QUIZ) : []),
+    [guide]
+  );
 
   const setAnswer = (qIdx, choiceIdx) => {
     setQuizFailed(false);
@@ -287,7 +292,9 @@ export default function InuitVoyage() {
     localStorage.removeItem('inuitVoyageV1');
   };
 
-  const allQuizAnswered = quizForGuide.length === 5 && Object.keys(answers).length === 5;
+  const allQuizAnswered =
+    quizForGuide.length === QUESTIONS_PER_QUIZ &&
+    Object.keys(answers).length === QUESTIONS_PER_QUIZ;
 
   const showSummary = phase === 'complete' || (currentStep > TOTAL_STEPS);
 
@@ -338,7 +345,7 @@ export default function InuitVoyage() {
               <div className="guide-card" style={{ borderColor: guide.color }}>
                 <div className="guide-name" style={{ color: guide.color }}>{guide.label}</div>
                 <div className="guide-gist">{guide.gist}</div>
-                <div className="guide-narration">{GUIDE_EMOJI[guide.id]} « Pour cette étape, réponds aux 5 questions. Je veille et t’indique la voie juste. »</div>
+                <div className="guide-narration">{GUIDE_EMOJI[guide.id]} « Pour cette étape, réponds aux 3 questions. Je veille et t’indique la voie juste. »</div>
               </div>
 
               {quizFailed && (

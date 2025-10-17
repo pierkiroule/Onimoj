@@ -5,6 +5,37 @@
   text-align: center;
 }
 
+/* Nav */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.nav-left { display: flex; gap: 0.5rem; }
+.nav-right { display: flex; gap: 0.5rem; align-items: center; }
+.nav-link {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.link-active { background: rgba(255,255,255,0.1); }
+.fx-pulse-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: #a6ffcc;
+  box-shadow: 0 0 0 0 rgba(166,255,204,0.8);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(166,255,204,0.8); }
+  70% { box-shadow: 0 0 0 10px rgba(166,255,204,0); }
+  100% { box-shadow: 0 0 0 0 rgba(166,255,204,0); }
+}
+
 /* Home container */
 .home-container {
   display: flex;

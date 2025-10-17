@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CosmojiD3 from '../shared/CosmojiD3';
 import '../App.css';
+import ArcticBackground from '../shared/ArcticBackground';
 
 const BASE_EMOJIS = ['❄️', '🌌', '🧭', '🦭', '🔥', '🌬️', '🧊', '🐻', '🌙', '🧿'];
 
@@ -293,7 +294,8 @@ export default function InuitVoyage() {
   const wisdomLines = guide ? GUIDE_WISDOM[guide.id] : [];
 
   return (
-    <div className="home-container" style={{ gap: '1rem', alignItems: 'stretch', position: 'relative' }}>
+    <div className="home-container arctic-night" style={{ gap: '1rem', alignItems: 'stretch', position: 'relative' }}>
+      <ArcticBackground />
       {!showSummary && (
         <div style={{ position: 'relative' }}>
           <StepHeader current={currentStep} total={TOTAL_STEPS} />

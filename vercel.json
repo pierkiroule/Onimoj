@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm --prefix dream-guardian ci && npm --prefix dream-guardian run build",
+  "outputDirectory": "dream-guardian/dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

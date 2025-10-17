@@ -9,7 +9,7 @@ import Dreamteam from './pages/Dreamteam'
 
 function App() {
   const location = useLocation();
-  const hideNav = location.pathname.startsWith('/voyage');
+  const hideNav = location.pathname === '/' || location.pathname.startsWith('/voyage');
   return (
     <div>
       {!hideNav && <NavBar />}

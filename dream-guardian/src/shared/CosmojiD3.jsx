@@ -18,6 +18,24 @@ export default function CosmojiD3({
     // Clear prior render
     container.innerHTML = '';
 
+    // Read CSS variables from the surrounding container for dynamic theming
+    let haloStroke = '#7a7fff';
+    let haloGlowOpacity = 0.55;
+    try {
+      const style = getComputedStyle(container);
+      const strokeVar = style.getPropertyValue('--emoji-halo-stroke').trim();
+      const glowVar = style.getPropertyValue('--emoji-halo-glow-opacity').trim();
+      if (strokeVar) haloStroke = strokeVar;
+      if (glowVar) {
+        const parsed = Number(glowVar);
+        if (!Number.isNaN(parsed)) haloGlowOpacity = parsed;
+      }
+    } catch {}
+
+    const reduceMotion = typeof window !== 'undefined' &&
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const animDuration = reduceMotion ? 0 : 140;
+
     const nodes = emojis.map((emoji, index) => ({ id: index, emoji }));
     const links = d3.range(emojis.length).map((i) => ({ source: i, target: (i + 1) % emojis.length }));
     // add a few cross links for constellation feel
@@ -31,6 +49,23 @@ export default function CosmojiD3({
       .attr('height', height)
       .style('display', 'block');
 
+    // Glow filter for selected halo
+    const defs = svg.append('defs');
+    const glow = defs
+      .append('filter')
+      .attr('id', 'emojiGlow')
+      .attr('x', '-50%')
+      .attr('y', '-50%')
+      .attr('width', '200%')
+      .attr('height', '200%');
+    glow
+      .append('feDropShadow')
+      .attr('dx', 0)
+      .attr('dy', 0)
+      .attr('stdDeviation', 4)
+      .attr('flood-color', haloStroke)
+      .attr('flood-opacity', haloGlowOpacity);
+
     const link = svg
       .append('g')
       .attr('stroke', 'rgba(255,255,255,0.6)')
@@ -40,28 +75,64 @@ export default function CosmojiD3({
       .enter()
       .append('line');
 
-    const node = svg
+    // One group per emoji: halo circle + text label
+    const nodeGroup = svg
       .append('g')
-      .selectAll('text')
+      .selectAll('g.cosmoji-node')
       .data(nodes)
       .enter()
+      .append('g')
+      .attr('class', 'cosmoji-node')
+      .attr('role', 'option')
+      .attr('tabindex', interactive ? 0 : null)
+      .attr('aria-selected', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 'true' : 'false'))
+      .style('cursor', interactive ? 'pointer' : 'default')
+      .on('click', (event, d) => {
+        if (!interactive) return;
+        if (typeof onToggleEmoji === 'function') onToggleEmoji(d.emoji);
+      })
+      .on('keydown', (event, d) => {
+        if (!interactive) return;
+        const key = event.key;
+        if (key === 'Enter' || key === ' ') {
+          event.preventDefault();
+          if (typeof onToggleEmoji === 'function') onToggleEmoji(d.emoji);
+        }
+      });
+
+    // Halo ring (only visible when selected)
+    const halo = nodeGroup
+      .append('circle')
+      .attr('r', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 20 : 0))
+      .attr('fill', 'none')
+      .attr('stroke', 'var(--emoji-halo-stroke, #7a7fff)')
+      .attr('stroke-width', 2)
+      .attr('filter', 'url(#emojiGlow)')
+      .attr('opacity', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 1 : 0));
+
+    // Emoji text label
+    const label = nodeGroup
       .append('text')
       .text((d) => d.emoji)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .style('font-size', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 34 : 26))
-      .style('opacity', (d) => (selectedEmojis && selectedEmojis.length > 0 ? (selectedEmojis.includes(d.emoji) ? 1 : 0.7) : 1))
-      .style('cursor', interactive ? 'pointer' : 'default')
-      .on('click', (event, d) => {
-        if (!interactive) return;
-        if (typeof onToggleEmoji === 'function') onToggleEmoji(d.emoji);
-      });
+      .style('opacity', (d) =>
+        selectedEmojis && selectedEmojis.length > 0
+          ? selectedEmojis.includes(d.emoji)
+            ? 1
+            : 0.7
+          : 1
+      );
 
     const simulation = d3
       .forceSimulation(nodes)
       .force('charge', d3.forceManyBody().strength(-60))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide(20))
+      .force(
+        'collision',
+        d3.forceCollide((d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 24 : 20))
+      )
       .force('link', d3.forceLink(links).id((d) => d.id).distance(90).strength(0.7))
       .on('tick', () => {
         link
@@ -70,8 +141,25 @@ export default function CosmojiD3({
           .attr('x2', (d) => d.target.x)
           .attr('y2', (d) => d.target.y);
 
-        node.attr('x', (d) => d.x).attr('y', (d) => d.y);
+        nodeGroup.attr('transform', (d) => `translate(${d.x}, ${d.y})`);
       });
+
+    // Small pop animation for newly selected emojis
+    if (selectedEmojis && selectedEmojis.length > 0) {
+      nodeGroup.each(function (d) {
+        const isSelected = selectedEmojis.includes(d.emoji);
+        const g = d3.select(this);
+        const c = g.select('circle');
+        const t = g.select('text');
+        if (isSelected) {
+          c.transition().duration(animDuration).attr('opacity', 1).attr('r', 20);
+          t.transition().duration(animDuration).style('font-size', 34);
+        } else {
+          c.transition().duration(animDuration).attr('opacity', selectedEmojis.length > 0 ? 0 : 0).attr('r', 0);
+          t.transition().duration(animDuration).style('font-size', 26).style('opacity', selectedEmojis.length > 0 ? 0.7 : 1);
+        }
+      });
+    }
 
     // gentle motion
     const jiggle = d3.interval(() => {

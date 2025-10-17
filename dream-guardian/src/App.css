@@ -137,6 +137,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  --emoji-halo-stroke: #7a7fff; /* default selection halo color */
+  --emoji-halo-glow-opacity: 0.55;
 }
 
 /* Voyage layout */

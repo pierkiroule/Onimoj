@@ -3,6 +3,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import CosmojiD3 from '../shared/CosmojiD3';
 import '../App.css';
 import ArcticBackground from '../shared/ArcticBackground';
+import {
+  getCurrentUser,
+  upsertOnimoji,
+  addCommunityEcho,
+  incrementShare,
+  generateDreamTitle,
+  listOnimojis,
+  listCommunity,
+} from '../shared/store';
 
 const BASE_EMOJIS = ['❄️', '🌌', '🧭', '🦭', '🔥', '🌬️', '🧊', '🐻', '🌙', '🧿'];
 
@@ -87,39 +96,39 @@ const GUIDE_WISDOM = {
 
 const QUIZZES = {
   Sila: [
-    { q: "Que représente Sila dans la cosmologie inuit ?", choices: ["Esprit de la mer", "Esprit de l’air et de la météo", "Esprit du feu"], correct: 1 },
-    { q: "Quelle pratique honore Sila avant le sommeil ?", choices: ["Respiration lente et écoute du vent", "Danse rapide", "Jeûne prolongé"], correct: 0 },
-    { q: "Un rêve sous le signe de Sila évoque souvent…", choices: ["La foudre intérieure", "La clarté et la direction", "La chasse au caribou"], correct: 1 },
-    { q: "Qu’est-ce qui change avec Sila ?", choices: ["Les marées", "Le temps et l’air", "La roche"], correct: 1 },
-    { q: "Quel symbole lui correspond le mieux ici ?", choices: ["🌬️", "🦭", "🐻"], correct: 0 },
+    { q: "Que représente Sila dans la cosmologie inuit ?", choices: ["Esprit de la mer", "Esprit de l’air et de la météo", "Esprit du feu"], correct: 1, explanations: ["Sedna veille sur la mer, pas Sila.", "Sila est le souffle du monde: air, météo, direction subtile.", "Ignik renvoie au feu, pas Sila."] },
+    { q: "Quelle pratique honore Sila avant le sommeil ?", choices: ["Respiration lente et écoute du vent", "Danse rapide", "Jeûne prolongé"], correct: 0, explanations: ["Respirer et écouter le vent: accorder sa nuit au monde.", "L’agitation disperse l’écoute de Sila.", "La privation n’est pas l’axe ici."] },
+    { q: "Un rêve sous le signe de Sila évoque souvent…", choices: ["La foudre intérieure", "La clarté et la direction", "La chasse au caribou"], correct: 1, explanations: ["La foudre renvoie à d’autres mythes.", "Clarté: Sila souffle une orientation paisible.", "La chasse concerne d’autres esprits et pratiques."] },
+    { q: "Qu’est-ce qui change avec Sila ?", choices: ["Les marées", "Le temps et l’air", "La roche"], correct: 1, explanations: ["Les marées: plutôt la lune et la mer.", "Sila: changements d’air et de météo, souffle perçu.", "La roche n’est pas l’emblème du changement ici."] },
+    { q: "Quel symbole lui correspond le mieux ici ?", choices: ["🌬️", "🦭", "🐻"], correct: 0, explanations: ["Exact: souffle/vent.", "Phoque: mémoire de Sedna.", "Ours: Nanook."] },
   ],
   Sedna: [
-    { q: "Sedna est surtout liée à…", choices: ["La montagne", "La mer et ses êtres", "Le désert"], correct: 1 },
-    { q: "Geste symbolique pour apaiser Sedna dans certains récits ?", choices: ["Peigner ses cheveux", "Entonner un chant d’orage", "Brûler de la mousse"], correct: 0 },
-    { q: "Un rêve ‘de Sedna’ porte sur…", choices: ["Phoques et profondeurs", "Foudre et tonnerre", "Feu de camp"], correct: 0 },
-    { q: "Valeur mise en avant par cette figure ?", choices: ["Exubérance", "Respect des cycles", "Mépris du gibier"], correct: 1 },
-    { q: "Quel symbole lui correspond le mieux ici ?", choices: ["🦭", "🔥", "🧭"], correct: 0 },
+    { q: "Sedna est surtout liée à…", choices: ["La montagne", "La mer et ses êtres", "Le désert"], correct: 1, explanations: ["La montagne n’est pas son domaine.", "Juste: maîtresse des animaux marins, cycles et subsistance.", "Le désert est hors cosmologie arctique."] },
+    { q: "Geste symbolique pour apaiser Sedna dans certains récits ?", choices: ["Peigner ses cheveux", "Entonner un chant d’orage", "Brûler de la mousse"], correct: 0, explanations: ["Oui: dénouer les noeuds apaise la mer.", "L’orage n’est pas son apaisement principal.", "Pas un rite spécifique à Sedna."] },
+    { q: "Un rêve ‘de Sedna’ porte sur…", choices: ["Phoques et profondeurs", "Foudre et tonnerre", "Feu de camp"], correct: 0, explanations: ["Exact: alliés marins et plongée.", "La foudre ne renvoie pas à Sedna.", "Le feu est ailleurs, avec Ignik."] },
+    { q: "Valeur mise en avant par cette figure ?", choices: ["Exubérance", "Respect des cycles", "Mépris du gibier"], correct: 1, explanations: ["Sedna n’incarne pas l’exubérance.", "Oui: prendre, rendre, remercier.", "Le mépris rompt l’éthique de subsistance."] },
+    { q: "Quel symbole lui correspond le mieux ici ?", choices: ["🦭", "🔥", "🧭"], correct: 0, explanations: ["Phoque: signe clair de Sedna.", "Le feu renvoie à Ignik.", "Boussole: symbole plus générique."] },
   ],
   Nanook: [
-    { q: "Nanook est l’esprit…", choices: ["De l’ours polaire", "Du renard arctique", "Du narval"], correct: 0 },
-    { q: "Qualité associée à Nanook ?", choices: ["Légèreté", "Courage prudent", "Insouciance"], correct: 1 },
-    { q: "Un signe onirique typique ?", choices: ["Empreintes sur la neige", "Pluie d’été", "Champ de fleurs"], correct: 0 },
-    { q: "Dans la relation au gibier, on valorise…", choices: ["Le gaspillage", "Le respect", "L’oubli des tabous"], correct: 1 },
-    { q: "Quel symbole lui correspond le mieux ici ?", choices: ["🐻", "🧿", "🌌"], correct: 0 },
+    { q: "Nanook est l’esprit…", choices: ["De l’ours polaire", "Du renard arctique", "Du narval"], correct: 0, explanations: ["Oui: autorité et respect du gibier.", "Renard: autre registre.", "Narval: autre être, pas Nanook."] },
+    { q: "Qualité associée à Nanook ?", choices: ["Légèreté", "Courage prudent", "Insouciance"], correct: 1, explanations: ["Légèreté n’est pas l’axe de Nanook.", "Juste: force alignée et mesure.", "L’insouciance mettrait en danger."] },
+    { q: "Un signe onirique typique ?", choices: ["Empreintes sur la neige", "Pluie d’été", "Champ de fleurs"], correct: 0, explanations: ["Exact: trace, responsabilité.", "Pluie d’été: climat non polaire.", "Fleurs: autre paysage symbolique."] },
+    { q: "Dans la relation au gibier, on valorise…", choices: ["Le gaspillage", "Le respect", "L’oubli des tabous"], correct: 1, explanations: ["Le gaspillage rompt l’alliance.", "Oui: juste mesure et réciprocité.", "Oublier les tabous brise l’éthique."] },
+    { q: "Quel symbole lui correspond le mieux ici ?", choices: ["🐻", "🧿", "🌌"], correct: 0, explanations: ["Ours: Nanook.", "Amulette: symbolique générique.", "Voie lactée: autre registre."] },
   ],
   Aningan: [
-    { q: "Aningan renvoie surtout à…", choices: ["La Lune et ses cycles", "Les tempêtes de sable", "Les volcans"], correct: 0 },
-    { q: "Quel rituel nocturne l’évoque ?", choices: ["Observer calmement le ciel", "Danser au soleil", "Chasser à midi"], correct: 0 },
-    { q: "Dans les rêves, Aningan invite à…", choices: ["La course effrénée", "Le rythme et la mesure", "Le vacarme"], correct: 1 },
-    { q: "Symbole qui convient le mieux ici ?", choices: ["🌙", "🔥", "🦭"], correct: 0 },
-    { q: "Une trace d’Aningan au matin ?", choices: ["Marées intérieures apaisées", "Froid mordant", "Odeur de fumée"], correct: 0 },
+    { q: "Aningan renvoie surtout à…", choices: ["La Lune et ses cycles", "Les tempêtes de sable", "Les volcans"], correct: 0, explanations: ["Oui: cycles nocturnes et mesure.", "Désert: non arctique.", "Volcans: autre géographie."] },
+    { q: "Quel rituel nocturne l’évoque ?", choices: ["Observer calmement le ciel", "Danser au soleil", "Chasser à midi"], correct: 0, explanations: ["Observation, veille douce.", "Soleil: hors nuit.", "Midi: hors nuit."] },
+    { q: "Dans les rêves, Aningan invite à…", choices: ["La course effrénée", "Le rythme et la mesure", "Le vacarme"], correct: 1, explanations: ["La précipitation dégrade l’écoute.", "Juste: cadence apaisée.", "Le vacarme brouille la clarté."] },
+    { q: "Symbole qui convient le mieux ici ?", choices: ["🌙", "🔥", "🦭"], correct: 0, explanations: ["Lune: Aningan.", "Feu: Ignik.", "Phoque: Sedna."] },
+    { q: "Une trace d’Aningan au matin ?", choices: ["Marées intérieures apaisées", "Froid mordant", "Odeur de fumée"], correct: 0, explanations: ["Oui: rythme intérieur harmonisé.", "Le froid n’est pas son signe.", "La fumée renvoie au feu."] },
   ],
   Ignik: [
-    { q: "Ignik représente surtout…", choices: ["Le feu qui rassemble", "La glace éternelle", "Le vent violent"], correct: 0 },
-    { q: "Que favorise Ignik au camp ?", choices: ["La dispersion", "La parole et le soin", "Le silence forcé"], correct: 1 },
-    { q: "En rêve, Ignik apporte…", choices: ["Chaleur relationnelle", "Aveuglement", "Tourmente"], correct: 0 },
-    { q: "Symbole qui convient le mieux ici ?", choices: ["🔥", "🧿", "🧊"], correct: 0 },
-    { q: "Pratique autour du feu ?", choices: ["Mauvais traitement du bois", "Partage et respect", "Ignorer les braises"], correct: 1 },
+    { q: "Ignik représente surtout…", choices: ["Le feu qui rassemble", "La glace éternelle", "Le vent violent"], correct: 0, explanations: ["Oui: chaleur commune et soin.", "Glace: plutôt l’hiver/la banquise.", "Vent: Sila."] },
+    { q: "Que favorise Ignik au camp ?", choices: ["La dispersion", "La parole et le soin", "Le silence forcé"], correct: 1, explanations: ["Dispersion: à l’inverse.", "Oui: cercle, réparation, écoute.", "Forcer rompt la relation."] },
+    { q: "En rêve, Ignik apporte…", choices: ["Chaleur relationnelle", "Aveuglement", "Tourmente"], correct: 0, explanations: ["Chaleur: lien et sécurité.", "Aveuglement n’est pas son bienfait.", "Tourmente: contraire de l’apaisement."] },
+    { q: "Symbole qui convient le mieux ici ?", choices: ["🔥", "🧿", "🧊"], correct: 0, explanations: ["Feu: Ignik.", "Amulette: autre usage.", "Glace: autre symbole."] },
+    { q: "Pratique autour du feu ?", choices: ["Mauvais traitement du bois", "Partage et respect", "Ignorer les braises"], correct: 1, explanations: ["Le bois se remercie et se ménage.", "Oui: soin collectif.", "Ignorer les braises est dangereux."] },
   ],
 };
 
@@ -148,7 +157,7 @@ export default function InuitVoyage() {
   const TOTAL_STEPS = 12;
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [phase, setPhase] = useState('quiz'); // 'quiz' | 'reveal' | 'share' | 'complete'
+  const [phase, setPhase] = useState('quiz'); // 'quiz' | 'reveal' | 'oracle' | 'share' | 'complete'
   const [guide, setGuide] = useState(null); // {id,label,color}
   const [answers, setAnswers] = useState({}); // qIdx -> choiceIdx
   const [quizFailed, setQuizFailed] = useState(false);
@@ -226,6 +235,8 @@ export default function InuitVoyage() {
     }
   };
 
+  const allCorrect = quizForGuide.length === 5 && quizForGuide.every((q, idx) => (answers[idx] ?? -1) === q.correct);
+
   const retryQuiz = () => {
     setAnswers({});
     setQuizFailed(false);
@@ -245,17 +256,18 @@ export default function InuitVoyage() {
   };
 
   const finishStep = () => {
-    // Optionally append to community echoes
-    if (shareToCommunity && (shareText.trim() || onimojiText.trim())) {
-      const existing = readCommunity();
-      existing.push({
-        ts: Date.now(),
-        step: currentStep,
-        guideId: guide?.id,
-        onimoji: onimojiText.trim(),
-        text: shareText.trim(),
-      });
-      writeCommunity(existing);
+    const me = getCurrentUser();
+    const oniEmojis = onimojiText.trim();
+    const title = generateDreamTitle({ emojis: oniEmojis, guideLabel: guide?.label });
+    let oni = null;
+    if (oniEmojis) {
+      oni = upsertOnimoji({ ownerId: me.id, emojis: oniEmojis, title });
+    }
+    if (shareToCommunity && (shareText.trim() || oniEmojis)) {
+      if (oni) {
+        addCommunityEcho({ onimojiId: oni.id, userId: me.id, text: shareText.trim() });
+        incrementShare(oni.id);
+      }
     }
 
     const summary = {
@@ -263,8 +275,9 @@ export default function InuitVoyage() {
       guideId: guide?.id,
       quizPassed: true,
       share: shareToCommunity,
-      onimoji: onimojiText.trim(),
+      onimoji: oniEmojis,
       phrase: shareText.trim(),
+      title,
     };
     setStepsData((prev) => [...prev, summary]);
     if (currentStep < TOTAL_STEPS) {
@@ -346,7 +359,10 @@ export default function InuitVoyage() {
                     <div className="quiz-q">{idx + 1}. {q.q}</div>
                     <div className="quiz-choices">
                       {q.choices.map((c, cIdx) => (
-                        <label key={cIdx} className="choice">
+                        <label
+                          key={cIdx}
+                          className={`choice ${answers[idx] === cIdx ? ((cIdx === q.correct) ? 'choice-correct' : 'choice-wrong') : ''}`}
+                        >
                           <input
                             type="radio"
                             name={`q-${idx}`}
@@ -357,16 +373,25 @@ export default function InuitVoyage() {
                         </label>
                       ))}
                     </div>
+                    {answers[idx] !== undefined && q.explanations && (
+                      <div className="explain-inline">
+                        {q.explanations[answers[idx]]}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
               <div style={{ display: 'flex', gap: 8 }}>
-                <button className="primary-button" disabled={!allQuizAnswered} onClick={onValidateQuiz}>
-                  Valider le quiz
+                <button
+                  className="primary-button"
+                  disabled={!allCorrect}
+                  onClick={() => setPhase('reveal')}
+                >
+                  Réveiller le guide
                 </button>
-                {quizFailed && (
-                  <button className="primary-button" onClick={retryQuiz}>Recommencer</button>
+                {!allCorrect && allQuizAnswered && (
+                  <button className="primary-button" onClick={retryQuiz}>Réinitialiser</button>
                 )}
               </div>
             </div>
@@ -382,7 +407,31 @@ export default function InuitVoyage() {
                   ))}
                 </div>
               </div>
-              <button className="primary-button" onClick={() => setPhase('share')}>
+              <button className="primary-button" onClick={() => setPhase('oracle')}>
+                L’Oracle — choisir 3 émojis
+              </button>
+            </div>
+          )}
+
+          {!showSummary && phase === 'oracle' && (
+            <div>
+              <h2 style={{ marginTop: 0 }}>Oracle — choisis 3 émojis totem</h2>
+              <p>Sélectionne exactement 3 signes qui résonnent pour toi aujourd’hui.</p>
+              <div className="selection-count">Sélection: {selectedEmojis.length} / 3</div>
+              <div className="tags-list" style={{ marginTop: 6 }}>
+                {selectedEmojis.map((e) => (
+                  <span key={e} className="emoji-pill">{e}</span>
+                ))}
+              </div>
+              <button
+                className="primary-button"
+                disabled={selectedEmojis.length !== 3}
+                onClick={() => {
+                  const txt = selectedEmojis.join(' ');
+                  setOnimojiText(txt);
+                  setPhase('share');
+                }}
+              >
                 Continuer
               </button>
             </div>
@@ -392,6 +441,11 @@ export default function InuitVoyage() {
             <div>
               <h2 style={{ marginTop: 0 }}>Échoniriques de la communauté</h2>
               <p>Écris une courte phrase en résonance avec ton onimoji (3 émojis) et choisis si tu souhaites la partager.</p>
+
+              <div className="tags-area" style={{ marginBottom: 6 }}>
+                <div style={{ fontWeight: 600 }}>Titre proposé</div>
+                <div className="muted">{generateDreamTitle({ emojis: onimojiText, guideLabel: guide?.label })}</div>
+              </div>
 
               <div className="tags-area">
                 <div className="tag-input-row">

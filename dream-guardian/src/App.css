@@ -694,6 +694,9 @@ blockquote {
   align-items: center;
   gap: 0.5rem;
 }
+.choice-correct { background: rgba(86, 255, 146, 0.12); border-radius: 8px; }
+.choice-wrong { background: rgba(255, 86, 86, 0.12); border-radius: 8px; }
+.explain-inline { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
 
 .tags-area {
   display: flex;

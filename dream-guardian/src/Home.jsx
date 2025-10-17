@@ -9,15 +9,15 @@ export default function Home() {
   return (
     <div className="home-container galaxy">
       <header className="hero" aria-labelledby="hero-title">
-        <h1 id="hero-title" className="cosmic-title">🌙 Bienvenue, gardiens et gardiennes de la galaxie des Onimojis</h1>
-        <p className="kicker">Vous entrez dans l’espace vivant du rêve, là où les étoiles oniriques résonnent encore.</p>
+        <h1 id="hero-title" className="cosmic-title">🌙 Onimojis</h1>
+        <p className="kicker">Vous entrez dans l’espace vivant du rêve, là où les ✨️ oniriques des cultures de notre 🌍 résonnent encore.</p>
       </header>
 
       <hr className="divider" />
 
       <main className="narrative" aria-label="Présentation d'Onimoji">
         <section className="narrative-section" aria-labelledby="s-preserver-galaxie">
-          <h2 id="s-preserver-galaxie" className="cosmic-heading">🌌 Préserver la galaxie du rêve</h2>
+          <h2 id="s-preserver-galaxie" className="cosmic-heading">🌌 Préserver les cultures oniriques pour prendre soin de vos rêves</h2>
           <p>Chaque nuit, des milliers d’étoiles s’éteignent dans nos imaginaires. Nos rythmes s’accélèrent, nos nuits se contractent — le rêve se perd.</p>
           <p><strong>Onimoji</strong> naît pour préserver cette galaxie fragile : un écosystème d’images, de symboles et de cultures qui relient les humains au monde vivant.</p>
         </section>

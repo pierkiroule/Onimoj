@@ -299,16 +299,20 @@ export default function InuitVoyage() {
       {!showSummary && (
         <div style={{ position: 'relative' }}>
           <StepHeader current={currentStep} total={TOTAL_STEPS} />
-          <div className="tool-dock">
+          {/* Local radial menu around the hublot replaces global nav */}
+          <div className="tool-dock" aria-label="Outils du voyage">
             <button className="tool-button" onClick={() => setShowCosmoji(true)}>🪐 Cosmoji</button>
             <button className="tool-button" onClick={() => setShowEchomoji(true)}>🌀 Échomoji</button>
+            <Link to="/atlas" className="tool-button">📚 Atlas</Link>
+            <Link to="/dreamteam" className="tool-button">👥 Dreamteam</Link>
+            <Link to="/" className="tool-button">🏠 Accueil</Link>
           </div>
         </div>
       )}
 
       <div className="voyage-layout">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <div className="hublot" style={{ width: 360, height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="hublot" style={{ width: 360, height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
             {phase === 'reveal' && guide ? (
               <div className="guide-avatar" style={{ borderColor: guide.color }} aria-label={`Guide ${guide.label}`}>
                 <div className="guide-emoji">{GUIDE_EMOJI[guide.id]}</div>
@@ -325,6 +329,14 @@ export default function InuitVoyage() {
                 />
               </div>
             )}
+            {/* Radial quick menu around hublot */}
+            <div className="hublot-menu">
+              <button className="mini-btn" onClick={() => setShowCosmoji(true)} title="Cosmoji">🪐</button>
+              <button className="mini-btn" onClick={() => setShowEchomoji(true)} title="Échomoji">🌀</button>
+              <Link to="/atlas" className="mini-btn" title="Atlas">📚</Link>
+              <Link to="/dreamteam" className="mini-btn" title="Dreamteam">👥</Link>
+              <Link to="/" className="mini-btn" title="Accueil">🏠</Link>
+            </div>
           </div>
         </div>
 
@@ -334,6 +346,7 @@ export default function InuitVoyage() {
               <div className="guide-card" style={{ borderColor: guide.color }}>
                 <div className="guide-name" style={{ color: guide.color }}>{guide.label}</div>
                 <div className="guide-gist">{guide.gist}</div>
+                <div className="guide-narration">{GUIDE_EMOJI[guide.id]} « Pour cette étape, réponds aux 5 questions. Je veille et t’indique la voie juste. »</div>
               </div>
 
               {quizFailed && (
@@ -381,6 +394,7 @@ export default function InuitVoyage() {
                     <p key={i} className="wisdom-line">{line}</p>
                   ))}
                 </div>
+                <div className="guide-narration">{GUIDE_EMOJI[guide.id]} « Écoute ces conseils. Quand tu es prêt·e, continue pour composer ton triangle d’onimoji. »</div>
               </div>
               <button className="primary-button" onClick={() => setPhase('share')}>
                 Continuer
@@ -392,6 +406,9 @@ export default function InuitVoyage() {
             <div>
               <h2 style={{ marginTop: 0 }}>Échoniriques de la communauté</h2>
               <p>Écris une courte phrase en résonance avec ton onimoji (3 émojis) et choisis si tu souhaites la partager.</p>
+              <div className="guide-card" style={{ borderColor: guide?.color }}>
+                <div className="guide-narration">{guide ? GUIDE_EMOJI[guide.id] : '🌙'} « Sélectionne précisément 3 émojis pour former un triangle. Puis écris une phrase qui résonne. Coche si tu souhaites partager. »</div>
+              </div>
 
               <div className="tags-area">
                 <div className="tag-input-row">
@@ -450,8 +467,9 @@ export default function InuitVoyage() {
           )}
 
           {!showSummary && (
-            <div style={{ marginTop: 12 }}>
-              <Link to="/" className="primary-button">Quitter</Link>
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="selection-count">Sélection {selectedEmojis.length}/3</div>
+              <span className="muted">Astuce: clique pour choisir/déchoisir; 3 forment un triangle.</span>
             </div>
           )}
         </div>

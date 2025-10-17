@@ -13,6 +13,77 @@ const GUIDE_DEFS = [
   { id: 'Ignik', label: 'Ignik', keywords: ['🔥', '❄️'], color: '#fab1a0', gist: "Feu, chaleur, communauté et soin." },
 ];
 
+const GUIDE_EMOJI = {
+  Sila: '🌬️',
+  Sedna: '🦭',
+  Nanook: '🐻',
+  Aningan: '🌙',
+  Ignik: '🔥',
+};
+
+const GUIDE_WISDOM = {
+  Sila: [
+    "Respire avec le ciel, jusqu’à entendre le souffle du monde.",
+    "Sila enseigne l’attention: chaque rafale est une parole.",
+    "Dans l’air, la mémoire circule: légère, mais agissante.",
+    "Écoute les variations: elles guident tes déplacements intérieurs.",
+    "Quand le temps change, ajuste ta posture et ton regard.",
+    "La clarté vient souvent après l’orage des pensées.",
+    "Sila n’impose rien: il propose une direction subtile.",
+    "Respirer, c’est converser avec l’invisible qui nous porte.",
+    "Préserve la douceur du vent: elle apaise les liens.",
+    "Dans le rêve, le souffle dessine le chemin de retour.",
+  ],
+  Sedna: [
+    "Sous la surface, une grande patience veille.",
+    "Respecte les cycles: prendre, rendre, remercier.",
+    "La mer garde trace des gestes justes.",
+    "Peigner les noeuds du coeur, comme on apaise la houle.",
+    "Les alliés marins guident les choix sobres.",
+    "Descendre sans brusquer, remonter avec tact.",
+    "La profondeur protège ce qui mûrit.",
+    "Partage équitable, mémoire vivante des communautés.",
+    "Écoute les phoques: ils connaissent les passages.",
+    "Au matin, remercie l’eau qui te porte.",
+  ],
+  Nanook: [
+    "La force est un silence aligné.",
+    "Avancer ferme, mais sans outrager les traces.",
+    "Le courage prudent voit loin sans précipiter.",
+    "Chaque empreinte engage une responsabilité.",
+    "Le respect fait vivre la réciprocité avec le vivant.",
+    "Nul triomphe: seulement la juste mesure.",
+    "Apprends du froid: il sculpte la présence.",
+    "Se rassembler pour décider, ne pas gaspiller.",
+    "Honorer la proie, c’est honorer la vie.",
+    "Devant l’ours, l’âme se tient droite.",
+  ],
+  Aningan: [
+    "La lune règle les marées visibles et secrètes.",
+    "Compter les nuits, c’est apprivoiser le rythme.",
+    "La veille douce affine l’écoute du monde.",
+    "Revenir au souffle quand la nuit se trouble.",
+    "Les cycles enseignent la patience des métamorphoses.",
+    "Ralentir révèle des chemins délicats.",
+    "La clarté ne crie pas: elle s’installe.",
+    "Observer, sans juger, jusqu’à l’évidence.",
+    "Le rêve est un calendrier du coeur.",
+    "Au matin, note le détail qui insiste.",
+  ],
+  Ignik: [
+    "Le feu rassemble, répare, relie.",
+    "Soigne les liens comme on attise une braise.",
+    "Parler vrai réchauffe, accuser brûle.",
+    "Chaleur partagée, sécurité commune.",
+    "Le soin circule de main en main.",
+    "Garder la flamme: ni trop, ni trop peu.",
+    "Le récit nourrit, comme une soupe.",
+    "Écouter longtemps avant de conclure.",
+    "Respecter le bois, remercier la lumière.",
+    "Au soir, confier au feu ce qui pèse.",
+  ],
+};
+
 const QUIZZES = {
   Sila: [
     { q: "Que représente Sila dans la cosmologie inuit ?", choices: ["Esprit de la mer", "Esprit de l’air et de la météo", "Esprit du feu"], correct: 1 },
@@ -51,13 +122,10 @@ const QUIZZES = {
   ],
 };
 
-function determineGuide(selected) {
-  const scored = GUIDE_DEFS.map((g) => ({
-    guide: g,
-    score: g.keywords.reduce((acc, k) => acc + (selected.includes(k) ? 1 : 0), 0),
-  }));
-  scored.sort((a, b) => b.score - a.score);
-  return (scored[0]?.guide) || GUIDE_DEFS[0];
+function determineGuideByStep(step) {
+  // Cycle guides by step for a curated progression
+  const idx = (step - 1) % GUIDE_DEFS.length;
+  return GUIDE_DEFS[idx];
 }
 
 function StepHeader({ current, total }) {
@@ -79,14 +147,16 @@ export default function InuitVoyage() {
   const TOTAL_STEPS = 12;
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [selection, setSelection] = useState([]);
-  const [phase, setPhase] = useState('select'); // 'select' | 'quiz' | 'tags'
+  const [phase, setPhase] = useState('quiz'); // 'quiz' | 'reveal' | 'share' | 'complete'
   const [guide, setGuide] = useState(null); // {id,label,color}
   const [answers, setAnswers] = useState({}); // qIdx -> choiceIdx
-  const [score, setScore] = useState(0);
-  const [tags, setTags] = useState([]);
+  const [quizFailed, setQuizFailed] = useState(false);
   const [stepsData, setStepsData] = useState([]);
-  const [tagInput, setTagInput] = useState('');
+  const [showCosmoji, setShowCosmoji] = useState(false);
+  const [showEchomoji, setShowEchomoji] = useState(false);
+  const [shareText, setShareText] = useState('');
+  const [onimojiText, setOnimojiText] = useState('');
+  const [shareToCommunity, setShareToCommunity] = useState(false);
 
   // load persisted state
   useEffect(() => {
@@ -106,124 +176,141 @@ export default function InuitVoyage() {
     localStorage.setItem('inuitVoyageV1', JSON.stringify({ currentStep, stepsData }));
   }, [currentStep, stepsData]);
 
-  const toggleEmoji = useCallback((emoji) => {
-    setSelection((prev) => {
-      if (prev.includes(emoji)) return prev.filter((e) => e !== emoji);
-      if (prev.length >= 3) return prev; // keep at most 3
-      return [...prev, emoji];
-    });
-  }, []);
-
-  const canValidateSelection = selection.length === 3;
-
-  const onValidateSelection = () => {
-    const g = determineGuide(selection);
+  // Compute guide when step changes
+  useEffect(() => {
+    const g = determineGuideByStep(currentStep);
     setGuide(g);
-    setPhase('quiz');
     setAnswers({});
-    setScore(0);
-    setTags([]);
-  };
+    setQuizFailed(false);
+    setShareText('');
+    setOnimojiText('');
+    setShareToCommunity(false);
+    setPhase('quiz');
+  }, [currentStep]);
+
+  // Quiz helpers
 
   const quizForGuide = useMemo(() => (guide ? QUIZZES[guide.id] : []), [guide]);
 
   const setAnswer = (qIdx, choiceIdx) => {
+    setQuizFailed(false);
     setAnswers((prev) => ({ ...prev, [qIdx]: choiceIdx }));
   };
 
   const onValidateQuiz = () => {
-    const s = quizForGuide.reduce((acc, q, idx) => acc + ((answers[idx] ?? -1) === q.correct ? 1 : 0), 0);
-    setScore(s);
-    setPhase('tags');
+    const correctCount = quizForGuide.reduce((acc, q, idx) => acc + ((answers[idx] ?? -1) === q.correct ? 1 : 0), 0);
+    if (correctCount === quizForGuide.length) {
+      setPhase('reveal');
+      setQuizFailed(false);
+    } else {
+      setQuizFailed(true);
+    }
   };
 
-  const addTag = (t) => {
-    const clean = String(t || '').trim().toLowerCase();
-    if (!clean) return;
-    setTags((prev) => {
-      if (prev.includes(clean)) return prev;
-      if (prev.length >= score) return prev; // limit by score
-      return [...prev, clean];
-    });
-    setTagInput('');
+  const retryQuiz = () => {
+    setAnswers({});
+    setQuizFailed(false);
+  };
+
+  // Simple local community store for Échomoji
+  const readCommunity = () => {
+    try {
+      const raw = localStorage.getItem('echomojiCommunityV1');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+  const writeCommunity = (items) => {
+    try { localStorage.setItem('echomojiCommunityV1', JSON.stringify(items)); } catch {}
   };
 
   const finishStep = () => {
-    const summary = { step: currentStep, selection, guideId: guide.id, score, tags };
+    // Optionally append to community echoes
+    if (shareToCommunity && (shareText.trim() || onimojiText.trim())) {
+      const existing = readCommunity();
+      existing.push({
+        ts: Date.now(),
+        step: currentStep,
+        guideId: guide?.id,
+        onimoji: onimojiText.trim(),
+        text: shareText.trim(),
+      });
+      writeCommunity(existing);
+    }
+
+    const summary = {
+      step: currentStep,
+      guideId: guide?.id,
+      quizPassed: true,
+      share: shareToCommunity,
+      onimoji: onimojiText.trim(),
+      phrase: shareText.trim(),
+    };
     setStepsData((prev) => [...prev, summary]);
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep((s) => s + 1);
-      setSelection([]);
-      setGuide(null);
-      setAnswers({});
-      setScore(0);
-      setTags([]);
-      setPhase('select');
     } else {
-      // journey complete -> show summary section
       setPhase('complete');
     }
   };
 
   const resetJourney = () => {
     setCurrentStep(1);
-    setSelection([]);
     setGuide(null);
     setAnswers({});
-    setScore(0);
-    setTags([]);
+    setQuizFailed(false);
     setStepsData([]);
-    setPhase('select');
+    setShareText('');
+    setOnimojiText('');
+    setShareToCommunity(false);
+    setPhase('quiz');
     localStorage.removeItem('inuitVoyageV1');
   };
 
-  const remainingTags = Math.max(0, score - tags.length);
   const allQuizAnswered = quizForGuide.length === 5 && Object.keys(answers).length === 5;
-  const suggestions = ['banquise', 'respiration', 'lune', 'phoques', 'veillée', 'protection', 'respect', 'écoute', 'silence', 'trace'];
 
   const showSummary = phase === 'complete' || (currentStep > TOTAL_STEPS);
 
+  const wisdomLines = guide ? GUIDE_WISDOM[guide.id] : [];
+
   return (
-    <div className="home-container" style={{ gap: '1rem', alignItems: 'stretch' }}>
-      {!showSummary && <StepHeader current={currentStep} total={TOTAL_STEPS} />}
+    <div className="home-container" style={{ gap: '1rem', alignItems: 'stretch', position: 'relative' }}>
+      {!showSummary && (
+        <div style={{ position: 'relative' }}>
+          <StepHeader current={currentStep} total={TOTAL_STEPS} />
+          <div className="tool-dock">
+            <button className="tool-button" onClick={() => setShowCosmoji(true)}>🪐 Cosmoji</button>
+            <button className="tool-button" onClick={() => setShowEchomoji(true)}>🌀 Échomoji</button>
+          </div>
+        </div>
+      )}
 
       <div className="voyage-layout">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <div className="hublot" style={{ width: 360, height: 360 }}>
-            <CosmojiD3
-              width={320}
-              height={320}
-              emojis={BASE_EMOJIS}
-              interactive={!showSummary}
-              selectedEmojis={selection}
-              onToggleEmoji={toggleEmoji}
-            />
+          <div className="hublot" style={{ width: 360, height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {phase === 'reveal' && guide ? (
+              <div className="guide-avatar" style={{ borderColor: guide.color }} aria-label={`Guide ${guide.label}`}>
+                <div className="guide-emoji">{GUIDE_EMOJI[guide.id]}</div>
+              </div>
+            ) : (
+              <div style={{ fontSize: '2rem', opacity: 0.9 }}>🛰️</div>
+            )}
           </div>
-          {!showSummary && (
-            <div className="selection-count">
-              Ton onimoji: {selection.join(' ')}
-              <span className="badge" style={{ marginLeft: 8 }}>{selection.length} / 3</span>
-            </div>
-          )}
         </div>
 
         <div className="side-panel">
-          {!showSummary && phase === 'select' && (
-            <div>
-              <h2 style={{ marginTop: 0 }}>Choisis 3 émojis</h2>
-              <p>Sélectionne exactement trois émojis dans le cosmoji. Ils feront émerger un esprit guide inuit.</p>
-              <button className="primary-button" disabled={!canValidateSelection} onClick={onValidateSelection}>
-                Valider mes 3 émojis
-              </button>
-            </div>
-          )}
-
           {!showSummary && phase === 'quiz' && guide && (
             <div>
               <div className="guide-card" style={{ borderColor: guide.color }}>
                 <div className="guide-name" style={{ color: guide.color }}>{guide.label}</div>
                 <div className="guide-gist">{guide.gist}</div>
               </div>
+
+              {quizFailed && (
+                <div className="banner-error">Certaines réponses sont inexactes. Réessaie jusqu’à réussir pour réveiller le guide.</div>
+              )}
+
               <div className="quiz-list">
                 {quizForGuide.map((q, idx) => (
                   <div key={idx} className="quiz-item">
@@ -244,39 +331,58 @@ export default function InuitVoyage() {
                   </div>
                 ))}
               </div>
-              <button className="primary-button" disabled={!allQuizAnswered} onClick={onValidateQuiz}>
-                Valider le quiz
+
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="primary-button" disabled={!allQuizAnswered} onClick={onValidateQuiz}>
+                  Valider le quiz
+                </button>
+                {quizFailed && (
+                  <button className="primary-button" onClick={retryQuiz}>Recommencer</button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!showSummary && phase === 'reveal' && guide && (
+            <div>
+              <div className="guide-card" style={{ borderColor: guide.color }}>
+                <div className="guide-name" style={{ color: guide.color }}>Réveil de {guide.label}</div>
+                <div className="wisdom-box">
+                  {wisdomLines.map((line, i) => (
+                    <p key={i} className="wisdom-line">{line}</p>
+                  ))}
+                </div>
+              </div>
+              <button className="primary-button" onClick={() => setPhase('share')}>
+                Continuer
               </button>
             </div>
           )}
 
-          {!showSummary && phase === 'tags' && (
+          {!showSummary && phase === 'share' && (
             <div>
               <h2 style={{ marginTop: 0 }}>Échoniriques de la communauté</h2>
-              <p>Score: <strong>{score} / 5</strong>. Tu peux accueillir <strong>{score}</strong> enrichissements (tags) d’autres gardiens.</p>
+              <p>Écris une courte phrase en résonance avec ton onimoji (3 émojis) et choisis si tu souhaites la partager.</p>
 
               <div className="tags-area">
-                <div className="tags-list">
-                  {tags.map((t) => (
-                    <span key={t} className="emoji-pill" onClick={() => setTags((prev) => prev.filter((x) => x !== t))}>{t} ×</span>
-                  ))}
+                <div className="tag-input-row">
+                  <input
+                    value={onimojiText}
+                    onChange={(e) => setOnimojiText(e.target.value)}
+                    placeholder="Ton onimoji (3 émojis)"
+                  />
                 </div>
-                {remainingTags > 0 && (
-                  <div className="tag-input-row">
-                    <input
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      placeholder={`Ajouter un tag (${remainingTags} restant${remainingTags > 1 ? 's' : ''})`}
-                    />
-                    <button onClick={() => addTag(tagInput)} disabled={!tagInput.trim()} className="primary-button">ajouter</button>
-                  </div>
-                )}
-
-                <div className="tag-suggestions">
-                  {suggestions.map((s) => (
-                    <button key={s} className="emoji-pill" onClick={() => addTag(s)} disabled={tags.includes(s) || tags.length >= score}>{s}</button>
-                  ))}
+                <div className="tag-input-row">
+                  <input
+                    value={shareText}
+                    onChange={(e) => setShareText(e.target.value)}
+                    placeholder="Phrase courte (ex: souffle clair, pas de hâte)"
+                  />
                 </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input type="checkbox" checked={shareToCommunity} onChange={(e) => setShareToCommunity(e.target.checked)} />
+                  <span>Partager aux Échoniriques</span>
+                </label>
               </div>
 
               <button className="primary-button" onClick={finishStep}>
@@ -287,22 +393,20 @@ export default function InuitVoyage() {
 
           {showSummary && (
             <div>
-              <h2 style={{ marginTop: 0 }}>Voyage terminé — onimojis en expansion</h2>
-              {stepsData.length === 0 && <p>Aucun onimoji encore. Lance un nouveau voyage.</p>}
+              <h2 style={{ marginTop: 0 }}>Voyage terminé — guides éveillés et résonances</h2>
+              {stepsData.length === 0 && <p>Aucune étape encore. Lance un nouveau voyage.</p>}
               <div className="summary-grid">
                 {stepsData.map((s) => {
                   const g = GUIDE_DEFS.find((gd) => gd.id === s.guideId) || GUIDE_DEFS[0];
                   return (
                     <div key={s.step} className="summary-card">
                       <div className="summary-top">
-                        <div className="onimoji">{s.selection.join(' ')}</div>
                         <span className="badge" style={{ background: g.color, color: '#111' }}>{g.label}</span>
+                        <div className="onimoji">{s.onimoji || '—'}</div>
                       </div>
-                      <div className="summary-bottom">
-                        <div className="score">Score: {s.score}/5</div>
-                        <div className="tags">
-                          {s.tags.length > 0 ? s.tags.map((t) => <span key={t} className="emoji-pill">{t}</span>) : <span className="muted">aucun tag</span>}
-                        </div>
+                      <div className="summary-bottom" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+                        <div className="muted">Étape {s.step}</div>
+                        {s.phrase ? <div>“{s.phrase}”</div> : <div className="muted">pas de phrase partagée</div>}
                       </div>
                     </div>
                   );
@@ -323,6 +427,82 @@ export default function InuitVoyage() {
           )}
         </div>
       </div>
+
+      {/* Cosmoji Modal (view-only) */}
+      {showCosmoji && (
+        <div className="modal-overlay" onClick={() => setShowCosmoji(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowCosmoji(false)} aria-label="Fermer">×</button>
+            <h3 className="modal-title">Cosmoji</h3>
+            <p className="muted">Carte des émojis — consultation seulement</p>
+            <div className="hublot-wrapper" style={{ marginTop: 12 }}>
+              <div className="hublot" style={{ width: 320, height: 320 }}>
+                <CosmojiD3 width={280} height={280} emojis={BASE_EMOJIS} interactive={false} selectedEmojis={[]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Échomoji Modal */}
+      {showEchomoji && (
+        <div className="modal-overlay" onClick={() => setShowEchomoji(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowEchomoji(false)} aria-label="Fermer">×</button>
+            <h3 className="modal-title">Échomoji</h3>
+            <EchomojiPanel readCommunity={readCommunity} />
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function EchomojiPanel({ readCommunity }) {
+  const items = readCommunity().slice().sort((a, b) => b.ts - a.ts);
+  const topWords = computeTopWords(items.map((i) => i.text || '').join(' '));
+  return (
+    <div style={{ textAlign: 'left' }}>
+      <div style={{ marginBottom: 8 }}>
+        <div className="badge">{items.length} partages</div>
+      </div>
+      {topWords.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Tendances sémantiques</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {topWords.map(([w, c]) => (
+              <span key={w} className="emoji-pill">{w} ×{c}</span>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{ display: 'grid', gap: 8, maxHeight: 260, overflow: 'auto' }}>
+        {items.map((it, idx) => (
+          <div key={idx} className="summary-card">
+            <div className="summary-top">
+              <span className="muted">{new Date(it.ts).toLocaleString()}</span>
+              <span className="badge">{it.guideId || '—'}</span>
+            </div>
+            <div className="summary-bottom" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+              <div className="onimoji">{it.onimoji || '—'}</div>
+              <div>{it.text || '—'}</div>
+            </div>
+          </div>
+        ))}
+        {items.length === 0 && <div className="muted">Aucun partage pour l’instant.</div>}
+      </div>
+    </div>
+  );
+}
+
+function computeTopWords(text) {
+  const stop = new Set(['', 'le', 'la', 'les', 'de', 'du', 'des', 'et', 'en', 'au', 'aux', 'un', 'une', 'à', 'pour', 'dans', 'que', 'qui', 'ne', 'pas', 'ce', 'ces', 'se', 'sur', 'avec']);
+  const words = text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter((w) => !stop.has(w) && w.length > 2);
+  const counts = new Map();
+  for (const w of words) counts.set(w, (counts.get(w) || 0) + 1);
+  return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 12);
 }

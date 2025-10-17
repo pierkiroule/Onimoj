@@ -24,7 +24,7 @@
 .nav-link {
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
 }
 .link-active { background: rgba(255,255,255,0.1); }
 .fx-pulse-dot {
@@ -33,7 +33,7 @@
   margin-left: 6px;
   border-radius: 50%;
   background: #a6ffcc;
-  box-shadow: 0 0 0 0 rgba(166,255,204,0.8);
+  box-shadow: none;
   animation: pulse 1.6s infinite;
 }
 @keyframes pulse {
@@ -50,9 +50,9 @@
   justify-content: center;
   gap: 1.5rem;
   min-height: 70vh;
-  background: rgba(0,0,0,0.08);
-  border-radius: 12px;
-  padding: 1rem;
+  background: transparent;
+  border-radius: 0;
+  padding: 0.5rem;
 }
 
 /* Galactic ambiance */
@@ -107,10 +107,7 @@
   opacity: 0.7;
 }
 
-.cosmic-title {
-  letter-spacing: 0.01em;
-  text-shadow: 0 0 22px rgba(122, 127, 255, 0.5), 0 0 42px rgba(111, 226, 255, 0.25);
-}
+.cosmic-title { letter-spacing: 0.01em; text-shadow: none; }
 
 .cosmic-heading {
   position: relative;
@@ -427,7 +424,7 @@
   width: 100%;
   max-width: 880px;
   border: none;
-  border-top: 1px solid rgba(255,255,255,0.15);
+  border-top: 1px solid rgba(255,255,255,0.12);
 }
 .narrative {
   width: 100%;
@@ -537,11 +534,11 @@ blockquote {
 }
 
 .mission-card {
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 0.9rem;
   text-align: left;
-  background: linear-gradient(180deg, rgba(100, 108, 255, 0.12), rgba(100, 108, 255, 0.04));
-  border: 1px solid rgba(100, 108, 255, 0.35);
+  background: transparent;
+  border: none;
   color: inherit;
   position: relative;
 }
@@ -622,10 +619,10 @@ blockquote {
 
 .side-panel {
   text-align: left;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 14px;
-  padding: 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .badge {
@@ -654,9 +651,9 @@ blockquote {
 }
 
 .guide-card {
-  border-left: 4px solid #7a7fff;
-  background: rgba(255,255,255,0.06);
-  border-radius: 10px;
+  border-left: 2px solid #7a7fff;
+  background: transparent;
+  border-radius: 0;
   padding: 0.75rem;
   margin-bottom: 0.75rem;
 }
@@ -689,9 +686,9 @@ blockquote {
   margin-bottom: 0.75rem;
 }
 .quiz-item {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   padding: 0.6rem 0.75rem;
 }
 .quiz-q {
@@ -803,9 +800,9 @@ blockquote {
   gap: 0.75rem;
 }
 .summary-card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   padding: 0.75rem;
 }
 .summary-top {

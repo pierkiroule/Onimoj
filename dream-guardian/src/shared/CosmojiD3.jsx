@@ -1,7 +1,14 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-export default function CosmojiD3({ width = 320, height = 320 }) {
+export default function CosmojiD3({
+  width = 320,
+  height = 320,
+  emojis = ['❄️', '🌌', '🧭', '🦭', '🔥', '🌬️', '🧊', '🐻', '🌙', '🧿'],
+  interactive = false,
+  selectedEmojis = [],
+  onToggleEmoji,
+}) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -10,8 +17,6 @@ export default function CosmojiD3({ width = 320, height = 320 }) {
 
     // Clear prior render
     container.innerHTML = '';
-
-    const emojis = ['❄️', '🌌', '🧭', '🦭', '🔥', '🌬️', '🧊', '🐻', '🌙', '🧿'];
 
     const nodes = emojis.map((emoji, index) => ({ id: index, emoji }));
     const links = d3.range(emojis.length).map((i) => ({ source: i, target: (i + 1) % emojis.length }));
@@ -44,8 +49,13 @@ export default function CosmojiD3({ width = 320, height = 320 }) {
       .text((d) => d.emoji)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .style('font-size', 26)
-      .style('cursor', 'default');
+      .style('font-size', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 34 : 26))
+      .style('opacity', (d) => (selectedEmojis && selectedEmojis.length > 0 ? (selectedEmojis.includes(d.emoji) ? 1 : 0.7) : 1))
+      .style('cursor', interactive ? 'pointer' : 'default')
+      .on('click', (event, d) => {
+        if (!interactive) return;
+        if (typeof onToggleEmoji === 'function') onToggleEmoji(d.emoji);
+      });
 
     const simulation = d3
       .forceSimulation(nodes)
@@ -76,7 +86,7 @@ export default function CosmojiD3({ width = 320, height = 320 }) {
       simulation.stop();
       svg.remove();
     };
-  }, [width, height]);
+  }, [width, height, interactive, Array.isArray(emojis) ? emojis.join(',') : String(emojis), Array.isArray(selectedEmojis) ? selectedEmojis.join(',') : '']);
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }

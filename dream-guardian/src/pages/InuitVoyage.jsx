@@ -200,7 +200,7 @@ export default function InuitVoyage() {
     if (phase === 'share') {
       setOnimojiText(selectedEmojis.join(' '));
     }
-  }, [phase]);
+  }, [phase, selectedEmojis]);
 
   const toggleEmoji = useCallback((emoji) => {
     setSelectedEmojis((prev) => {

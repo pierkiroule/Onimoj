@@ -22,7 +22,9 @@ function read(key, fallback) {
 function write(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-  } catch {}
+  } catch {
+    // Ignore storage write issues (quota/permissions)
+  }
 }
 
 function uid(prefix = 'id') {

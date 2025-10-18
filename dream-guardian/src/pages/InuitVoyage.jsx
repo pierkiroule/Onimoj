@@ -172,7 +172,9 @@ export default function InuitVoyage() {
         setCurrentStep(parsed.currentStep ?? 1);
         setStepsData(parsed.stepsData ?? []);
       }
-    } catch {}
+    } catch {
+      // Ignore corrupted persisted state; start fresh
+    }
   }, []);
 
   // persist minimal progress
@@ -246,7 +248,11 @@ export default function InuitVoyage() {
     }
   };
   const writeCommunity = (items) => {
-    try { localStorage.setItem('echomojiCommunityV1', JSON.stringify(items)); } catch {}
+    try {
+      localStorage.setItem('echomojiCommunityV1', JSON.stringify(items));
+    } catch {
+      // Ignore storage write errors (quota/permissions)
+    }
   };
 
   const finishStep = () => {

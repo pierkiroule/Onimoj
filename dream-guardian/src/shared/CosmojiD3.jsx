@@ -30,7 +30,9 @@ export default function CosmojiD3({
         const parsed = Number(glowVar);
         if (!Number.isNaN(parsed)) haloGlowOpacity = parsed;
       }
-    } catch {}
+    } catch {
+      // If reading computed styles fails, fall back to defaults
+    }
 
     const reduceMotion = typeof window !== 'undefined' &&
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -125,7 +127,7 @@ export default function CosmojiD3({
       });
 
     // Halo ring (only visible when selected)
-    const halo = nodeGroup
+    nodeGroup
       .append('circle')
       .attr('r', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 20 : 0))
       .attr('fill', 'none')
@@ -135,7 +137,7 @@ export default function CosmojiD3({
       .attr('opacity', (d) => (selectedEmojis && selectedEmojis.includes(d.emoji) ? 1 : 0));
 
     // Emoji text label
-    const label = nodeGroup
+    nodeGroup
       .append('text')
       .text((d) => d.emoji)
       .attr('text-anchor', 'middle')

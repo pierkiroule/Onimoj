@@ -11,11 +11,13 @@ export default function NavBar() {
     return () => clearInterval(i);
   }, []);
 
+  // Recompute when notifTick changes to reflect polling updates
   const hasAtlasAlert = useMemo(() => {
     const notifs = listNotifications();
     const onis = listOnimojis();
     const mine = new Set(onis.filter((o) => o.ownerId === me.id).map((o) => o.id));
     return notifs.some((n) => n.type === 'atlas:matured' && n.payload && mine.has(n.payload.onimojiId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notifTick, me.id]);
 
   return (

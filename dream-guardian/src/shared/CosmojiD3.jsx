@@ -231,7 +231,7 @@ export default function CosmojiD3({
       simulation.stop();
       svg.remove();
     };
-  }, [width, height, interactive, Array.isArray(emojis) ? emojis.join(',') : String(emojis), Array.isArray(selectedEmojis) ? selectedEmojis.join(',') : '']);
+  }, [width, height, interactive, emojis, onToggleEmoji, selectedEmojis]);
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }

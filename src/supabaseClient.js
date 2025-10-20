@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-// 🧭 Mode d'exécution
-const isLocal = import.meta.env.DEV
+// 🧭 Mode d'exécution (commenté car non utilisé)
+// const isLocal = import.meta.env.DEV
 
 // 🌐 Variables d'environnement
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL

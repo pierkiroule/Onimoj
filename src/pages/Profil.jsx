@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import './Home.css'
 
@@ -11,9 +11,9 @@ export default function Profil({ userId }) {
   useEffect(() => {
     if (!userId) return
     fetchMissions()
-  }, [userId])
+  }, [userId, fetchMissions])
 
-  async function fetchMissions() {
+  const fetchMissions = useCallback(async () => {
     const { data, error } = await supabase
       .from('missions')
       .select('*')
@@ -22,7 +22,7 @@ export default function Profil({ userId }) {
 
     if (error) setStatus('❌ Erreur de lecture : ' + error.message)
     else setMissions(data)
-  }
+  }, [userId])
 
   async function saveProfile() {
     if (!username) return setStatus('⚠️ Entre un nom onirique.')

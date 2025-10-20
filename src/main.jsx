@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-window.onerror = function (msg, url, line, col, error) {
+window.onerror = function (msg, url, line, col) {
   const box = document.createElement("div");
   box.style.position = "fixed";
   box.style.bottom = "0";

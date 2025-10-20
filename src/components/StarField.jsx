@@ -26,6 +26,7 @@ export default function StarField() {
     }))
 
     // Boucle d'animation
+    let rafId
     const draw = () => {
       // fond très sombre légèrement bleuté
       ctx.fillStyle = 'rgba(5, 5, 20, 0.9)'
@@ -48,12 +49,15 @@ export default function StarField() {
         ctx.fill()
       })
 
-      requestAnimationFrame(draw)
+      rafId = requestAnimationFrame(draw)
     }
 
-    draw()
+    rafId = requestAnimationFrame(draw)
 
-    return () => window.removeEventListener('resize', resize)
+    return () => {
+      window.removeEventListener('resize', resize)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   return (

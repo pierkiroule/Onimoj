@@ -2,22 +2,16 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import './Home.css'
 
-export default function Profil() {
-  const [user, setUser] = useState(null)
+export default function Profil({ user, onLogout }) {
   const [mission, setMission] = useState(null)
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    async function loadUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      if (user) fetchMission(user.id)
-    }
-    loadUser()
-  }, [])
+    if (user) fetchMission(user.id)
+  }, [user])
 
-  // 🔍 Récupère la mission actuelle
+  // 🔍 Charge la mission active
   async function fetchMission(userId) {
     const { data, error } = await supabase
       .from('missions')
@@ -28,23 +22,19 @@ export default function Profil() {
       .single()
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur lecture mission :', error.message)
-      setStatus('❌ Erreur lecture mission')
-    } else if (data) {
-      setMission(data)
-    } else {
-      setMission(null)
-    }
+      console.error('❌ Lecture mission :', error.message)
+      setStatus('Erreur lecture mission')
+    } else setMission(data || null)
   }
 
-  // 💳 Achat simulé d'une mission
+  // 💳 Simulation d’achat mission
   async function buyMission(culture) {
-    if (!user) return setStatus('⚠️ Utilisateur non connecté.')
+    if (!user) return setStatus('⚠️ Non connecté.')
     if (mission && !isMissionFinished(mission))
-      return setStatus('⚠️ Termine d’abord ta mission actuelle !')
+      return setStatus('⚠️ Termine ta mission actuelle.')
 
     setLoading(true)
-    setStatus('💳 Paiement en cours...')
+    setStatus('💳 Paiement cosmique en cours...')
 
     setTimeout(async () => {
       const startDate = new Date().toISOString()
@@ -64,8 +54,8 @@ export default function Profil() {
       ])
 
       if (error) {
-        console.error('Erreur mission :', error.message)
-        setStatus('❌ Erreur mission')
+        console.error('❌ Erreur mission :', error.message)
+        setStatus('Erreur mission')
       } else {
         setStatus(`✅ Mission ${culture} activée !`)
         fetchMission(user.id)
@@ -74,12 +64,30 @@ export default function Profil() {
     }, 1500)
   }
 
-  // 🧮 Vérifie si la mission est terminée
-  function isMissionFinished(mission) {
-    return mission.progress >= 12 || new Date(mission.end_date) < new Date()
+  // 🌟 Étape suivante
+  async function nextStep() {
+    if (!mission || isMissionFinished(mission)) return
+    const newProgress = Math.min(mission.progress + 1, 12)
+    const newStatus = newProgress === 12 ? 'completed' : 'active'
+
+    const { error } = await supabase
+      .from('missions')
+      .update({ progress: newProgress, status: newStatus })
+      .eq('id', mission.id)
+
+    if (error) setStatus('❌ Erreur progression')
+    else {
+      setStatus(`🌟 Étape ${newProgress}/12 atteinte !`)
+      fetchMission(user.id)
+    }
   }
 
-  // 🎨 Affichage des 12 badges de progression
+  // 🧮 Vérifie si mission terminée
+  function isMissionFinished(m) {
+    return m.progress >= 12 || new Date(m.end_date) < new Date()
+  }
+
+  // 🎨 Badges progression
   const renderBadges = (progress) => (
     <div style={{ display: 'flex', justifyContent: 'center', gap: '0.3rem', marginTop: '0.5rem' }}>
       {[...Array(12)].map((_, i) => (
@@ -97,37 +105,21 @@ export default function Profil() {
     </div>
   )
 
-  // 🌟 Étape suivante
-  async function nextStep() {
-    if (!mission || isMissionFinished(mission)) return
-
-    const newProgress = Math.min(mission.progress + 1, 12)
-    const newStatus = newProgress === 12 ? 'completed' : 'active'
-
-    const { error } = await supabase
-      .from('missions')
-      .update({ progress: newProgress, status: newStatus })
-      .eq('id', mission.id)
-
-    if (error) {
-      console.error('Erreur progression :', error.message)
-      setStatus('❌ Erreur progression')
-    } else {
-      setStatus(`🌟 Étape ${newProgress}/12 atteinte !`)
-      fetchMission(user.id)
-    }
-  }
-
+  // ✨ Interface
   return (
     <div className="fade-in" style={{ padding: '1rem', color: '#eee', textAlign: 'center' }}>
-      <h2>👤 Mon Profil Onimoji</h2>
+      <h2>👤 Profil Onimoji</h2>
 
       {user ? (
-        <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-          ID : <span style={{ fontFamily: 'monospace' }}>{user.id.slice(0, 8)}...</span>
+        <p style={{ opacity: 0.8, fontSize: '0.9rem' }}>
+          {user.email ? (
+            <>🌕 {user.email}</>
+          ) : (
+            <>🌀 ID : {user.id.slice(0, 8)}...</>
+          )}
         </p>
       ) : (
-        <p>Chargement de l'utilisateur...</p>
+        <p>Chargement du profil...</p>
       )}
 
       <h3 style={{ marginTop: '1.5rem' }}>🌍 Mission actuelle</h3>
@@ -187,6 +179,21 @@ export default function Profil() {
       </div>
 
       <p style={{ marginTop: '1rem', opacity: 0.8 }}>{status}</p>
+
+      <button
+        onClick={onLogout}
+        style={{
+          marginTop: '2rem',
+          background: '#ff6b6b',
+          border: 'none',
+          borderRadius: '8px',
+          padding: '0.5rem 1rem',
+          color: '#fff',
+          fontWeight: 'bold',
+        }}
+      >
+        🚪 Se déconnecter
+      </button>
     </div>
   )
 }

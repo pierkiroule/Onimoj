@@ -1,155 +1,115 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import './HublotEtoileCadavre.css'
 
 export default function HublotEtoileCadavre({ userId, step, mission, onComplete }) {
-  const [caught, setCaught] = useState([])
-  const [available, setAvailable] = useState(['🌬️','❄️','🌊','🔥','🌕','🌿','🪶','🪷','💨','✨'])
+  const [emojis] = useState(['🌬️','❄️','🌊','🔥','🌕','🪶','🌿','💫','🪞','🌙'])
+  const [bubbles, setBubbles] = useState([])
+  const [selected, setSelected] = useState([])
   const [text, setText] = useState('')
-  const [partial, setPartial] = useState('')
   const [title, setTitle] = useState('')
-  const [phase, setPhase] = useState('catch')
-  const [showModal, setShowModal] = useState(false)
+  const [prevTail, setPrevTail] = useState('')
+  const [status, setStatus] = useState('')
 
+  // 🌬️ Initialisation
   useEffect(() => {
-    setAvailable([...available].sort(() => 0.5 - Math.random()))
+    const arr = Array.from({ length: 10 }).map((_, i) => {
+      const angle = (i / 10) * 2 * Math.PI
+      const radius = 90 + Math.random() * 20
+      const x = 120 + Math.cos(angle) * radius
+      const y = 120 + Math.sin(angle) * radius
+      return {
+        id: crypto.randomUUID(),
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+        x, y,
+        delay: Math.random() * 2,
+        speed: 4 + Math.random() * 2
+      }
+    })
+    setBubbles(arr)
   }, [])
 
-  const handleCatch = (emoji) => {
-    if (caught.includes(emoji) || caught.length >= 5) return
-    const newCaught = [...caught, emoji]
-    setCaught(newCaught)
-    if (newCaught.length === 5) {
-      setTimeout(() => setPhase('network'), 400)
-      setTimeout(() => setPhase('write'), 2800)
-    }
+  // 🎯 Sélection
+  function catchEmoji(id) {
+    if (selected.length >= 5) return
+    const chosen = bubbles.find(b => b.id === id)
+    if (!chosen) return
+    setSelected(prev => [...prev, chosen.emoji])
+    setBubbles(prev => prev.map(b => (b.id === id ? { ...b, caught: true } : b)))
   }
 
-  const handleChange = (e) => {
-    const val = e.target.value
-    setText(val)
-    const words = val.split(/\s+/)
-    setPartial(words.slice(-5).join(' '))
-  }
+  // ✨ Envoi à Supabase
+  async function sendStar() {
+    if (selected.length < 5) return setStatus('⚠️ Choisis 5 symboles.')
+    if (!text.trim()) return setStatus('💭 Écris ton souffle onirique.')
 
-  const handleSubmit = async () => {
-    if (!title || caught.length < 5 || !text.trim()) return alert('Complète ton étoile 🌟')
-
-    const { error } = await supabase.from('dream_stars').insert([
-      {
-        creator_id: userId,
-        culture: 'Inuite',
-        spirit: step.spirit_name,
-        emojis: caught,
-        story: text,
-        last_words: partial,
-        title,
-      },
-    ])
-
-    if (error) console.error(error)
-    else {
-      setShowModal(true)
-      if (onComplete) setTimeout(onComplete, 2500)
+    const star = {
+      creator_id: userId,
+      title: title || step?.spirit_name || 'Étoile Inuite',
+      emojis: selected,
+      texts: [text],
+      culture: 'Inuite'
     }
+
+    const { data, error } = await supabase.from('dream_stars').insert([star]).select().single()
+    if (error) return setStatus('❌ ' + error.message)
+
+    setPrevTail(text.split(/\s+/).slice(-5).join(' '))
+    setSelected([])
+    setTitle('')
+    setText('')
+    setStatus('🌟 Étoile tissée et envoyée !')
+    onComplete?.(data)
   }
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-      {phase === 'catch' && (
-        <>
-          <p style={{ opacity: 0.8 }}>Attrape 5 émojis dans le hublot ✋</p>
-          <div className="hublot">
-            {available.map((emoji, i) => {
-              const angle = (i / available.length) * 2 * Math.PI
-              const radius = 90 + Math.sin(Date.now() / 1000 + i) * 5
-              const x = Math.cos(angle) * radius
-              const y = Math.sin(angle) * radius
-              return (
-                <div
-                  key={i}
-                  className="float-emoji"
-                  onClick={() => handleCatch(emoji)}
-                  style={{
-                    left: `calc(50% + ${x}px - 14px)`,
-                    top: `calc(50% + ${y}px - 14px)`,
-                    filter: caught.includes(emoji) ? 'brightness(0.4)' : 'none',
-                    transform: caught.includes(emoji) ? 'scale(0.8)' : 'scale(1)',
-                  }}
-                >
-                  {emoji}
-                </div>
-              )
-            })}
+    <div className="hublot-container">
+      <div className="hublot">
+        {bubbles.map(b => (
+          <div
+            key={b.id}
+            className={`float-emoji ${b.caught ? 'caught' : ''}`}
+            style={{
+              left: b.x,
+              top: b.y,
+              animationDelay: `${b.delay}s`,
+              animationDuration: `${b.speed}s`
+            }}
+            onClick={() => catchEmoji(b.id)}
+          >
+            {b.emoji}
           </div>
-          <p style={{ fontSize: '1rem' }}>{caught.join(' ')}</p>
-        </>
-      )}
+        ))}
+      </div>
 
-      {phase === 'network' && (
-        <div className="network">
-          <p>Les symboles s’alignent... ton étoile se tisse 🌟</p>
-          <svg width="260" height="260">
-            <polygon points="130,30 210,100 170,230 90,230 50,100"
-              fill="none" stroke="rgba(110,255,141,0.4)" strokeWidth="2" />
-            <polyline points="130,30 170,230 50,100 210,100 90,230 130,30"
-              fill="none" stroke="rgba(53,160,255,0.7)"
-              style={{ filter: 'drop-shadow(0 0 6px #6eff8d)' }} />
-          </svg>
-          {caught.map((emoji, i) => {
-            const p = [[130,30],[210,100],[170,230],[90,230],[50,100]][i]
-            return <div key={i} className="node" style={{ left: p[0]-14, top:p[1]-14 }}>{emoji}</div>
-          })}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="particle" style={{
-              width: `${Math.random()*6+2}px`,
-              height: `${Math.random()*6+2}px`,
-              top: `${Math.random()*240}px`,
-              left: `${Math.random()*240}px`,
-              animationDelay: `${i*0.5}s`,
-            }}/>
-          ))}
-        </div>
-      )}
+      {/* sélection */}
+      <div style={{ fontSize: '1.8rem', letterSpacing: '0.2rem' }}>
+        {selected.map((e, i) => <span key={i}>{e}</span>)}
+      </div>
+      <p style={{ opacity: 0.8 }}>
+        {selected.length < 5 ? 'Attrape 5 symboles du rêve…' : '✨ Ton étoile est prête à tisser.'}
+      </p>
 
-      {phase === 'write' && (
-        <>
-          <p>🪶 Continue le rêve... seuls les 5 derniers mots seront visibles</p>
-          <textarea
-            rows="4"
-            value={text}
-            onChange={handleChange}
-            placeholder="Écris ton fragment poétique..."
-          />
-          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
-            Derniers mots : <em>{partial}</em>
-          </p>
-          <button onClick={() => setPhase('title')}>💫 Donner un titre</button>
-        </>
+      {/* texte cadavre exquis */}
+      {prevTail && (
+        <p style={{ opacity: 0.6, fontStyle: 'italic' }}>…{prevTail}</p>
       )}
+      <input
+        type="text"
+        placeholder="Titre de ton étoile"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <textarea
+        placeholder="Écris la suite du rêve..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
 
-      {phase === 'title' && (
-        <>
-          <p>🌟 Nomme ton étoile onirique</p>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Titre de ton étoile..."
-          />
-          <button onClick={handleSubmit}>🚀 Envoyer dans le cosmos</button>
-        </>
-      )}
-
-      {showModal && (
-        <div className="modal">
-          <div className="emoji">🌠</div>
-          <h2>Ton étoile s’élève...</h2>
-          <p>L’esprit <strong>{step.spirit_name}</strong> murmure :  
-          <em>“{step.symbol} {step.myth || 'Le souffle du monde t’accompagne.'}”</em></p>
-          <button onClick={() => setShowModal(false)}>✨ Fermer</button>
-        </div>
-      )}
+      <button onClick={sendStar} disabled={selected.length < 5}>
+        💫 Tisser l’étoile
+      </button>
+      {status && <p style={{ marginTop: '0.4rem', opacity: 0.8 }}>{status}</p>}
     </div>
   )
 }

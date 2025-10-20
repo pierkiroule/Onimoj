@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 
 // 🧩 Composants
@@ -11,16 +11,16 @@ import MissionSelect from './pages/MissionSelect'
 import MissionInuite from './pages/MissionInuite'
 import DreamStarCreator from './pages/DreamStarCreator'
 import Profil from './pages/Profil'
-import Donner from './pages/Donner'
-import Recevoir from './pages/Recevoir'
+import EchoCreation from './pages/EchoCreation' // 🪶 nouvelle page
 import TestSupabase from './pages/TestSupabase'
+import Auth from './pages/Auth' // 🔐 Auth page
 
 import './App.css'
 
 export default function App() {
   const [page, setPage] = useState('home')
   const [supabaseStatus, setSupabaseStatus] = useState('⏳ Connexion...')
-  const [userId, setUserId] = useState(null)
+  const [session, setSession] = useState(null)
   const [mission, setMission] = useState(null)
 
   // 🚀 Vérifie Supabase au démarrage
@@ -38,25 +38,35 @@ export default function App() {
     testSupabase()
   }, [])
 
-  // 🧬 Connexion anonyme automatique
+  // 🔐 Gestion de la session
   useEffect(() => {
-    async function initAuth() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUserId(user.id)
-        return
-      }
-      const { data, error } = await supabase.auth.signInAnonymously()
-      if (!error && data?.user) setUserId(data.user.id)
+    async function getSession() {
+      const { data } = await supabase.auth.getSession()
+      setSession(data.session)
     }
-    initAuth()
+    getSession()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => listener.subscription.unsubscribe()
   }, [])
 
   // 🧭 Navigation
   const handleNavigation = (pageId) => setPage(pageId)
 
-  // ✨ Rendu principal
+  // 🔓 Déconnexion
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    setSession(null)
+    setPage('home')
+  }
+
+  // 🪄 Rendu principal
   const renderPage = () => {
+    if (!session) return <Auth onAuth={(user) => setSession({ user })} />
+
     switch (page) {
       case 'home':
         return <Home onStart={() => setPage('mission-select')} />
@@ -78,13 +88,10 @@ export default function App() {
         return <DreamStarCreator />
 
       case 'profil':
-        return <Profil onBack={() => setPage('home')} />
+        return <Profil user={session?.user} onLogout={handleLogout} />
 
-      case 'donner':
-        return <Donner />
-
-      case 'recevoir':
-        return <Recevoir />
+      case 'echo-creation':
+        return <EchoCreation /> // 🪶 nouveau ciel poétique
 
       case 'test':
         return <TestSupabase />
@@ -94,6 +101,7 @@ export default function App() {
     }
   }
 
+  // 🌌 Interface principale
   return (
     <div className="app-root">
       <StarField />
@@ -107,10 +115,10 @@ export default function App() {
       {/* 🌌 Contenu principal */}
       <main className="main-container fade-in">{renderPage()}</main>
 
-      {/* 🌠 Menu global */}
-      <BottomMenu currentPage={page} onNavigate={handleNavigation} />
+      {/* 🌠 Menu global (si connecté) */}
+      {session && <BottomMenu currentPage={page} onNavigate={handleNavigation} />}
 
-      {/* ✅ Indicateur technique */}
+      {/* ✅ Indicateur Supabase + user */}
       <div
         style={{
           position: 'fixed',
@@ -127,9 +135,9 @@ export default function App() {
         }}
       >
         {supabaseStatus}
-        {userId && (
+        {session?.user?.id && (
           <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
-            👤 {userId.slice(0, 8)}
+            👤 {session.user.id.slice(0, 8)}
           </div>
         )}
       </div>

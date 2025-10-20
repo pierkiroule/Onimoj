@@ -1,0 +1,169 @@
+/* 🌌 STRUCTURE GLOBALE */
+.home {
+  color: #e8f0ff;
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-top: 5rem;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Poppins', sans-serif;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+/* 🌘 LOGO ZONE */
+.logo-zone {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 2s ease forwards;
+}
+
+.logo-svg {
+  filter: drop-shadow(0 0 12px rgba(150, 220, 255, 0.5));
+  margin-bottom: 0.6rem;
+  transition: transform 1.2s ease;
+}
+
+.logo-svg:hover {
+  transform: rotate(6deg) scale(1.05);
+}
+
+.home-title {
+  font-size: 2.4rem;
+  color: #aeeeff;
+  text-shadow: 0 0 12px rgba(120,240,255,0.8);
+  margin-top: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: #bfefff;
+  margin-top: 0.8rem;
+  text-shadow: 0 0 8px rgba(180,220,255,0.4);
+}
+
+/* 🧠 ARGUMENTAIRE SCIENTIFIQUE */
+.argument {
+  margin: 2rem 0;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  padding: 1.6rem 1.8rem;
+  box-shadow: 0 0 25px rgba(120,240,255,0.08);
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s ease;
+}
+
+.argument:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(120,240,255,0.15);
+}
+
+.argument h2 {
+  color: #aeeeff;
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.argument p {
+  font-size: 1rem;
+  color: #e0e6ff;
+  line-height: 1.5;
+  margin-bottom: 0.6rem;
+}
+
+/* 🚀 NARRATIVE COSMIQUE */
+.narrative {
+  margin: 2rem 0;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  padding: 1.6rem 1.8rem;
+  box-shadow: 0 0 25px rgba(120,240,255,0.08);
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s ease;
+}
+
+.narrative:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(120,240,255,0.15);
+}
+
+.narrative h2 {
+  color: #aeeeff;
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.narrative p {
+  font-size: 1rem;
+  color: #e0e6ff;
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+}
+
+.mission-list {
+  color: #9fdfff;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(150,220,255,0.5);
+}
+
+/* 🌠 BOUTON COSMIQUE */
+.dream-button {
+  background: linear-gradient(90deg, #6a5acd, #7fffd4);
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem 1.8rem;
+  color: #0b0b1a;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 1.2rem;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  box-shadow: 0 0 10px #7fffd4aa, 0 0 20px rgba(106,90,205,0.3);
+}
+
+.dream-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px #7fffd4, 0 0 40px #6a5acd;
+  letter-spacing: 0.02em;
+}
+
+/* 🌌 PIED DE PAGE */
+.footer {
+  font-size: 0.8rem;
+  opacity: 0.55;
+  margin-top: 2.5rem;
+  color: #99aaff;
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+/* ✨ ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🌙 RESPONSIVE DESIGN */
+@media (max-width: 600px) {
+  .home-title {
+    font-size: 1.9rem;
+  }
+
+  .tagline {
+    font-size: 1rem;
+  }
+
+  .argument, .narrative {
+    padding: 1.2rem 1.4rem;
+  }
+
+  .dream-button {
+    padding: 0.8rem 1.4rem;
+    font-size: 1rem;
+  }
+}

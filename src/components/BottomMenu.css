@@ -1,0 +1,28 @@
+.bottom-menu {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+  background: rgba(20, 20, 50, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0 20px #7fffd433;
+  z-index: 10;
+}
+
+.menu-item {
+  font-size: 1.6rem;
+  color: #ccc;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.menu-item.active {
+  color: #7fffd4;
+  text-shadow: 0 0 10px #7fffd4, 0 0 20px #6a5acd;
+  transform: scale(1.2);
+}

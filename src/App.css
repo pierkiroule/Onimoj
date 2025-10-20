@@ -1,0 +1,198 @@
+/* 🌌 FOND COSMIQUE — profondeur et douceur */
+body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at 50% 30%, #0c0c2b 0%, #010010 80%);
+  color: #f3f5ff;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  letter-spacing: 0.02em;
+  scroll-behavior: smooth;
+}
+
+/* 🪐 STRUCTURE GLOBALE */
+.app-root {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 1;
+}
+
+.app-container {
+  background: transparent !important;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* 🌠 TITRES PRINCIPAUX */
+.header h1, .title {
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+  text-shadow: 0 0 12px #aabaff, 0 0 22px #6a5acd;
+  animation: titleGlow 5s ease-in-out infinite alternate;
+  letter-spacing: 0.03em;
+}
+
+.subtitle {
+  font-style: italic;
+  color: #b7c4ff;
+  font-size: 1rem;
+  opacity: 0.9;
+  text-shadow: 0 0 8px #5555ff40;
+  margin-bottom: 1.2rem;
+}
+
+/* 🧘‍♀️ TEXTES & PARAGRAPHES */
+.main p,
+.intro-zone {
+  max-width: 360px;
+  margin: 1.5rem auto;
+  line-height: 1.6;
+  color: #e4e6ff;
+  font-size: 1rem;
+  text-shadow: 0 0 6px #3a3aff40;
+}
+
+.intro-zone strong {
+  color: #7fffd4;
+  text-shadow: 0 0 6px #6ff;
+}
+
+/* 🌠 BOUTON COSMIQUE PHOSPHORESCENT */
+.dream-button,
+.start-btn,
+.enter-btn {
+  background: linear-gradient(90deg, #6a5acd, #7fffd4);
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem 1.8rem;
+  color: #0b0b1a;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 1.2rem;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  box-shadow: 0 0 10px #7fffd4aa, 0 0 20px rgba(106,90,205,0.3);
+}
+
+.dream-button:hover,
+.start-btn:hover,
+.enter-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px #7fffd4, 0 0 40px #6a5acd;
+  letter-spacing: 0.02em;
+}
+
+/* 🌬️ TEXTE DOUX & HINTS */
+.hint {
+  font-size: 0.9rem;
+  color: #b8c8ff;
+  margin-top: 1.2rem;
+  opacity: 0.8;
+  font-style: italic;
+  text-shadow: 0 0 4px #334;
+}
+
+/* 🪶 PIED DE PAGE */
+.footer {
+  font-size: 0.8rem;
+  opacity: 0.55;
+  margin-top: 2rem;
+  color: #99aaff;
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+/* ✨ ANIMATIONS */
+@keyframes titleGlow {
+  from { text-shadow: 0 0 10px #99f, 0 0 25px #55f; }
+  to   { text-shadow: 0 0 25px #bbf, 0 0 45px #88f; }
+}
+
+/* 🌌 ENTRÉE FLUIDE */
+.fade-in {
+  animation: fadeIn 1.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🌬️ PETIT SOUFFLE VISUEL POUR LES BLOCS */
+.card-glow {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(150,180,255,0.1);
+  padding: 1rem 2rem;
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s ease, box-shadow 0.4s ease;
+}
+
+.card-glow:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 35px rgba(150,180,255,0.25);
+}
+
+/* 💫 LOGO ET TITRE HOME */
+.logo-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 2s ease forwards;
+}
+
+.logo-svg {
+  filter: drop-shadow(0 0 12px rgba(150,220,255,0.6));
+  margin-bottom: 0.6rem;
+  width: 90px;
+  height: 90px;
+  transition: transform 1s ease;
+}
+
+.logo-svg:hover {
+  transform: rotate(5deg) scale(1.05);
+}
+
+.home-title {
+  font-size: 2.4rem;
+  color: #aeeeff;
+  text-shadow: 0 0 12px rgba(120,240,255,0.8);
+  margin-top: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: #bfefff;
+  margin-top: 0.8rem;
+  text-shadow: 0 0 8px rgba(180,220,255,0.4);
+}
+
+/* 🌙 RESPONSIVE */
+@media (max-width: 600px) {
+  .home-title {
+    font-size: 1.8rem;
+  }
+  .tagline {
+    font-size: 1rem;
+  }
+  .card-glow {
+    padding: 1rem 1.4rem;
+  }
+  .dream-button {
+    padding: 0.8rem 1.4rem;
+    font-size: 1rem;
+  }
+  .intro-zone, .main p {
+    max-width: 90%;
+  }
+}

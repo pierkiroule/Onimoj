@@ -1,111 +1,90 @@
-import { useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { supabase } from '../supabaseClient'
 
-export default function EtoileOnirique({ emojis = [], texts = [], onTextChange }) {
-  const canvasRef = useRef(null)
+export default function EtoileOnirique({ user, mission, step }) {
+  const [title, setTitle] = useState('')
+  const [emojis, setEmojis] = useState(['', '', '', '', ''])
+  const [texts, setTexts] = useState(['', '', '', '', ''])
+  const [status, setStatus] = useState('')
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    const w = (canvas.width = 280)
-    const h = (canvas.height = 280)
-    const cx = w / 2
-    const cy = h / 2
-    const radius = 100
+  async function handleSubmit() {
+    if (!title.trim()) return setStatus('⚠️ Donne un titre à ton étoile.')
+    setStatus('💫 Tissage en cours...')
 
-    function drawPentagram() {
-      ctx.clearRect(0, 0, w, h)
-      ctx.strokeStyle = 'rgba(150,255,220,0.6)'
-      ctx.lineWidth = 1.5
-      ctx.beginPath()
-      for (let i = 0; i < 5; i++) {
-        const angle = ((Math.PI * 2) / 5) * i - Math.PI / 2
-        const x = cx + radius * Math.cos(angle)
-        const y = cy + radius * Math.sin(angle)
-        ctx.lineTo(x, y)
-      }
-      ctx.closePath()
-      ctx.stroke()
+    const { error } = await supabase.from('dream_stars').insert([
+      {
+        creator_id: user.id,
+        title,
+        emojis,
+        texts,
+        culture: mission.culture,
+      },
+    ])
 
-      // Lignes internes
-      ctx.beginPath()
-      for (let i = 0; i < 5; i++) {
-        const a1 = ((Math.PI * 2) / 5) * i - Math.PI / 2
-        const a2 = ((Math.PI * 2) / 5) * ((i + 2) % 5) - Math.PI / 2
-        ctx.moveTo(cx + radius * Math.cos(a1), cy + radius * Math.sin(a1))
-        ctx.lineTo(cx + radius * Math.cos(a2), cy + radius * Math.sin(a2))
-      }
-      ctx.strokeStyle = 'rgba(127,255,212,0.4)'
-      ctx.stroke()
-
-      // Pulsation respirante
-      const glow = Math.sin(Date.now() / 500) * 3 + 6
-      ctx.shadowBlur = glow
-      ctx.shadowColor = 'rgba(127,255,212,0.8)'
-      ctx.stroke()
-
-      // Émojis
-      emojis.forEach((emoji, i) => {
-        const angle = ((Math.PI * 2) / 5) * i - Math.PI / 2
-        const x = cx + radius * Math.cos(angle)
-        const y = cy + radius * Math.sin(angle)
-        ctx.font = '24px serif'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(emoji, x, y)
-      })
+    if (error) {
+      console.error(error)
+      return setStatus('❌ Erreur : ' + error.message)
     }
 
-    const loop = () => {
-      drawPentagram()
-      requestAnimationFrame(loop)
-    }
-    loop()
-  }, [emojis])
+    // Avancer la mission
+    const newStep = mission.current_step + 1
+    await supabase
+      .from('missions')
+      .update({ current_step: newStep })
+      .eq('id', mission.id)
 
-  // Positions fixes pour champs de souffle
-  const positions = [
-    { left: '50%', top: '24%' },
-    { left: '74%', top: '46%' },
-    { left: '63%', top: '76%' },
-    { left: '37%', top: '76%' },
-    { left: '26%', top: '46%' },
-  ]
+    setStatus('✅ Étoile tissée et envoyée aux Esprits !')
+  }
 
   return (
-    <div style={{ position: 'relative', width: '280px', height: '280px', margin: 'auto' }}>
-      <canvas
-        ref={canvasRef}
-        width="280"
-        height="280"
+    <div style={{ marginTop: '1rem' }}>
+      <h4>🌟 Crée ton Étoile Onirique</h4>
+      <input
+        placeholder="Titre de ton étoile..."
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         style={{
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(20,30,50,0.95), rgba(10,10,30,1))',
-          boxShadow: '0 0 20px rgba(127,255,212,0.3)',
+          margin: '0.5rem',
+          padding: '0.5rem',
+          borderRadius: '6px',
+          width: '90%',
         }}
       />
-      {positions.map((pos, i) => (
+      <p>🔥❄️🌬️🌕🌊</p>
+
+      {emojis.map((v, i) => (
         <input
           key={i}
-          type="text"
-          placeholder={`Souffle ${i + 1}`}
-          value={texts[i] || ''}
-          onChange={(e) => onTextChange(i, e.target.value)}
-          style={{
-            position: 'absolute',
-            left: pos.left,
-            top: pos.top,
-            transform: 'translate(-50%, -50%)',
-            width: '70px',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(127,255,212,0.3)',
-            borderRadius: '6px',
-            color: '#bfe',
-            fontSize: '0.7rem',
-            textAlign: 'center',
-            padding: '2px 4px',
-          }}
+          placeholder={`Émoji ${i + 1}`}
+          value={v}
+          onChange={(e) =>
+            setEmojis(emojis.map((x, j) => (j === i ? e.target.value : x)))
+          }
+          style={{ margin: '0.2rem', padding: '0.4rem', borderRadius: '6px' }}
         />
       ))}
+
+      {texts.map((v, i) => (
+        <input
+          key={i}
+          placeholder={`Souffle ${i + 1}`}
+          value={v}
+          onChange={(e) =>
+            setTexts(texts.map((x, j) => (j === i ? e.target.value : x)))
+          }
+          style={{ margin: '0.2rem', padding: '0.4rem', borderRadius: '6px' }}
+        />
+      ))}
+
+      <button
+        onClick={handleSubmit}
+        className="dream-button"
+        style={{ marginTop: '0.5rem' }}
+      >
+        💫 Envoyer mon étoile
+      </button>
+
+      <p style={{ marginTop: '0.5rem', opacity: 0.8 }}>{status}</p>
     </div>
   )
 }

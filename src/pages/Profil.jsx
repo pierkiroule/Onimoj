@@ -1,78 +1,94 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import './Home.css'
 
-export default function Profil({ userId }) {
-  const [username, setUsername] = useState('')
+export default function Profil() {
+  const [user, setUser] = useState(null)
+  const [mission, setMission] = useState(null)
   const [status, setStatus] = useState('')
-  const [missions, setMissions] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  // 🔹 Charge missions de l’utilisateur
   useEffect(() => {
-    if (!userId) return
-    fetchMissions()
-  }, [userId])
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return setStatus('⚠️ Connecte-toi pour accéder à ton profil.')
+      setUser(user)
+      fetchMission(user.id)
+    }
+    loadUser()
+  }, [])
 
-  async function fetchMissions() {
+  async function fetchMission(userId) {
     const { data, error } = await supabase
       .from('missions')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .eq('culture', 'Inuite')
+      .single()
 
-    if (error) setStatus('❌ Erreur de lecture : ' + error.message)
-    else setMissions(data)
+    if (error && error.code !== 'PGRST116') {
+      console.error(error.message)
+      setStatus('❌ Erreur lecture mission')
+    } else {
+      setMission(data)
+    }
   }
 
-  async function saveProfile() {
-    if (!username) return setStatus('⚠️ Entre un nom onirique.')
-    const { error } = await supabase.from('profiles').upsert([{ id: userId, username }])
+  async function startMission() {
+    if (!user) return
+    if (mission) return setStatus('⚠️ Mission déjà en cours.')
+
+    setLoading(true)
+    const { error } = await supabase.from('missions').insert([
+      { user_id: user.id, culture: 'Inuite', current_step: 1, status: 'active' }
+    ])
+
     if (error) setStatus('❌ Erreur : ' + error.message)
-    else setStatus('✅ Profil sauvegardé.')
+    else {
+      setStatus('✅ Mission Inuite lancée !')
+      fetchMission(user.id)
+    }
+    setLoading(false)
   }
+
+  const renderBadges = (step) => (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.3rem' }}>
+      {[...Array(12)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            width: '14px',
+            height: '14px',
+            borderRadius: '50%',
+            background: i < step ? '#6eff8d' : '#333',
+          }}
+        ></div>
+      ))}
+    </div>
+  )
 
   return (
     <div className="fade-in" style={{ padding: '1rem', textAlign: 'center', color: '#eee' }}>
-      <h2>👤 Profil Onimoji</h2>
-      <p style={{ opacity: 0.7 }}>
-        ID utilisateur : <code>{userId ? userId.slice(0, 8) : 'chargement...'}</code>
-      </p>
-
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Ton pseudo onirique..."
-        style={{ marginTop: '1rem', padding: '0.5rem', borderRadius: '8px', width: '90%' }}
-      />
-      <button
-        onClick={saveProfile}
-        style={{
-          marginTop: '0.5rem',
-          background: '#444',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '8px',
-          padding: '0.6rem 1.2rem',
-        }}
-      >
-        💾 Sauvegarder
-      </button>
-
-      <p style={{ marginTop: '0.8rem', opacity: 0.8 }}>{status}</p>
-
-      <h3 style={{ marginTop: '1.5rem' }}>🪶 Missions</h3>
-      {missions.length === 0 ? (
-        <p style={{ opacity: 0.6 }}>Aucune mission enregistrée.</p>
+      <h2>👤 Mon Profil Onimoji</h2>
+      {mission ? (
+        <>
+          <h3>❄️ Mission Inuite</h3>
+          <p>Étape {mission.current_step}/12</p>
+          {renderBadges(mission.current_step)}
+        </>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {missions.map((m) => (
-            <li key={m.id} style={{ margin: '0.5rem 0' }}>
-              🌍 <strong>{m.culture}</strong> — Étape {m.progress}/12
-            </li>
-          ))}
-        </ul>
+        <>
+          <p>Aucune mission active.</p>
+          <button
+            onClick={startMission}
+            disabled={loading}
+            className="dream-button"
+          >
+            {loading ? '💫...' : '💳 Démarrer la Mission Inuite'}
+          </button>
+        </>
       )}
+      <p style={{ marginTop: '1rem', opacity: 0.8 }}>{status}</p>
     </div>
   )
 }

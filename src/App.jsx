@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from './supabaseClient'
 import StarField from './components/StarField'
 import ShootingEmojis from './components/ShootingEmojis'
 import DreamGate from './components/DreamGate'
@@ -10,13 +11,31 @@ import MissionSelect from './pages/MissionSelect'
 import Profil from './pages/Profil'
 import Donner from './pages/Donner'
 import Recevoir from './pages/Recevoir'
+import TestSupabase from './pages/TestSupabase'
 import './App.css'
 
 export default function App() {
-  const [phase, setPhase] = useState('intro') // intro → mission → catch → gate → tissage → spirit
+  const [phase, setPhase] = useState('intro')
   const [picked, setPicked] = useState([])
   const [page, setPage] = useState('home')
   const [mission, setMission] = useState(null)
+  const [supabaseStatus, setSupabaseStatus] = useState('⏳ Connexion...')
+
+  // 🚀 Test Supabase au démarrage (silencieux)
+  useEffect(() => {
+    async function testSupabase() {
+      try {
+        const { data, error } = await supabase.from('test_table').select('*').limit(1)
+        if (error) throw error
+        console.log('✅ Supabase OK:', data)
+        setSupabaseStatus('✅ Supabase OK')
+      } catch (err) {
+        console.error('❌ Supabase erreur:', err.message)
+        setSupabaseStatus('❌ Supabase erreur')
+      }
+    }
+    testSupabase()
+  }, [])
 
   // 🧭 Navigation globale
   const handleNavigation = (pageId) => {
@@ -30,7 +49,7 @@ export default function App() {
     setPhase('catch')
   }
 
-  // 🌟 Capture des émojis
+  // 🌟 Capture
   const handleCatch = (emoji) => {
     if (phase !== 'catch' || picked.length >= 5) return
     const updated = [...picked, emoji]
@@ -38,7 +57,7 @@ export default function App() {
     if (updated.length === 5) setTimeout(() => setPhase('gate'), 800)
   }
 
-  // ✨ Rendu par page
+  // ✨ Rendu des pages
   const renderPage = () => {
     switch (page) {
       case 'home':
@@ -55,7 +74,9 @@ export default function App() {
             )}
             {phase === 'catch' && (
               <div className="mission-screen fade-in">
-                <h1 className="title">🛰️ Mission {mission?.culture || 'Onimoji'}</h1>
+                <h1 className="title">
+                  🛰️ Mission {mission?.culture || 'Onimoji'}
+                </h1>
                 <p className="subtitle">
                   Attrape 5 étoiles-émojis pour ouvrir la <strong>DreamGate</strong>.
                 </p>
@@ -88,13 +109,12 @@ export default function App() {
 
       case 'profil':
         return <Profil onBack={() => setPage('home')} />
-
       case 'donner':
         return <Donner />
-
       case 'recevoir':
         return <Recevoir />
-
+      case 'test':
+        return <TestSupabase />
       default:
         return <Home onStart={() => setPhase('mission')} />
     }
@@ -104,17 +124,33 @@ export default function App() {
     <div className="app-root">
       <StarField />
 
-      {/* 🌘 LOGO FLOTTANT UNIQUE */}
+      {/* 🌘 Logo */}
       <div className="floating-logo">
         <div className="logo-icon">🌘</div>
         <div className="logo-text">Onimoji</div>
       </div>
 
-      {/* 🌌 CONTENU CENTRAL */}
+      {/* 🌌 Contenu principal */}
       <main className="main-container fade-in">{renderPage()}</main>
 
-      {/* 🌠 MENU GLOBAL */}
+      {/* 🌠 Menu global */}
       <BottomMenu currentPage={page} onNavigate={handleNavigation} />
+
+      {/* ✅ Indicateur Supabase discret */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '0.6rem',
+          right: '0.8rem',
+          fontSize: '0.8rem',
+          opacity: 0.7,
+          color:
+            supabaseStatus.includes('OK') ? '#6eff8d' :
+            supabaseStatus.includes('erreur') ? '#ff6b6b' : '#ffcc66',
+        }}
+      >
+        {supabaseStatus}
+      </div>
 
       <footer className="footer">
         © 2025 Onimoji • Prototype Onirix Beta One

@@ -8,12 +8,14 @@ import BottomMenu from './components/BottomMenu'
 import Home from './pages/Home'
 import MissionSelect from './pages/MissionSelect'
 import Profil from './pages/Profil'
+import Donner from './pages/Donner'
+import Recevoir from './pages/Recevoir'
 import './App.css'
 
 export default function App() {
   const [phase, setPhase] = useState('intro') // intro → mission → catch → gate → tissage → spirit
   const [picked, setPicked] = useState([])
-  const [page, setPage] = useState('home') // home ou profil
+  const [page, setPage] = useState('home') // home, profil, donner, recevoir
   const [mission, setMission] = useState(null)
 
   // 🧭 NAVIGATION
@@ -22,6 +24,27 @@ export default function App() {
     setPage('home')
   }
   const goProfil = () => setPage('profil')
+  const goDonner = () => setPage('donner')
+  const goRecevoir = () => setPage('recevoir')
+  
+  const handleNavigation = (pageId) => {
+    switch(pageId) {
+      case 'home':
+        goHome()
+        break
+      case 'profil':
+        goProfil()
+        break
+      case 'donner':
+        goDonner()
+        break
+      case 'recevoir':
+        goRecevoir()
+        break
+      default:
+        break
+    }
+  }
 
   // 🚀 Lancer la mission
   const startMission = () => {
@@ -133,8 +156,18 @@ export default function App() {
         <Profil onBack={goHome} />
       )}
 
+      {/* --- PAGE DONNER --- */}
+      {page === 'donner' && (
+        <Donner />
+      )}
+
+      {/* --- PAGE RECEVOIR --- */}
+      {page === 'recevoir' && (
+        <Recevoir />
+      )}
+
       {/* 🧭 MENU DE NAVIGATION PRINCIPAL */}
-      <BottomMenu />
+      <BottomMenu currentPage={page} onNavigate={handleNavigation} />
 
       <footer className="footer">
         © 2025 Onimoji • Prototype Onirix Beta One

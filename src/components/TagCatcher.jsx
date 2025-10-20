@@ -7,7 +7,6 @@ export default function TagCatcher({ initialEmojis = [], onFinish }) {
   const [points, setPoints] = useState([])
   const [centerTitle, setCenterTitle] = useState("")
   const [msg, setMsg] = useState("✨ Ton étoile est tissée !")
-  const [filledCount, setFilledCount] = useState(0)
   const [done, setDone] = useState(false)
 
   // placement direct de l’étoile
@@ -164,7 +163,6 @@ export default function TagCatcher({ initialEmojis = [], onFinish }) {
     setPoints(prev => {
       const updated = prev.map(p => (p.id === id ? { ...p, filled: true, word: val || "…" } : p))
       const newCount = updated.filter(p => p.filled).length
-      setFilledCount(newCount)
       if (newCount === 5 && centerTitle && !done) {
         setDone(true)
         setMsg("🌕 L’étoile résonne... L’esprit Onimoji s’éveille.")

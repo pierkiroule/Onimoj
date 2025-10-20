@@ -15,51 +15,88 @@ import './App.css'
 export default function App() {
   const [phase, setPhase] = useState('intro') // intro → mission → catch → gate → tissage → spirit
   const [picked, setPicked] = useState([])
-  const [page, setPage] = useState('home') // home, profil, donner, recevoir
+  const [page, setPage] = useState('home')
   const [mission, setMission] = useState(null)
 
-  // 🧭 NAVIGATION
-  const goHome = () => {
-    setPhase('intro')
-    setPage('home')
-  }
-  const goProfil = () => setPage('profil')
-  const goDonner = () => setPage('donner')
-  const goRecevoir = () => setPage('recevoir')
-  
+  // 🧭 Navigation globale
   const handleNavigation = (pageId) => {
-    switch(pageId) {
-      case 'home':
-        goHome()
-        break
-      case 'profil':
-        goProfil()
-        break
-      case 'donner':
-        goDonner()
-        break
-      case 'recevoir':
-        goRecevoir()
-        break
-      default:
-        break
-    }
+    setPage(pageId)
+    if (pageId === 'home') setPhase('intro')
   }
 
-  // 🚀 Lancer la mission
+  // 🚀 Lancer une mission
   const startMission = () => {
     setPicked([])
     setPhase('catch')
   }
 
-  // 🌟 Capture des emojis
+  // 🌟 Capture des émojis
   const handleCatch = (emoji) => {
-    if (phase !== 'catch') return
-    if (picked.length >= 5) return
-    const next = [...picked, emoji]
-    setPicked(next)
-    if (next.length === 5) {
-      setTimeout(() => setPhase('gate'), 800)
+    if (phase !== 'catch' || picked.length >= 5) return
+    const updated = [...picked, emoji]
+    setPicked(updated)
+    if (updated.length === 5) setTimeout(() => setPhase('gate'), 800)
+  }
+
+  // ✨ Rendu par page
+  const renderPage = () => {
+    switch (page) {
+      case 'home':
+        return (
+          <>
+            {phase === 'intro' && <Home onStart={() => setPhase('mission')} />}
+            {phase === 'mission' && (
+              <MissionSelect
+                onStart={({ culture, name }) => {
+                  setMission({ culture, name })
+                  startMission()
+                }}
+              />
+            )}
+            {phase === 'catch' && (
+              <div className="mission-screen fade-in">
+                <h1 className="title">🛰️ Mission {mission?.culture || 'Onimoji'}</h1>
+                <p className="subtitle">
+                  Attrape 5 étoiles-émojis pour ouvrir la <strong>DreamGate</strong>.
+                </p>
+                <ShootingEmojis onCatch={handleCatch} />
+                <p className="hint">Étoiles attrapées : {picked.length} / 5</p>
+                {picked.length === 5 && (
+                  <div className="gate-open-msg">🌠 DreamGate activée...</div>
+                )}
+              </div>
+            )}
+            {phase === 'gate' && <DreamGate onEnter={() => setPhase('tissage')} />}
+            {phase === 'tissage' && (
+              <div className="star-phase fade-in">
+                <TagCatcher
+                  initialEmojis={picked}
+                  onFinish={() => setPhase('spirit')}
+                />
+              </div>
+            )}
+            {phase === 'spirit' && (
+              <OnimojiSpirit
+                onNext={() => {
+                  setPhase('intro')
+                  setMission(null)
+                }}
+              />
+            )}
+          </>
+        )
+
+      case 'profil':
+        return <Profil onBack={() => setPage('home')} />
+
+      case 'donner':
+        return <Donner />
+
+      case 'recevoir':
+        return <Recevoir />
+
+      default:
+        return <Home onStart={() => setPhase('mission')} />
     }
   }
 
@@ -67,106 +104,16 @@ export default function App() {
     <div className="app-root">
       <StarField />
 
-      {/* 🧭 MENU GLOBAL */}
-      <nav className="main-nav">
-        <div className="nav-container">
-          <div className="logo-section" onClick={goHome}>
-            <div className="logo-icon">🌘</div>
-            <span className="logo-text">Onimoji</span>
-            <div className="logo-glow"></div>
-          </div>
-          <div className="nav-links">
-            <button 
-              className={`nav-button ${page === 'home' ? 'active' : ''}`}
-              onClick={goHome}
-              aria-label="Accueil"
-            >
-              <span className="nav-icon">🏠</span>
-              <span className="nav-text">Accueil</span>
-            </button>
-            <button 
-              className={`nav-button ${page === 'profil' ? 'active' : ''}`}
-              onClick={goProfil}
-              aria-label="Profil"
-            >
-              <span className="nav-icon">👤</span>
-              <span className="nav-text">Profil</span>
-            </button>
-          </div>
-        </div>
-        <div className="nav-background"></div>
-      </nav>
+      {/* 🌘 LOGO FLOTTANT UNIQUE */}
+      <div className="floating-logo">
+        <div className="logo-icon">🌘</div>
+        <div className="logo-text">Onimoji</div>
+      </div>
 
-      {/* --- PAGE ACCUEIL --- */}
-      {page === 'home' && (
-        <>
-          {phase === 'intro' && (
-            <Home onStart={() => setPhase('mission')} />
-          )}
+      {/* 🌌 CONTENU CENTRAL */}
+      <main className="main-container fade-in">{renderPage()}</main>
 
-          {phase === 'mission' && (
-            <MissionSelect
-              onStart={({ culture, name }) => {
-                setMission({ culture, name })
-                startMission()
-              }}
-            />
-          )}
-
-          {phase === 'catch' && (
-            <div className="mission-screen fade-in">
-              <h1 className="title">🛰️ Mission {mission?.culture || "Onimoji"}</h1>
-              <p className="subtitle">
-                Attrape 5 étoiles-émojis pour ouvrir la DreamGate.
-              </p>
-              <ShootingEmojis onCatch={handleCatch} />
-              <p className="hint">Étoiles attrapées : {picked.length} / 5</p>
-              {picked.length === 5 && (
-                <div className="gate-open-msg">🌠 DreamGate activée...</div>
-              )}
-            </div>
-          )}
-
-          {phase === 'gate' && (
-            <DreamGate onEnter={() => setPhase('tissage')} />
-          )}
-
-          {phase === 'tissage' && (
-            <div className="star-phase fade-in">
-              <TagCatcher
-                initialEmojis={picked}
-                onFinish={() => setPhase('spirit')}
-              />
-            </div>
-          )}
-
-          {phase === 'spirit' && (
-            <OnimojiSpirit
-              onNext={() => {
-                setPhase('intro')
-                setMission(null)
-              }}
-            />
-          )}
-        </>
-      )}
-
-      {/* --- PAGE PROFIL --- */}
-      {page === 'profil' && (
-        <Profil onBack={goHome} />
-      )}
-
-      {/* --- PAGE DONNER --- */}
-      {page === 'donner' && (
-        <Donner />
-      )}
-
-      {/* --- PAGE RECEVOIR --- */}
-      {page === 'recevoir' && (
-        <Recevoir />
-      )}
-
-      {/* 🧭 MENU DE NAVIGATION PRINCIPAL */}
+      {/* 🌠 MENU GLOBAL */}
       <BottomMenu currentPage={page} onNavigate={handleNavigation} />
 
       <footer className="footer">

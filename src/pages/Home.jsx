@@ -3,24 +3,8 @@ import './Home.css'
 export default function Home({ onStart }) {
   return (
     <div className="home fade-in">
-      {/* LOGO */}
-      <div className="logo-zone">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 200 200"
-          width="100"
-          height="100"
-          className="logo-svg"
-        >
-          <circle cx="100" cy="100" r="90" fill="none" stroke="#9fdfff" strokeWidth="3" opacity="0.3" />
-          <path
-            d="M120 100a40 40 0 1 1-40-40 30 30 0 0 0 40 40z"
-            fill="#9fdfff"
-            opacity="0.4"
-          />
-          <text x="100" y="112" textAnchor="middle" fontSize="32" fill="#9fdfff">🌘</text>
-        </svg>
-        <h1 className="home-title">Onimoji</h1>
+      {/* TAGLINE */}
+      <div className="intro-zone">
         <p className="tagline">
           Ton étoile de poésie<br />
           pour prendre soin de tes rêves<br />
@@ -41,7 +25,7 @@ export default function Home({ onStart }) {
         </p>
       </div>
 
-      {/* AMORCE NARRATIVE */}
+      {/* NARRATION */}
       <div className="narrative card-glow">
         <h2>🚀 L’aventure commence ici</h2>
         <p>

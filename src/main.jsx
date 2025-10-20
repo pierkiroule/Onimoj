@@ -14,7 +14,15 @@ window.onerror = function (msg, url, line, col, error) {
   box.style.fontSize = "12px";
   box.style.padding = "4px";
   box.style.zIndex = "9999";
-  box.textContent = "⚠️ " + msg + " (" + line + ":" + col + ")";
+  box.textContent =
+    "⚠️ " +
+    msg +
+    " (" +
+    line +
+    ":" +
+    col +
+    ")" +
+    (error && error.message ? " — " + error.message : "");
   document.body.appendChild(box);
   return false;
 };

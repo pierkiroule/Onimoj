@@ -21,13 +21,12 @@ export default function App() {
   const [page, setPage] = useState('home')
   const [supabaseStatus, setSupabaseStatus] = useState('⏳ Connexion...')
   const [userId, setUserId] = useState(null)
-  const [mission, setMission] = useState(null)
 
   // 🚀 Vérifie Supabase au démarrage
   useEffect(() => {
     async function testSupabase() {
       try {
-        const { data, error } = await supabase.from('test_table').select('*').limit(1)
+        const { error } = await supabase.from('test_table').select('*').limit(1)
         if (error) throw error
         setSupabaseStatus('✅ Supabase OK')
       } catch (err) {
@@ -65,7 +64,6 @@ export default function App() {
         return (
           <MissionSelect
             onChoose={(selected) => {
-              setMission(selected)
               if (selected.culture === 'Inuite') setPage('mission-inuite')
             }}
           />

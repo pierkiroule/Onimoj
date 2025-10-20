@@ -5,14 +5,14 @@ export default function HublotOnirique({ onCatch }) {
   const canvasRef = useRef(null)
   const [caught, setCaught] = useState([])
 
-  const emojis = ['🌬️', '❄️', '🦭', '🌊', '🌕', '🦅', '🐚', '🔥']
-
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     const w = (canvas.width = 260)
     const h = (canvas.height = 260)
     const radius = w / 2
+
+    const emojis = ['🌬️', '❄️', '🦭', '🌊', '🌕', '🦅', '🐚', '🔥']
 
     // chaque émoji devient une particule
     const particles = emojis.map((emoji) => ({

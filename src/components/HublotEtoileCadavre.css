@@ -1,0 +1,96 @@
+.hublot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.hublot {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.08), rgba(0,0,0,0.25));
+  box-shadow: 0 0 25px rgba(127,255,212,0.4);
+  animation: pulse 3s infinite alternate;
+}
+
+.float-emoji {
+  position: absolute;
+  font-size: 1.6rem;
+  cursor: pointer;
+  animation: float 4s infinite ease-in-out;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.float-emoji.caught {
+  opacity: 0.4;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+.network {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin-top: 1rem;
+  animation: pulse 2s infinite alternate;
+}
+
+.node {
+  position: absolute;
+  font-size: 1.8rem;
+  text-shadow: 0 0 6px #6eff8d;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(127,255,212,0.9), transparent);
+  animation: sparkle 3s infinite ease-in-out;
+}
+
+textarea, input {
+  background: #111;
+  color: #bfe;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 85%;
+  padding: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+button {
+  background: linear-gradient(145deg,#6eff8d,#35a0ff);
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #111;
+  margin-top: 0.5rem;
+}
+
+.revelation {
+  text-align: center;
+  margin-top: 1rem;
+  animation: pulse 3s infinite;
+}
+.revelation .emoji {
+  font-size: 2.6rem;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@keyframes sparkle {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}

@@ -10,6 +10,7 @@ export default function MissionInuite() {
   const [current, setCurrent] = useState(null)
   const [status, setStatus] = useState('🌌 Connexion...')
   const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     async function loadMission() {
@@ -25,7 +26,7 @@ export default function MissionInuite() {
         .single()
 
       if (!missionData) {
-        setStatus('🌙 Lance ta mission Inuite depuis ton profil.')
+        setStatus('🌙 Lance ta mission Inuite pour commencer le voyage.')
         setLoading(false)
         return
       }
@@ -47,6 +48,13 @@ export default function MissionInuite() {
     loadMission()
   }, [])
 
+  // Resynchronise l'étape courante dès qu'elle change côté mission ou lorsque les étapes sont chargées
+  useEffect(() => {
+    if (!steps.length || !mission) return
+    const cur = steps.find((s) => s.step_number === mission.current_step)
+    setCurrent(cur)
+  }, [mission?.current_step, steps])
+
   async function nextStep() {
     if (!mission) return
     const next = Math.min(mission.current_step + 1, 12)
@@ -57,11 +65,44 @@ export default function MissionInuite() {
     if (!error) setMission({ ...mission, current_step: next })
   }
 
+  // Création de mission si absente
+  async function handleStartMission() {
+    if (!user || creating) return
+    try {
+      setCreating(true)
+      const { data, error } = await supabase
+        .from('missions')
+        .insert([{ user_id: user.id, culture: 'Inuite', current_step: 1 }])
+        .select()
+        .single()
+      if (error) throw error
+      setMission(data)
+      setStatus('')
+    } catch (err) {
+      console.error(err)
+      setStatus('❌ Erreur lors du démarrage de la mission: ' + err.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
   if (loading)
     return <p style={{ color: '#eee', textAlign: 'center' }}>🌘 Chargement...</p>
 
   if (!mission)
-    return <p style={{ color: '#eee', textAlign: 'center' }}>{status}</p>
+    return (
+      <div className="fade-in" style={{ textAlign: 'center', color: '#eee', padding: '1rem' }}>
+        <p style={{ marginBottom: '1rem' }}>{status}</p>
+        <button
+          className="dream-button"
+          onClick={handleStartMission}
+          disabled={creating}
+          aria-live="polite"
+        >
+          {creating ? '⏳ Création…' : '🚀 Démarrer la mission Inuite'}
+        </button>
+      </div>
+    )
 
   if (!current)
     return <p style={{ color: '#eee', textAlign: 'center' }}>⚠️ Étape non trouvée.</p>

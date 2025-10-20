@@ -22,13 +22,21 @@ function createSupabaseStub() {
   }
   return {
     from: () => ({
-      select: () => selectable,
-      insert: async () => ({ data: null, error: missingEnvError }),
+      select: () => ({
+        ...selectable,
+        single: async () => ({ data: null, error: missingEnvError }),
+      }),
+      insert: () => ({
+        select: () => ({
+          single: async () => ({ data: null, error: missingEnvError }),
+        }),
+      }),
       update: () => updatable,
     }),
     auth: {
       getUser: async () => ({ data: { user: null }, error: missingEnvError }),
       signInWithPassword: async () => ({ data: null, error: missingEnvError }),
+      signInAnonymously: async () => ({ data: { user: null }, error: missingEnvError }),
     },
   }
 }

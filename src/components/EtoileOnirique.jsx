@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 
-export default function EtoileOnirique({ user, mission, step }) {
+export default function EtoileOnirique({ user, mission }) {
   const [title, setTitle] = useState('')
   const [emojis, setEmojis] = useState(['', '', '', '', ''])
   const [texts, setTexts] = useState(['', '', '', '', ''])

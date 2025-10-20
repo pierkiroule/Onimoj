@@ -5,9 +5,8 @@ export default function HublotOnirique({ onCatch }) {
   const canvasRef = useRef(null)
   const [caught, setCaught] = useState([])
 
-  const emojis = ['🌬️', '❄️', '🦭', '🌊', '🌕', '🦅', '🐚', '🔥']
-
   useEffect(() => {
+    const emojis = ['🌬️', '❄️', '🦭', '🌊', '🌕', '🦅', '🐚', '🔥']
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     const w = (canvas.width = 260)

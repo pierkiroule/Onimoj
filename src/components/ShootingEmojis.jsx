@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const EMOJIS = ['🌙','💫','⭐','🌕','🌈','🪐','☄️','🌠','✨'];
 
 export default function ShootingEmojis({ onCatch }) {
   const [stars, setStars] = useState([]);
+  const rafRef = useRef(0);
 
   // 🌌 Apparition régulière des étoiles
   useEffect(() => {
@@ -22,9 +23,9 @@ export default function ShootingEmojis({ onCatch }) {
     return () => clearInterval(spawn);
   }, []);
 
-  // 🌬️ Mouvement horizontal fluide
+  // 🌬️ Mouvement horizontal fluide via requestAnimationFrame
   useEffect(() => {
-    const move = setInterval(() => {
+    const animate = () => {
       setStars((s) =>
         s
           .map((star) => ({
@@ -33,8 +34,10 @@ export default function ShootingEmojis({ onCatch }) {
           }))
           .filter((star) => (star.left || 0) < window.innerWidth + 80)
       );
-    }, 30);
-    return () => clearInterval(move);
+      rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
   // 🌟 Capture d’une étoile
@@ -52,9 +55,16 @@ export default function ShootingEmojis({ onCatch }) {
   return (
     <>
       {stars.map((star) => (
-        <span
+        <button
           key={star.id}
           onClick={() => handleCatch(star.id, star.emoji)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleCatch(star.id, star.emoji);
+            }
+          }}
+          aria-label={`Attraper ${star.emoji}`}
           style={{
             position: "absolute",
             top: `${star.top}%`,
@@ -68,10 +78,15 @@ export default function ShootingEmojis({ onCatch }) {
             filter: star.glow
               ? "drop-shadow(0 0 8px rgba(180,220,255,0.9))"
               : "drop-shadow(0 0 5px rgba(255,255,255,0.5))",
+            background: 'transparent',
+            border: 'none',
+            lineHeight: 1,
+            padding: 0,
+            color: 'inherit',
           }}
         >
           {star.emoji}
-        </span>
+        </button>
       ))}
     </>
   );

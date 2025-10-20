@@ -1,12 +1,11 @@
-import { NavLink } from 'react-router-dom'
 import './BottomMenu.css'
 
-export default function BottomMenu() {
+export default function BottomMenu({ currentPage, onNavigate }) {
   const menuItems = [
-    { to: '/', icon: '🏠', label: 'Accueil', id: 'home' },
-    { to: '/donner', icon: '💫', label: 'Donner', id: 'donner' },
-    { to: '/recevoir', icon: '🌙', label: 'Recevoir', id: 'recevoir' },
-    { to: '/profil', icon: '👤', label: 'Profil', id: 'profil' }
+    { icon: '🏠', label: 'Accueil', id: 'home' },
+    { icon: '💫', label: 'Donner', id: 'donner' },
+    { icon: '🌙', label: 'Recevoir', id: 'recevoir' },
+    { icon: '👤', label: 'Profil', id: 'profil' }
   ]
 
   return (
@@ -17,12 +16,10 @@ export default function BottomMenu() {
     >
       <div className="menu-container">
         {menuItems.map((item) => (
-          <NavLink
+          <button
             key={item.id}
-            to={item.to}
-            className={({ isActive }) => 
-              `menu-item ${isActive ? 'active' : ''}`
-            }
+            onClick={() => onNavigate(item.id)}
+            className={`menu-item ${currentPage === item.id ? 'active' : ''}`}
             aria-label={item.label}
             role="button"
             tabIndex={0}
@@ -33,7 +30,7 @@ export default function BottomMenu() {
             </div>
             <span className="menu-label">{item.label}</span>
             <div className="active-indicator" aria-hidden="true"></div>
-          </NavLink>
+          </button>
         ))}
       </div>
       <div className="menu-background" aria-hidden="true"></div>

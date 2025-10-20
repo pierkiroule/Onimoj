@@ -1,12 +1,12 @@
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 
 export default function OnimojiSpirit({ onNext }) {
   const [visible, setVisible] = useState(false)
   const [spirit, setSpirit] = useState(null)
 
   // base de données locale — poèmes et ressources
-  const spirits = [
+  const spirits = useMemo(() => [
     {
       name: "Lumae",
       emoji: "🌕",
@@ -42,7 +42,7 @@ export default function OnimojiSpirit({ onNext }) {
       message: "Ta clarté réchauffe le monde invisible.",
       ritual: "Allume une bougie ou pense à une lumière intérieure.",
     },
-  ]
+  ], [])
 
   useEffect(() => {
     // choisir un esprit aléatoire
@@ -51,7 +51,7 @@ export default function OnimojiSpirit({ onNext }) {
     // effet d’apparition douce
     const t = setTimeout(() => setVisible(true), 1000)
     return () => clearTimeout(t)
-  }, [])
+  }, [spirits])
 
   if (!spirit) return null
 

@@ -20,8 +20,9 @@ export default function App() {
   const [page, setPage] = useState('home')
   const [mission, setMission] = useState(null)
   const [supabaseStatus, setSupabaseStatus] = useState('⏳ Connexion...')
+  const [userId, setUserId] = useState(null)
 
-  // 🚀 Test Supabase au démarrage (silencieux)
+  // 🚀 Test rapide Supabase
   useEffect(() => {
     async function testSupabase() {
       try {
@@ -37,13 +38,43 @@ export default function App() {
     testSupabase()
   }, [])
 
-  // 🧭 Navigation globale
+  // 🧬 Connexion invitée (sécurisée)
+  useEffect(() => {
+    async function initAuth() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          console.log('👤 Utilisateur déjà connecté :', user.id)
+          setUserId(user.id)
+          return
+        }
+
+        // Connexion sur le compte invité prédéfini
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: 'guest@onimoji.app',
+          password: 'onimoji123',
+        })
+
+        if (error) throw error
+
+        console.log('✨ Connecté comme invité :', data.user.id)
+        setUserId(data.user.id)
+      } catch (err) {
+        console.error('❌ Erreur auth invitée :', err.message)
+        setSupabaseStatus('❌ Auth erreur')
+      }
+    }
+
+    initAuth()
+  }, [])
+
+  // 🧭 Navigation
   const handleNavigation = (pageId) => {
     setPage(pageId)
     if (pageId === 'home') setPhase('intro')
   }
 
-  // 🚀 Lancer une mission
+  // 🚀 Lancer mission
   const startMission = () => {
     setPicked([])
     setPhase('catch')
@@ -57,7 +88,7 @@ export default function App() {
     if (updated.length === 5) setTimeout(() => setPhase('gate'), 800)
   }
 
-  // ✨ Rendu des pages
+  // ✨ Rendu
   const renderPage = () => {
     switch (page) {
       case 'home':
@@ -108,11 +139,11 @@ export default function App() {
         )
 
       case 'profil':
-        return <Profil onBack={() => setPage('home')} />
+        return <Profil userId={userId} onBack={() => setPage('home')} />
       case 'donner':
-        return <Donner />
+        return <Donner userId={userId} />
       case 'recevoir':
-        return <Recevoir />
+        return <Recevoir userId={userId} />
       case 'test':
         return <TestSupabase />
       default:
@@ -124,19 +155,15 @@ export default function App() {
     <div className="app-root">
       <StarField />
 
-      {/* 🌘 Logo */}
       <div className="floating-logo">
         <div className="logo-icon">🌘</div>
         <div className="logo-text">Onimoji</div>
       </div>
 
-      {/* 🌌 Contenu principal */}
       <main className="main-container fade-in">{renderPage()}</main>
 
-      {/* 🌠 Menu global */}
       <BottomMenu currentPage={page} onNavigate={handleNavigation} />
 
-      {/* ✅ Indicateur Supabase discret */}
       <div
         style={{
           position: 'fixed',
@@ -145,11 +172,13 @@ export default function App() {
           fontSize: '0.8rem',
           opacity: 0.7,
           color:
-            supabaseStatus.includes('OK') ? '#6eff8d' :
-            supabaseStatus.includes('erreur') ? '#ff6b6b' : '#ffcc66',
+            supabaseStatus.includes('OK') ? '#6eff8d'
+            : supabaseStatus.includes('erreur') ? '#ff6b6b'
+            : '#ffcc66',
         }}
       >
         {supabaseStatus}
+        {userId && <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>👤 {userId.slice(0, 8)}</div>}
       </div>
 
       <footer className="footer">

@@ -1,60 +1,54 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import './Home.css'
 
-export default function Profil() {
+export default function Profil({ userId }) {
   const [username, setUsername] = useState('')
-  const [culture, setCulture] = useState('')
   const [status, setStatus] = useState('')
-  const [profiles, setProfiles] = useState([])
+  const [missions, setMissions] = useState([])
 
-  async function fetchProfiles() {
-    const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  // 🔹 Charge missions de l’utilisateur
+  useEffect(() => {
+    if (!userId) return
+    fetchMissions()
+  }, [userId])
+
+  async function fetchMissions() {
+    const { data, error } = await supabase
+      .from('missions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
     if (error) setStatus('❌ Erreur de lecture : ' + error.message)
-    else setProfiles(data)
+    else setMissions(data)
   }
 
   async function saveProfile() {
-    if (!username) return setStatus('⚠️ Entre au moins un nom.')
-    const { error } = await supabase.from('profiles').insert([{ username, culture }])
-    if (error) setStatus('❌ Erreur de sauvegarde : ' + error.message)
-    else {
-      setStatus('✅ Profil enregistré !')
-      setUsername('')
-      setCulture('')
-      fetchProfiles()
-    }
+    if (!username) return setStatus('⚠️ Entre un nom onirique.')
+    const { error } = await supabase.from('profiles').upsert([{ id: userId, username }])
+    if (error) setStatus('❌ Erreur : ' + error.message)
+    else setStatus('✅ Profil sauvegardé.')
   }
 
-  useEffect(() => {
-    fetchProfiles()
-  }, [])
-
   return (
-    <div className="fade-in" style={{ padding: '1rem', color: '#eee', textAlign: 'center' }}>
-      <h2>👤 Mon Profil Onimoji</h2>
-      <p>Crée ton profil onirique pour tisser ta mission culturelle.</p>
+    <div className="fade-in" style={{ padding: '1rem', textAlign: 'center', color: '#eee' }}>
+      <h2>👤 Profil Onimoji</h2>
+      <p style={{ opacity: 0.7 }}>
+        ID utilisateur : <code>{userId ? userId.slice(0, 8) : 'chargement...'}</code>
+      </p>
 
       <input
         type="text"
-        placeholder="Ton pseudo onirique..."
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        placeholder="Ton pseudo onirique..."
         style={{ marginTop: '1rem', padding: '0.5rem', borderRadius: '8px', width: '90%' }}
       />
-
-      <input
-        type="text"
-        placeholder="Culture choisie (Inuite, Berbère, Celtique...)"
-        value={culture}
-        onChange={(e) => setCulture(e.target.value)}
-        style={{ marginTop: '0.5rem', padding: '0.5rem', borderRadius: '8px', width: '90%' }}
-      />
-
       <button
         onClick={saveProfile}
         style={{
-          marginTop: '1rem',
+          marginTop: '0.5rem',
           background: '#444',
           color: '#fff',
           border: 'none',
@@ -62,19 +56,23 @@ export default function Profil() {
           padding: '0.6rem 1.2rem',
         }}
       >
-        💾 Enregistrer
+        💾 Sauvegarder
       </button>
 
-      <p style={{ marginTop: '1rem', opacity: 0.8 }}>{status}</p>
+      <p style={{ marginTop: '0.8rem', opacity: 0.8 }}>{status}</p>
 
-      <h3 style={{ marginTop: '2rem' }}>📜 Profils enregistrés :</h3>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {profiles.map((p) => (
-          <li key={p.id} style={{ margin: '0.5rem 0' }}>
-            🌟 <strong>{p.username}</strong> — {p.culture || 'non précisée'}
-          </li>
-        ))}
-      </ul>
+      <h3 style={{ marginTop: '1.5rem' }}>🪶 Missions</h3>
+      {missions.length === 0 ? (
+        <p style={{ opacity: 0.6 }}>Aucune mission enregistrée.</p>
+      ) : (
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {missions.map((m) => (
+            <li key={m.id} style={{ margin: '0.5rem 0' }}>
+              🌍 <strong>{m.culture}</strong> — Étape {m.progress}/12
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

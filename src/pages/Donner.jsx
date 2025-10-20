@@ -1,39 +1,43 @@
-import { useState } from 'react'
-import '../App.css'
+import { supabase } from '../supabaseClient'
 
-export default function Donner() {
-  const [message, setMessage] = useState('')
-  const [sent, setSent] = useState(false)
+// ...
 
-  const handleSend = () => {
-    if (message.trim() !== '') {
-      setSent(true)
-      setTimeout(() => {
-        setMessage('')
-        setSent(false)
-      }, 2500)
+const handleSend = async () => {
+  if (message.trim() === '') return
+
+  try {
+    // 🔐 Récupération sécurisée de l'utilisateur
+    const { data, error: userError } = await supabase.auth.getUser()
+    if (userError) throw userError
+
+    const user = data?.user
+    if (!user) {
+      setHint('⚠️ Connecte-toi avant d’offrir un rêve.')
+      return
     }
+
+    // 💾 Enregistrement de l’offrande
+    const { error } = await supabase.from('offrandes_oniriques').insert([
+      {
+        user_id: user.id,
+        message,
+        created_at: new Date().toISOString(),
+      },
+    ])
+
+    if (error) throw error
+
+    // ✨ Feedback visuel
+    setSent(true)
+    setHint(inspirations[Math.floor(Math.random() * inspirations.length)])
+
+    setTimeout(() => {
+      setMessage('')
+      setSent(false)
+      setHint('')
+    }, 2800)
+  } catch (err) {
+    console.error('❌ Erreur handleSend :', err)
+    setHint('❌ Erreur : offrande non envoyée.')
   }
-
-  return (
-    <div className="app-container">
-      <h1>💫 Donner</h1>
-      <p className="subtitle">
-        Offre un rêve, une intention, ou un souffle à l’univers.
-      </p>
-
-      <textarea
-        className="dream-input"
-        value={message}
-        placeholder="Écris ici ton offrande onirique..."
-        onChange={(e) => setMessage(e.target.value)}
-      />
-
-      <button className="dream-button" onClick={handleSend}>
-        ✨ Envoyer
-      </button>
-
-      {sent && <p className="hint">🌠 Message envoyé dans les étoiles...</p>}
-    </div>
-  )
 }

@@ -5,10 +5,12 @@
   left: 0;
   width: 100%;
   z-index: 1000;
-  backdrop-filter: blur(10px);
-  background: rgba(10, 10, 30, 0.75);
-  border-top: 1px solid rgba(127, 255, 212, 0.2);
-  box-shadow: 0 -2px 12px rgba(127, 255, 212, 0.1);
+  backdrop-filter: blur(10px) saturate(120%);
+  background: rgba(5, 10, 25, 0.7);
+  border-top: 1px solid rgba(127, 255, 212, 0.25);
+  box-shadow: 0 -2px 14px rgba(127, 255, 212, 0.08),
+              0 0 40px rgba(127, 255, 212, 0.05) inset;
+  transition: background 0.4s ease;
 }
 
 /* 🌠 CONTAINER FLEXIBLE */
@@ -16,7 +18,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0.5rem 0.6rem;
+  padding: 0.6rem 0.5rem 0.8rem;
 }
 
 /* ✨ ÉLÉMENT DE MENU */
@@ -33,6 +35,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0.3rem;
 }
 
 .menu-item:focus-visible {
@@ -43,7 +46,7 @@
 /* 🌙 ÉTAT ACTIF */
 .menu-item.active {
   color: #7fffd4;
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .menu-item.active .icon-glow {
@@ -53,24 +56,26 @@
 
 /* 💫 EFFET DE SURVOL */
 .menu-item:hover .icon-glow {
-  opacity: 0.6;
-  transform: scale(1.2);
+  opacity: 0.7;
+  transform: scale(1.25);
 }
 
 /* 🪐 ICÔNES */
 .icon-emoji {
   position: relative;
   z-index: 2;
-  text-shadow: 0 0 10px rgba(150, 220, 255, 0.7);
+  text-shadow: 0 0 10px rgba(150, 220, 255, 0.7),
+               0 0 20px rgba(127, 255, 212, 0.4);
 }
 
+/* 🌈 AURA COSMIQUE */
 .icon-glow {
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(127,255,212,0.4), transparent 70%);
-  filter: blur(6px);
+  background: radial-gradient(circle, rgba(127,255,212,0.35), transparent 75%);
+  filter: blur(8px);
   top: 8px;
   left: 50%;
   transform: translateX(-50%) scale(0.8);
@@ -83,18 +88,18 @@
   font-size: 0.7rem;
   margin-top: 0.3rem;
   color: #b8c8ff;
-  text-shadow: 0 0 4px rgba(127,255,212,0.3);
+  text-shadow: 0 0 5px rgba(127,255,212,0.25);
 }
 
 /* 🌠 INDICATEUR D’ACTIVITÉ */
 .active-indicator {
   position: absolute;
   bottom: -3px;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #7fffd4;
-  box-shadow: 0 0 10px #7fffd4, 0 0 20px #6a5acd;
+  box-shadow: 0 0 10px #7fffd4, 0 0 25px #6a5acd;
   opacity: 0;
   transition: all 0.4s ease;
 }
@@ -107,7 +112,7 @@
 /* 📱 MOBILE OPTIMISATION */
 @media (max-width: 600px) {
   .menu-item {
-    font-size: 1.9rem;
+    font-size: 1.8rem;
   }
   .menu-label {
     font-size: 0.65rem;

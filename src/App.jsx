@@ -4,6 +4,7 @@ import ShootingEmojis from './components/ShootingEmojis'
 import DreamGate from './components/DreamGate'
 import TagCatcher from './components/TagCatcher'
 import OnimojiSpirit from './components/OnimojiSpirit'
+import BottomMenu from './components/BottomMenu'
 import Home from './pages/Home'
 import MissionSelect from './pages/MissionSelect'
 import Profil from './pages/Profil'
@@ -45,11 +46,32 @@ export default function App() {
 
       {/* 🧭 MENU GLOBAL */}
       <nav className="main-nav">
-        <div className="logo-mini" onClick={goHome}>🌘 Onimoji</div>
-        <div className="nav-links">
-          <button onClick={goHome}>🏠 Accueil</button>
-          <button onClick={goProfil}>👤 Profil</button>
+        <div className="nav-container">
+          <div className="logo-section" onClick={goHome}>
+            <div className="logo-icon">🌘</div>
+            <span className="logo-text">Onimoji</span>
+            <div className="logo-glow"></div>
+          </div>
+          <div className="nav-links">
+            <button 
+              className={`nav-button ${page === 'home' ? 'active' : ''}`}
+              onClick={goHome}
+              aria-label="Accueil"
+            >
+              <span className="nav-icon">🏠</span>
+              <span className="nav-text">Accueil</span>
+            </button>
+            <button 
+              className={`nav-button ${page === 'profil' ? 'active' : ''}`}
+              onClick={goProfil}
+              aria-label="Profil"
+            >
+              <span className="nav-icon">👤</span>
+              <span className="nav-text">Profil</span>
+            </button>
+          </div>
         </div>
+        <div className="nav-background"></div>
       </nav>
 
       {/* --- PAGE ACCUEIL --- */}
@@ -110,6 +132,9 @@ export default function App() {
       {page === 'profil' && (
         <Profil onBack={goHome} />
       )}
+
+      {/* 🧭 MENU DE NAVIGATION PRINCIPAL */}
+      <BottomMenu />
 
       <footer className="footer">
         © 2025 Onimoji • Prototype Onirix Beta One

@@ -64,16 +64,14 @@ export default function EchoSky({ stars = [], links = [], onSelect }) {
     const size = d3.scaleLinear().domain([0, 1]).range([10, 26])
     const opa = d3.scaleLinear().domain([0, 1]).range([0.4, 1])
 
-    // 🔗 Tracés de résonance
-    g.append("g")
+    // 🔗 Tracés de résonance (liens) - positions mises à jour par la simulation
+    const linkSel = g
+      .append("g")
+      .attr("class", "links")
       .selectAll("line")
       .data(edges)
       .enter()
       .append("line")
-      .attr("x1", (d) => nodeMap.get(d.source)?.x || 0)
-      .attr("y1", (d) => nodeMap.get(d.source)?.y || 0)
-      .attr("x2", (d) => nodeMap.get(d.target)?.x || 0)
-      .attr("y2", (d) => nodeMap.get(d.target)?.y || 0)
       .attr("stroke", (d) =>
         d.strength > 0.6
           ? "rgba(255,170,80,0.8)"
@@ -85,72 +83,128 @@ export default function EchoSky({ stars = [], links = [], onSelect }) {
       .attr("opacity", (d) => 0.15 + 0.6 * d.strength)
       .style("filter", "blur(2px)")
 
-    // 🌟 Halo
-    g.selectAll(".halo")
-      .data(nodes)
-      .enter()
-      .append("circle")
-      .attr("class", "halo")
-      .attr("cx", (d) => d.x)
-      .attr("cy", (d) => d.y)
-      .attr("r", (d) => size(d.harmonic_balance) * 1.6)
-      .attr("fill", (d) => color(d.resonance_level))
-      .attr("opacity", (d) => 0.1 + 0.4 * opa(d.divergence_score))
-      .style("filter", "blur(10px)")
-
-    // 🌠 Étoile
-    const starPath = (cx, cy, spikes, outer, inner) => {
+    // 🌠 Étoile (centrée à 0,0) + halo dans un groupe pour animer le souffle
+    const starPath = (spikes, outer, inner) => {
       let p = "", step = Math.PI / spikes
       for (let i = 0; i < 2 * spikes; i++) {
         const r = i % 2 ? inner : outer
-        const x = cx + Math.cos(i * step - Math.PI / 2) * r
-        const y = cy + Math.sin(i * step - Math.PI / 2) * r
+        const x = Math.cos(i * step - Math.PI / 2) * r
+        const y = Math.sin(i * step - Math.PI / 2) * r
         p += i === 0 ? `M${x},${y}` : `L${x},${y}`
       }
       return p + "Z"
     }
 
-    g.selectAll(".star")
+    const nodesGroup = g.append("g").attr("class", "nodes")
+    const nodeG = nodesGroup
+      .selectAll("g.node")
       .data(nodes)
       .enter()
+      .append("g")
+      .attr("class", "node")
+      .style("cursor", "pointer")
+      .on("click", (_, d) => onSelect?.(d))
+
+    // Sous-groupe pour la respiration cosmique (évite les conflits avec la position via force)
+    const breathG = nodeG.append("g").attr("class", "breath")
+
+    // Halo
+    breathG
+      .append("circle")
+      .attr("class", "halo")
+      .attr("r", (d) => size(d.harmonic_balance) * 1.6)
+      .attr("fill", (d) => color(d.resonance_level))
+      .attr("opacity", (d) => 0.1 + 0.4 * opa(d.divergence_score))
+      .style("filter", "blur(10px)")
+
+    // Étoile
+    breathG
       .append("path")
       .attr("class", "star")
-      .attr("d", (d) =>
-        starPath(d.x, d.y, 5, size(d.harmonic_balance), size(d.harmonic_balance) / 2.2)
+      .attr(
+        "d",
+        (d) =>
+          starPath(
+            5,
+            size(d.harmonic_balance),
+            size(d.harmonic_balance) / 2.2
+          )
       )
       .attr("fill", (d) => color(d.resonance_level))
       .attr("stroke", "#fff")
       .attr("stroke-width", 0.7)
       .attr("opacity", (d) => opa(d.divergence_score))
       .style("filter", "drop-shadow(0 0 8px rgba(255,255,255,0.4))")
-      .on("click", (_, d) => onSelect?.(d))
 
     // ✴️ Labels
-    g.selectAll(".label")
-      .data(nodes)
-      .enter()
+    nodeG
       .append("text")
-      .attr("x", (d) => d.x)
-      .attr("y", (d) => d.y + size(d.harmonic_balance) + 14)
+      .attr("class", "label")
+      .attr("y", (d) => size(d.harmonic_balance) + 14)
       .attr("fill", "#fff")
       .attr("font-size", "12px")
       .attr("opacity", 0.85)
       .attr("text-anchor", "middle")
       .text((d) => d.title || "★")
 
-    // 🌬️ Respiration cosmique douce
+    // ⚛️ Simulation D3 avec collision pour éviter les chevauchements
+    const nodeRadius = (d) => size(d.harmonic_balance)
+    const simulation = d3
+      .forceSimulation(nodes)
+      .force(
+        "link",
+        d3
+          .forceLink(edges)
+          .id((d) => d.id)
+          .distance((e) => 50 + (1 - e.strength) * 120)
+          .strength((e) => 0.2 + e.strength * 0.3)
+      )
+      .force("charge", d3.forceManyBody().strength(-60))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("x", d3.forceX(width / 2).strength(0.02))
+      .force("y", d3.forceY(height / 2).strength(0.02))
+      .force(
+        "collision",
+        d3
+          .forceCollide()
+          .radius((d) => nodeRadius(d) + 6) // marge pour éviter chevauchement visuel
+          .iterations(2)
+      )
+
+    simulation.on("tick", () => {
+      // contraindre dans la zone visible
+      nodes.forEach((d) => {
+        const r = nodeRadius(d) + 6
+        d.x = Math.max(r, Math.min(width - r, d.x))
+        d.y = Math.max(r, Math.min(height - r, d.y))
+      })
+
+      linkSel
+        .attr("x1", (d) => d.source.x)
+        .attr("y1", (d) => d.source.y)
+        .attr("x2", (d) => d.target.x)
+        .attr("y2", (d) => d.target.y)
+
+      nodeG.attr("transform", (d) => `translate(${d.x},${d.y})`)
+    })
+
+    // 🌬️ Respiration cosmique douce (appliquée seulement au sous-groupe visuel)
     let t = 0
     function animate() {
       t += 0.002
-      g.selectAll(".star, .halo")
-        .attr("transform", (d, i) => {
-          const dx = Math.sin(t * 2 + i) * 1.5
-          const dy = Math.cos(t * 3 + i) * 1.5
-          return `translate(${dx},${dy})`
-        })
+      breathG.attr("transform", (_d, i) => {
+        const dx = Math.sin(t * 2 + i) * 1.5
+        const dy = Math.cos(t * 3 + i) * 1.5
+        return `translate(${dx},${dy})`
+      })
       requestAnimationFrame(animate)
     }
     animate()
+
+    // Nettoyage
+    return () => {
+      simulation.stop()
+    }
   }, [stars, links, onSelect])
 
   return (

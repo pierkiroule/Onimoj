@@ -28,7 +28,17 @@ function createSupabaseStub() {
     }),
     auth: {
       getUser: async () => ({ data: { user: null }, error: missingEnvError }),
+      getSession: async () => ({ data: { session: null }, error: missingEnvError }),
       signInWithPassword: async () => ({ data: null, error: missingEnvError }),
+      signOut: async () => ({ error: missingEnvError }),
+      onAuthStateChange: (_cb) => ({
+        data: {
+          subscription: {
+            unsubscribe: () => {},
+          },
+        },
+        error: null,
+      }),
     },
   }
 }

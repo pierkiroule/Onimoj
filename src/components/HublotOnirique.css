@@ -1,0 +1,16 @@
+.hublot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hublot-canvas {
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #0a0f14, #020305);
+  box-shadow: 0 0 15px rgba(100,255,200,0.2);
+  cursor: pointer;
+  transition: box-shadow 0.5s ease;
+}
+.hublot-canvas:hover {
+  box-shadow: 0 0 25px rgba(110,255,140,0.4);
+}

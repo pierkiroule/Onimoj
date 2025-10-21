@@ -1,169 +1,201 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from "react"
+import { supabase } from "../supabaseClient"
 
-export default function HublotOnirique({
-  emojis = ['🌬️','❄️','🌕','🌊','🔥','🌿','🪶','🌙','🧊','🐋','🦭','🐻'],
-  onCatch
-}) {
-  const canvasRef = useRef(null)
-  const particles = useRef([])
-  const fxParticles = useRef([])
+export default function HublotOnirique({ step, userId, onComplete }) {
+  const [pool, setPool] = useState([])
+  const [selected, setSelected] = useState([])
+  const [title, setTitle] = useState("")
+  const [status, setStatus] = useState("")
+  const [saving, setSaving] = useState(false)
 
+  const animRef = useRef()
+  const positions = useRef([])
+
+  // 🎲 pool initial
   useEffect(() => {
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    const size = 300
-    canvas.width = size
-    canvas.height = size
-
-    // 🌌 Initialisation des emojis flottants
-    particles.current = emojis.map((emoji) => ({
-      emoji,
-      x: Math.random() * size,
-      y: Math.random() * size,
-      vx: (Math.random() - 0.5) * 1.4,
-      vy: (Math.random() - 0.5) * 1.4,
-      size: 26 + Math.random() * 8,
-      caught: false,
-      pulse: 0
+    const base = [
+      "🌞","🌜","⭐","🔥","💧","🌿","🪶","❄️","🌈","🌬️",
+      "🌊","🕯️","🌻","🪵","🪐","💎","🐋","🪞","⚡","🌙",
+      "🍃","🌹","☁️","🦋","🪸","🕊️","🌾","🦭","🧊","🌑"
+    ]
+    const list = base.sort(() => 0.5 - Math.random()).slice(0, 15)
+    setPool(list)
+    positions.current = list.map(() => ({
+      x: Math.random() * 240 + 20,
+      y: Math.random() * 240 + 20,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
     }))
+  }, [])
 
-    // ✨ FX animation
-    const animate = () => {
+  // 🌀 animation de flottement
+  useEffect(() => {
+    const canvas = document.getElementById("emojiSky")
+    const ctx = canvas.getContext("2d")
+    const size = 280
+
+    function draw() {
       ctx.clearRect(0, 0, size, size)
-
-      // Fond vivant
-      const gradient = ctx.createRadialGradient(size / 2, size / 2, 40, size / 2, size / 2, 150)
-      gradient.addColorStop(0, 'rgba(110,255,141,0.15)')
-      gradient.addColorStop(1, 'rgba(0,0,0,0.2)')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, size, size)
-
-      // Bord du hublot
-      ctx.beginPath()
-      ctx.arc(size / 2, size / 2, size / 2 - 1, 0, 2 * Math.PI)
-      ctx.strokeStyle = 'rgba(127,255,212,0.5)'
-      ctx.lineWidth = 2
-      ctx.stroke()
-
-      // 🌬️ Dessine les emojis
-      for (const p of particles.current) {
-        if (p.caught) continue
+      positions.current.forEach((p, i) => {
         p.x += p.vx
         p.y += p.vy
-        if (p.x < 20 || p.x > size - 20) p.vx *= -1
-        if (p.y < 20 || p.y > size - 20) p.vy *= -1
-
-        // Halo pulsant
-        p.pulse += 0.05
-        const halo = 4 + Math.sin(p.pulse) * 2
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size / 1.8 + halo, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(127,255,212,0.1)'
-        ctx.fill()
-
-        ctx.font = `${p.size}px "Noto Color Emoji","Segoe UI Emoji"`
-        ctx.fillText(p.emoji, p.x - p.size / 2, p.y + p.size / 3)
-      }
-
-      // 🌟 FX de capture
-      fxParticles.current.forEach((fx) => {
-        fx.life -= 1
-        fx.x += fx.vx
-        fx.y += fx.vy
-        const alpha = fx.life / fx.maxLife
-        ctx.beginPath()
-        ctx.arc(fx.x, fx.y, fx.size, 0, 2 * Math.PI)
-        ctx.fillStyle = `rgba(255,255,255,${alpha})`
-        ctx.fill()
-      })
-      fxParticles.current = fxParticles.current.filter((fx) => fx.life > 0)
-
-      requestAnimationFrame(animate)
-    }
-    animate()
-
-    // 🪶 Clic / capture
-    const handleClick = (e) => {
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-
-      for (const p of particles.current) {
-        if (p.caught) continue
-        const dx = x - p.x
-        const dy = y - p.y
+        // rebond sur bords circulaires
+        const dx = p.x - size / 2
+        const dy = p.y - size / 2
         const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < p.size * 0.7) {
-          p.caught = true
-          // 💥 Ajoute FX particules
-          for (let i = 0; i < 20; i++) {
-            fxParticles.current.push({
-              x: p.x,
-              y: p.y,
-              vx: (Math.random() - 0.5) * 3,
-              vy: (Math.random() - 0.5) * 3,
-              size: 1 + Math.random() * 2,
-              life: 30 + Math.random() * 20,
-              maxLife: 50,
-            })
-          }
-          // 💫 Onde lumineuse
-          for (let r = 0; r < 80; r += 10) {
-            fxParticles.current.push({
-              x: p.x,
-              y: p.y,
-              vx: 0,
-              vy: 0,
-              size: r / 5,
-              life: 20,
-              maxLife: 20,
-            })
-          }
-          if (onCatch) onCatch(p.emoji)
-          break
+        if (dist > size / 2 - 20) {
+          const angle = Math.atan2(dy, dx)
+          p.vx = -Math.cos(angle) * 0.5
+          p.vy = -Math.sin(angle) * 0.5
         }
-      }
+        ctx.font = selected.includes(pool[i]) ? "30px serif" : "26px serif"
+        ctx.globalAlpha = selected.includes(pool[i]) ? 0.4 : 0.9
+        ctx.fillText(pool[i], p.x, p.y)
+      })
+      animRef.current = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => cancelAnimationFrame(animRef.current)
+  }, [pool, selected])
+
+  // 🎯 Sélection stable
+  const handleCanvasClick = (e) => {
+    const rect = e.target.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    positions.current.forEach((p, i) => {
+      const dist = Math.hypot(p.x - x, p.y - y)
+      if (dist < 20) toggleEmoji(pool[i])
+    })
+  }
+
+  const toggleEmoji = (emoji) => {
+    if (selected.includes(emoji))
+      setSelected(selected.filter(e => e !== emoji))
+    else if (selected.length < 5)
+      setSelected([...selected, emoji])
+  }
+
+  // 🌟 Création
+  async function createStar() {
+    if (!title.trim()) return setStatus("💭 Donne un nom à ton Onimoji.")
+    if (selected.length !== 5) return setStatus("🪐 Choisis 5 émojis.")
+    setSaving(true)
+
+    const newStar = {
+      creator_id: userId,
+      title,
+      emojis: selected,
+      culture: "Inuite",
+      spirit: step?.spirit_name || "",
+      step_number: step?.step_number || 1,
+      completed: true,
     }
 
-    canvas.addEventListener('click', handleClick)
-    return () => canvas.removeEventListener('click', handleClick)
-  }, [emojis, onCatch])
+    const { data: inserted, error } = await supabase
+      .from("dream_stars")
+      .insert([newStar])
+      .select()
+      .single()
 
+    if (error) {
+      console.error(error)
+      setStatus("❌ Erreur de tissage.")
+      setSaving(false)
+      return
+    }
+
+    await supabase.rpc("update_star_resonances_with_divergence")
+
+    const { data: star } = await supabase
+      .from("cosmic_field")
+      .select("*")
+      .eq("id", inserted.id)
+      .single()
+
+    setSaving(false)
+    setStatus("🌟 Onimoji tissé avec succès !")
+    onComplete(star)
+  }
+
+  // 🧩 rendu
   return (
-    <div
-      style={{
-        width: '300px',
-        height: '300px',
-        margin: '1rem auto',
-        borderRadius: '50%',
-        overflow: 'hidden',
-        position: 'relative',
-        boxShadow: '0 0 25px rgba(127,255,212,0.4)',
-        background: 'radial-gradient(circle at center, rgba(0,20,30,0.85), rgba(0,0,0,0.95))',
-      }}
-    >
-      <canvas
-        ref={canvasRef}
-        style={{
-          display: 'block',
-          borderRadius: '50%',
-          cursor: 'crosshair',
-        }}
-      />
+    <div style={{ textAlign: "center", marginTop: "1rem" }}>
+      <h3 style={{ color: "#bff" }}>🌠 Tisse ton Onimoji</h3>
+      <p style={{ opacity: 0.8 }}>Choisis 5 émojis flottants qui résonnent avec ton rêve...</p>
+
       <div
         style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          color: '#7fffd4',
-          fontSize: '0.8rem',
-          opacity: 0.6,
-          textShadow: '0 0 4px #00ffff',
+          position: "relative",
+          width: 280, height: 280, margin: "1rem auto",
+          borderRadius: "50%",
+          overflow: "hidden",
+          background: "radial-gradient(circle, #081019, #010203 85%)",
+          boxShadow: "0 0 30px rgba(110,255,180,0.4)",
         }}
       >
-        🌠 Attrape les rêves
+        <canvas
+          id="emojiSky"
+          width="280"
+          height="280"
+          onClick={handleCanvasClick}
+          style={{ cursor: "pointer" }}
+        />
       </div>
+
+      {/* 🪞 affichage des 5 cases étoilées */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "0.6rem",
+          margin: "0.8rem 0",
+        }}
+      >
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: "45px", height: "45px",
+              borderRadius: "50%",
+              background: selected[i] ? "radial-gradient(circle, #6eff8d55, #1a1a1a 80%)" : "#0c0f0f",
+              border: "1px solid rgba(127,255,212,0.4)",
+              boxShadow: selected[i]
+                ? "0 0 10px rgba(110,255,180,0.7)"
+                : "0 0 5px rgba(127,255,212,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "1.4rem",
+            }}
+          >
+            {selected[i] || "⭐"}
+          </div>
+        ))}
+      </div>
+
+      <input
+        type="text"
+        placeholder="Nom de ton Onimoji..."
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        style={{
+          background: "#111", color: "#bff",
+          border: "1px solid rgba(127,255,212,0.3)",
+          borderRadius: "6px", padding: "0.4rem 0.6rem", textAlign: "center",
+        }}
+      />
+
+      <button
+        onClick={createStar}
+        disabled={saving}
+        style={{
+          marginTop: "0.8rem", background: "linear-gradient(145deg,#6eff8d,#35a0ff)",
+          border: "none", borderRadius: "10px", padding: "0.7rem 1.3rem",
+          fontWeight: "bold", cursor: "pointer", color: "#111",
+        }}
+      >
+        {saving ? "✨ Tissage..." : "🌟 Valider l’Onimoji"}
+      </button>
+      <p style={{ opacity: 0.7 }}>{status}</p>
     </div>
   )
 }

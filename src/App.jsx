@@ -46,11 +46,15 @@ export default function App() {
     }
     getSession()
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+    let authSubscription
+    if (typeof supabase?.auth?.onAuthStateChange === 'function') {
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session)
+      })
+      authSubscription = listener?.subscription
+    }
 
-    return () => listener.subscription.unsubscribe()
+    return () => authSubscription?.unsubscribe?.()
   }, [])
 
   // 🧭 Navigation

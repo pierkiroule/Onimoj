@@ -1,44 +1,130 @@
+import { useState, useEffect, useRef } from "react"
 import { supabase } from "../supabaseClient"
-import { useState } from "react"
+import { askNebius } from "../nebiusClient"
 
 export default function EchoStarModal({ star, onClose }) {
   const [chain, setChain] = useState(star.poetic_chain || [])
   const [input, setInput] = useState("")
   const [saving, setSaving] = useState(false)
+  const [iaFragment, setIaFragment] = useState(
+    star.poetic_chain?.some(f => f.author === "Souffleur") ? true : null
+  )
 
-  // positions des 5 émojis (pointe d’étoile)
-  const starPositions = [
-    { x: 0, y: -80 },
-    { x: 75, y: -25 },
-    { x: 45, y: 70 },
-    { x: -45, y: 70 },
-    { x: -75, y: -25 },
-  ]
+  const canvasRef = useRef()
 
-  const cx = 100, cy = 100 // centre de l’étoile (dans un SVG 200x200)
-  const resonance = Math.min(1, Math.max(0, star.resonance_level ?? 0.5))
-  const haloColor = resonance < 0.4 ? "#ffffff" : resonance < 0.8 ? "#ffd580" : "#ff9a3c"
+  // 🌌 animation "bulle Onimoji"
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext("2d")
+    const emojis = star.emojis.slice(0, 3)
+    const cx = 120, cy = 120
+    const baseR = 80
+    const innerR = 35
+    const start = Date.now()
+    const haloColor =
+      star.resonance_level < 0.4
+        ? "#88fff0"
+        : star.resonance_level < 0.8
+        ? "#ffd580"
+        : "#ff9a3c"
 
-  // 🪶 Ajout d’un fragment (texte court, sans émojis/son) avec auteur
+    function draw() {
+      const t = (Date.now() - start) / 1000
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      // 🌌 bulle mère
+      const pulse = 1 + 0.05 * Math.sin(t * 2)
+      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, baseR * pulse)
+      grad.addColorStop(0, `${haloColor}22`)
+      grad.addColorStop(1, "rgba(20,40,50,0.35)")
+      ctx.fillStyle = grad
+      ctx.beginPath()
+      ctx.arc(cx, cy, baseR * pulse, 0, Math.PI * 2)
+      ctx.fill()
+
+      // 🌬 halo IA s’il existe
+      if (iaFragment) {
+        ctx.beginPath()
+        ctx.arc(cx, cy, baseR * pulse * 1.2, 0, Math.PI * 2)
+        ctx.strokeStyle = "rgba(180,255,255,0.35)"
+        ctx.lineWidth = 3
+        ctx.shadowColor = "rgba(180,255,255,0.5)"
+        ctx.shadowBlur = 10
+        ctx.stroke()
+        ctx.shadowBlur = 0
+      }
+
+      // 🫧 trois bulles émojis
+      for (let i = 0; i < emojis.length; i++) {
+        const angle = (i * (2 * Math.PI)) / 3 + t * 0.5
+        const r = innerR + 10 * Math.sin(t * 1.2 + i)
+        const x = cx + Math.cos(angle) * r
+        const y = cy + Math.sin(angle) * r
+
+        const grad2 = ctx.createRadialGradient(x, y, 5, x, y, 22)
+        grad2.addColorStop(0, "rgba(200,255,240,0.35)")
+        grad2.addColorStop(1, "rgba(0,30,40,0.3)")
+        ctx.fillStyle = grad2
+        ctx.beginPath()
+        ctx.arc(x, y, 22, 0, Math.PI * 2)
+        ctx.fill()
+
+        ctx.font = "24px serif"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText(emojis[i], x, y)
+      }
+      requestAnimationFrame(draw)
+    }
+
+    draw()
+  }, [star, iaFragment])
+
+  // 🌿 ajout d’un fragment utilisateur + souffle IA (inchangé)
   async function addFragment() {
     const text = input.trim()
     if (!text || text.length < 2 || text.length > 80) return
     setSaving(true)
-
     const { data: userData } = await supabase.auth.getUser()
     const username = userData?.user?.user_metadata?.username || "Anonyme"
-
     const { data, error } = await supabase.rpc("append_poetic_fragment", {
       star_id: star.id,
       new_text: text,
       author_name: username,
     })
-
-    if (!error && data) {
-      setChain(data)
-      setInput("")
-    } else {
+    if (error) {
       console.error("Erreur RPC :", error)
+      setSaving(false)
+      return
+    }
+    setChain(data)
+    setInput("")
+
+    // 🌬 souffle IA si pas encore généré
+    const hasSouffleur = data.some(f => f.author === "Souffleur")
+    if (!hasSouffleur) {
+      const prompt = `
+      Inspire-toi de ces trois emojis : ${star.emojis.join(" ")}.
+      Thème : ${star.title}.
+      Écris une phrase brève (≤25 mots), poétique, onirique et apaisante.
+      Évoque la glace, la mer et le souffle.
+      N’utilise pas les mots "rêve", "IA", ni "humain".
+      `
+      try {
+        const souffle = await askNebius(prompt, { temperature: 0.85 })
+        if (souffle) {
+          setIaFragment(souffle)
+          const newChain = [...data, { text: souffle, author: "Souffleur" }]
+          setChain(newChain)
+          await supabase.rpc("append_poetic_fragment", {
+            star_id: star.id,
+            new_text: souffle,
+            author_name: "Souffleur",
+          })
+        }
+      } catch (e) {
+        console.warn("Souffleur silencieux :", e)
+      }
     }
     setSaving(false)
   }
@@ -58,7 +144,7 @@ export default function EchoStarModal({ star, onClose }) {
       }}
     >
       <div
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
         style={{
           background: "rgba(15,25,25,0.95)",
           borderRadius: "16px",
@@ -67,109 +153,24 @@ export default function EchoStarModal({ star, onClose }) {
           color: "#bff",
           textAlign: "center",
           boxShadow: "0 0 25px rgba(255,200,120,0.35)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
         }}
       >
-        {/* Titre + Résonance */}
-        <h3 style={{ margin: 0 }}>{star.title}</h3>
-        <p style={{ margin: 0, opacity: 0.8 }}>
-          Résonance : {(resonance * 100).toFixed(0)}%
-        </p>
+        <h3>{star.title}</h3>
+        <p style={{ opacity: 0.8 }}>Résonance : {(star.resonance_level * 100).toFixed(0)}%</p>
 
-        {/* Halo + Cercle central + 5 rayons */}
-        <div
+        <canvas
+          ref={canvasRef}
+          width={240}
+          height={240}
           style={{
-            position: "relative",
-            width: 200,
-            height: 200,
+            background: "radial-gradient(circle,#000810,#000)",
+            borderRadius: "50%",
+            boxShadow: "0 0 30px rgba(110,255,180,0.4)",
             margin: "1rem auto",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
           }}
-        >
-          {/* halo doux */}
-          <div
-            style={{
-              position: "absolute",
-              width: 170,
-              height: 170,
-              borderRadius: "50%",
-              background: `radial-gradient(circle, ${haloColor}55, transparent 70%)`,
-              animation: "pulse 3s ease-in-out infinite",
-              filter: "blur(6px)",
-            }}
-          />
+        />
 
-          <svg width="200" height="200" style={{ position: "absolute", top: 0, left: 0 }}>
-            {/* cercle central */}
-            <defs>
-              <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={haloColor} stopOpacity="0.9" />
-                <stop offset="100%" stopColor={haloColor} stopOpacity="0.1" />
-              </radialGradient>
-            </defs>
-
-            {/* disque central */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={22}
-              fill="url(#coreGlow)"
-              stroke={haloColor}
-              strokeWidth="1.4"
-              style={{ filter: "drop-shadow(0 0 6px rgba(255,200,120,0.6))" }}
-            />
-
-            {/* cercle de guidage (léger) */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={86}
-              fill="none"
-              stroke="rgba(255,255,255,0.15)"
-              strokeDasharray="3 6"
-              strokeWidth="1"
-            />
-
-            {/* 5 rayons centre -> pointes (sans croisement) */}
-            {starPositions.map((p, i) => (
-              <line
-                key={`ray-${i}`}
-                x1={cx}
-                y1={cy}
-                x2={cx + p.x}
-                y2={cy + p.y}
-                stroke="rgba(255,200,120,0.7)"
-                strokeWidth="2"
-              />
-            ))}
-          </svg>
-
-          {/* émojis aux extrémités */}
-          {star.emojis?.map((e, i) => {
-            const p = starPositions[i]
-            return (
-              <div
-                key={i}
-                style={{
-                  position: "absolute",
-                  top: cy + p.y,
-                  left: cx + p.x,
-                  transform: "translate(-50%, -50%) scale(1.35)",
-                  fontSize: "1.8rem",
-                  textShadow: "0 0 10px rgba(255,200,120,0.9)",
-                }}
-              >
-                {e}
-              </div>
-            )
-          })}
-        </div>
-
-        {/* 🪶 Cadavre exquis */}
+        {/* Fragments */}
         <div
           style={{
             width: "100%",
@@ -177,42 +178,30 @@ export default function EchoStarModal({ star, onClose }) {
             borderRadius: "10px",
             padding: "0.5rem",
             marginTop: "0.5rem",
-            textAlign: "left",
             maxHeight: "120px",
             overflowY: "auto",
           }}
         >
-          {chain.length === 0 && (
+          {chain.length === 0 ? (
             <p style={{ opacity: 0.6, textAlign: "center", fontSize: "0.85rem" }}>
               Aucun fragment encore... écris le premier.
             </p>
+          ) : (
+            chain.map((l, i) => (
+              <p key={i} style={{ color: l.author === "Souffleur" ? "#aef" : "#ffd" }}>
+                “{l.text}” <br />
+                <span style={{ fontSize: "0.7rem", opacity: 0.6 }}>— {l.author || "Anonyme"}</span>
+              </p>
+            ))
           )}
-          {chain.map((l, i) => (
-            <p
-              key={i}
-              style={{
-                margin: "0.3rem 0",
-                fontSize: "0.9rem",
-                color: "#ffd",
-                textAlign: "center",
-                opacity: 0.9,
-              }}
-            >
-              “{l.text}”
-              <br />
-              <span style={{ fontSize: "0.7rem", opacity: 0.6 }}>
-                — {l.author || "Anonyme"}
-              </span>
-            </p>
-          ))}
         </div>
 
-        {/* Champ de saisie */}
+        {/* Champ + boutons */}
         <input
           type="text"
           placeholder="Écris un fragment court…"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={e => setInput(e.target.value)}
           maxLength={80}
           style={{
             width: "100%",
@@ -226,7 +215,6 @@ export default function EchoStarModal({ star, onClose }) {
           }}
         />
 
-        {/* Bouton ajout */}
         <button
           onClick={addFragment}
           disabled={saving || !input.trim()}
@@ -245,9 +233,8 @@ export default function EchoStarModal({ star, onClose }) {
           {saving ? "✨ Tissage..." : "🪶 Ajouter un fragment"}
         </button>
 
-        {/* Fermer */}
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             onClose()
           }}
@@ -264,15 +251,6 @@ export default function EchoStarModal({ star, onClose }) {
         >
           ✨ Fermer
         </button>
-
-        <style>
-          {`
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.16); opacity: 1; }
-          }
-          `}
-        </style>
       </div>
     </div>
   )

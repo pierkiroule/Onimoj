@@ -74,7 +74,7 @@ export default function HublotOnirique({ step, userId, onComplete }) {
   const toggleEmoji = (emoji) => {
     if (selected.includes(emoji))
       setSelected(selected.filter(e => e !== emoji))
-    else if (selected.length < 5)
+    else if (selected.length < 3)
       setSelected([...selected, emoji])
   }
 
@@ -97,7 +97,7 @@ export default function HublotOnirique({ step, userId, onComplete }) {
     if (hitIndex === -1) return
     const emoji = pool[hitIndex]
     if (dragOnlyAdd) {
-      if (!selected.includes(emoji) && selected.length < 5 && !dragVisitedIndicesRef.current.has(hitIndex)) {
+      if (!selected.includes(emoji) && selected.length < 3 && !dragVisitedIndicesRef.current.has(hitIndex)) {
         dragVisitedIndicesRef.current.add(hitIndex)
         setSelected((prev) => prev.concat(emoji))
       }
@@ -125,7 +125,7 @@ export default function HublotOnirique({ step, userId, onComplete }) {
   // 🌟 Création
   async function createStar() {
     if (!title.trim()) return setStatus("💭 Donne un nom à ton Onimoji.")
-    if (selected.length !== 5) return setStatus("🪐 Choisis 5 émojis.")
+    if (selected.length !== 3) return setStatus("🪐 Choisis 3 émojis.")
     setSaving(true)
 
     const newStar = {
@@ -280,7 +280,7 @@ export default function HublotOnirique({ step, userId, onComplete }) {
   return (
     <div style={{ textAlign: "center", marginTop: "1rem" }}>
       <h3 style={{ color: "#bff" }}>🌠 Tisse ton Onimoji</h3>
-      <p style={{ opacity: 0.8 }}>Choisis 5 émojis flottants qui résonnent avec ton rêve...</p>
+      <p style={{ opacity: 0.8 }}>Choisis 3 émojis flottants qui résonnent avec ton rêve...</p>
 
       <div
         style={{
@@ -313,7 +313,7 @@ export default function HublotOnirique({ step, userId, onComplete }) {
           margin: "0.8rem 0",
         }}
       >
-        {[0, 1, 2, 3, 4].map((i) => (
+        {[0, 1, 2].map((i) => (
           <div
             key={i}
             style={{
@@ -328,7 +328,7 @@ export default function HublotOnirique({ step, userId, onComplete }) {
               fontSize: "1.4rem",
             }}
           >
-            {selected[i] || "⭐"}
+            {selected[i] || "?"}
           </div>
         ))}
       </div>

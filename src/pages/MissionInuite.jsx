@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient"
 import HublotOnirique from "../components/HublotOnirique"
 import OnimojiCard from "../components/OnimojiCard"
 import OnimojiNarration from "../components/OnimojiNarration"
+import OnimojiQuiz from "../components/OnimojiQuiz"
 
 export default function MissionInuite() {
   const [user, setUser] = useState(null)
@@ -11,6 +12,7 @@ export default function MissionInuite() {
   const [current, setCurrent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [onimoji, setOnimoji] = useState(null)
+  const [status, setStatus] = useState("")
 
   useEffect(() => {
     async function loadMission() {
@@ -46,6 +48,42 @@ export default function MissionInuite() {
   if (!mission || !current)
     return <p style={{ color: "#eee", textAlign: "center" }}>⚠️ Mission non trouvée.</p>
 
+  async function handleQuizComplete() {
+    if (!mission || !current) return
+    const isLastStep = current.step_number >= 12
+    const nextStepNumber = Math.min(current.step_number + 1, 12)
+
+    setStatus("✨ Progression en cours...")
+    const updates = {
+      current_step: isLastStep ? 12 : nextStepNumber,
+      progress: Math.max(mission?.progress || current.step_number, isLastStep ? 12 : nextStepNumber),
+      status: isLastStep ? "completed" : "active",
+    }
+
+    const { error } = await supabase
+      .from("missions")
+      .update(updates)
+      .eq("id", mission.id)
+
+    if (error) {
+      console.error("❌ Erreur progression mission:", error.message)
+      setStatus("❌ Erreur progression mission")
+      return
+    }
+
+    // Met à jour l'état local et prépare l'étape suivante (ou termine)
+    const updatedMission = { ...mission, ...updates }
+    setMission(updatedMission)
+    if (!isLastStep) {
+      const next = steps.find((s) => s.step_number === nextStepNumber)
+      setCurrent(next)
+      setOnimoji(null)
+      setStatus("🌟 Étape suivante débloquée !")
+    } else {
+      setStatus("🏁 Mission terminée — bravo !")
+    }
+  }
+
   return (
     <div style={{ textAlign: "center", color: "#eee", padding: "1rem" }}>
       <h2>❄️ Mission Inuite</h2>
@@ -68,6 +106,14 @@ export default function MissionInuite() {
         <>
           <OnimojiCard star={onimoji} />
           <OnimojiNarration star={onimoji} />
+          <OnimojiQuiz
+            stepNumber={current.step_number}
+            userId={user.id}
+            onComplete={handleQuizComplete}
+          />
+          {status && (
+            <p style={{ marginTop: "0.6rem", opacity: 0.8 }}>{status}</p>
+          )}
         </>
       )}
     </div>

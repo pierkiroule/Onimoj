@@ -1,54 +1,111 @@
-import '../App.css'
+import "../App.css"
 
-export default function Home({ onStart }) {
+export default function Home({ onStart, onLogin, onRegister }) {
   return (
-    <div className="fade-in" style={{ textAlign: 'center', color: '#eee', padding: '1.2rem' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '0.4rem' }}>🌘 Onimoji</h1>
-      <p style={{ opacity: 0.8, fontStyle: 'italic', marginBottom: '1rem' }}>
-        Bienvenue, gardien des rêves.  
-        Le vent murmure, une mission t’attend...
-      </p>
+    <div
+      className="fade-in"
+      style={{
+        textAlign: "center",
+        padding: "2rem",
+        position: "relative",
+        zIndex: 1,
+      }}
+    >
+{/* 🌘 LOGO VERTICAL CENTRÉ */}
+<div className="home-logo fade-in">
+  <div className="moon-symbol">🌘•°</div>
+  <div className="brand-name">Onimoji</div>
+</div>
 
-      <div
+      {/* 🪶 SLOGAN D'ACCUEIL */}
+      <h2
+        className="tagline"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: '12px',
-          padding: '1rem',
-          margin: '1rem auto',
-          width: '90%',
-          maxWidth: '420px',
-          boxShadow: '0 0 15px rgba(127,255,212,0.15)',
+          fontSize: "1.2rem",
+          fontStyle: "italic",
+          color: "#bfefff",
+          marginTop: "1rem",
+          marginBottom: "1.6rem",
+          textShadow: "0 0 8px rgba(180,220,255,0.4)",
         }}
       >
-        <h3 style={{ color: '#7fffd4', marginBottom: '0.5rem' }}>🪶 Cycle des 12 Esprits</h3>
-        <p style={{ opacity: 0.85 }}>
-          Pars pour un voyage à travers les **rêves culturels**.  
-          Découvre les esprits Inuits, Berbères et Celtes.  
-          Chaque mission tisse une **étoile onirique vivante**.
+        Prendre soin de ses rêves en explorant les cultures oniriques.
+      </h2>
+
+      {/* 🌠 TITRE PRINCIPAL */}
+      <h1 className="home-title">Bienvenue à bord de la Navette Oniris</h1>
+
+      {/* 🌌 INTRODUCTION */}
+      <p className="intro-zone">
+        Onimoji est une expérience poétique et culturelle.  
+        Un voyage dans les rêves du monde, à travers des hyperbulles mythiques reliées par la résonance.
+      </p>
+
+      {/* 💫 SECTION — POURQUOI */}
+      <div className="card-glow">
+        <h3 style={{ color: "#7fffd4" }}>Pourquoi Onimoji ?</h3>
+        <p>
+          L’hypermodernité nous a rendus performants, connectés, réactifs… mais souvent déconnectés de nos mondes intérieurs.
+
+Pourtant, chaque culture rêve le monde à sa manière.
+Les Inuits écoutent les esprits du vent et de la mer.
+Les Berbères dialoguent avec les étoiles du désert.
+Les Celtes conversent avec la forêt et les rivières.
+
+En explorant ces imaginaires, nous apprenons à écouter autrement :
+à percevoir la résonance entre nos rêves, nos paysages et nos relations.
+Rêver devient un acte écologique et symbolique, une manière de soigner le lien entre soi, les autres et le monde vivant.
+
+Retrouver une santé onirique collective,
+c’est réapprendre à tisser des récits, à partager nos songes, à reconnaître dans chaque rêve une parcelle du vivant qui cherche à résonner.
         </p>
       </div>
 
-      <button
-        className="dream-button"
-        onClick={onStart}
-        style={{
-          background: '#6eff8d',
-          color: '#111',
-          fontWeight: 'bold',
-          borderRadius: '8px',
-          border: 'none',
-          padding: '0.7rem 1.4rem',
-          marginTop: '1.2rem',
-          boxShadow: '0 0 10px rgba(127,255,212,0.4)',
-        }}
-      >
-        🚀 Commencer ta mission
-      </button>
+      {/* 🌀 SECTION — COMMENT ÇA MARCHE */}
+      <div className="card-glow" style={{ marginTop: "1rem" }}>
+        <h3 style={{ color: "#7fffd4" }}>Comment ça marche ?</h3>
+        <p>
+          🚀 Embarque à bord d’Oniris et choisis ton premier horizon culturel.  
+          🌊 Explore les hyperbulles, découvre leurs symboles, leurs chants, leurs paysages.  
+          💭 Lors du voyage, une IA poétique t’invite à tisser un rêve personnalisé à partager dans le groupe.
+        </p>
+      </div>
 
-      <div style={{ marginTop: '2rem', opacity: 0.7, fontSize: '0.9rem' }}>
-        <p>🌙 12 jours, 12 défis doux, 12 esprits à écouter.</p>
-        <p>Chaque étoile créée nourrit le grand tissage des rêves.</p>
+      {/* ✨ BOUTONS D’ACTION */}
+      <div style={{ marginTop: "1.6rem" }}>
+        <button className="dream-button" onClick={onStart}>
+          Embarquer dans Oniris
+        </button>
+
+        <button
+          className="dream-button"
+          style={{
+            background: "rgba(127,255,212,0.15)",
+            color: "#7fffd4",
+            marginLeft: "0.6rem",
+          }}
+          onClick={onLogin}
+        >
+          Connexion
+        </button>
+
+        <button
+          className="dream-button"
+          style={{
+            background: "rgba(110,255,141,0.15)",
+            color: "#6eff8d",
+            marginLeft: "0.6rem",
+          }}
+          onClick={onRegister}
+        >
+          Inscription
+        </button>
+      </div>
+
+      {/* 🌙 PIED DE PAGE */}
+      <div className="footer">
+        <p>12 voyages culturels pour explorer les rêves de la Terre.</p>
+        <p>Chaque hyperbulle rallumée tisse un fil dans la trame du vivant.</p>
       </div>
     </div>
   )

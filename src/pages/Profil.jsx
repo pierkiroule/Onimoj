@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import './Home.css'
 
-export default function Profil({ user, onLogout }) {
+export default function Profil({ user, onLogout, onNavigate }) {
   const [mission, setMission] = useState(null)
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
@@ -11,7 +11,6 @@ export default function Profil({ user, onLogout }) {
     if (user) fetchMission(user.id)
   }, [user])
 
-  // 🔍 Charge la mission active
   async function fetchMission(userId) {
     const { data, error } = await supabase
       .from('missions')
@@ -27,7 +26,6 @@ export default function Profil({ user, onLogout }) {
     } else setMission(data || null)
   }
 
-  // 💳 Simulation d’achat mission
   async function buyMission(culture) {
     if (!user) return setStatus('⚠️ Non connecté.')
     if (mission && !isMissionFinished(mission))
@@ -64,7 +62,6 @@ export default function Profil({ user, onLogout }) {
     }, 1500)
   }
 
-  // 🌟 Étape suivante
   async function nextStep() {
     if (!mission || isMissionFinished(mission)) return
     const newProgress = Math.min(mission.progress + 1, 12)
@@ -82,12 +79,10 @@ export default function Profil({ user, onLogout }) {
     }
   }
 
-  // 🧮 Vérifie si mission terminée
   function isMissionFinished(m) {
     return m.progress >= 12 || new Date(m.end_date) < new Date()
   }
 
-  // 🎨 Badges progression
   const renderBadges = (progress) => (
     <div style={{ display: 'flex', justifyContent: 'center', gap: '0.3rem', marginTop: '0.5rem' }}>
       {[...Array(12)].map((_, i) => (
@@ -105,18 +100,13 @@ export default function Profil({ user, onLogout }) {
     </div>
   )
 
-  // ✨ Interface
   return (
     <div className="fade-in" style={{ padding: '1rem', color: '#eee', textAlign: 'center' }}>
       <h2>👤 Profil Onimoji</h2>
 
       {user ? (
         <p style={{ opacity: 0.8, fontSize: '0.9rem' }}>
-          {user.email ? (
-            <>🌕 {user.email}</>
-          ) : (
-            <>🌀 ID : {user.id.slice(0, 8)}...</>
-          )}
+          {user.email ? <>🌕 {user.email}</> : <>🌀 ID : {user.id.slice(0, 8)}...</>}
         </p>
       ) : (
         <p>Chargement du profil...</p>
@@ -194,6 +184,21 @@ export default function Profil({ user, onLogout }) {
       >
         🚪 Se déconnecter
       </button>
+
+      {/* 🔐 Bouton vers le Labo (privé admin) */}
+      {user?.id === "2d4955ad-4eb6-47c3-bfc9-8d76dedcbc97" && (
+        <p
+          onClick={() => onNavigate('labo-login')}
+          style={{
+            opacity: 0.4,
+            fontSize: '0.8rem',
+            marginTop: '1rem',
+            cursor: 'pointer',
+          }}
+        >
+          🧪 Accès Labo (privé)
+        </p>
+      )}
     </div>
   )
 }

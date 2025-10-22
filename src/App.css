@@ -2,7 +2,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at 50% 30%, #0c0c2b 0%, #010010 80%);
+  background: radial-gradient(circle at 50% 30%, #0b0b24 0%, #01000f 80%);
   color: #f3f5ff;
   font-family: 'Poppins', sans-serif;
   overflow-x: hidden;
@@ -11,272 +11,27 @@ body {
   scroll-behavior: smooth;
 }
 
-/* 🧭 NAVIGATION PRINCIPALE MODERNE */
-.main-nav {
+/* 🌠 FOND ANIMÉ — lueurs mouvantes */
+body::before,
+body::after {
+  content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  padding: 1rem 2rem;
-  backdrop-filter: blur(20px);
-  background: rgba(10, 10, 25, 0.7);
-  border-bottom: 1px solid rgba(127, 255, 212, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  background: radial-gradient(circle at 60% 40%, rgba(127,255,212,0.05), transparent 70%);
+  animation: cosmicFlow 14s ease-in-out infinite alternate;
+  z-index: 0;
+}
+body::after {
+  background: radial-gradient(circle at 40% 60%, rgba(106,90,205,0.08), transparent 80%);
+  animation-duration: 18s;
 }
 
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.nav-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    rgba(106, 90, 205, 0.05) 0%, 
-    rgba(127, 255, 212, 0.03) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-/* 🎨 LOGO SECTION */
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.logo-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(127, 255, 212, 0.1) 0%, 
-    rgba(106, 90, 205, 0.1) 100%);
-  border-radius: 1rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.logo-section:hover::before {
-  opacity: 1;
-}
-
-.logo-icon {
-  font-size: 1.8rem;
-  transition: all 0.3s ease;
-  z-index: 2;
-  position: relative;
-}
-
-.logo-text {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #aeeeff;
-  text-shadow: 0 0 8px rgba(120, 240, 255, 0.5);
-  transition: all 0.3s ease;
-  z-index: 2;
-  position: relative;
-  letter-spacing: 0.05em;
-}
-
-.logo-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 3rem;
-  height: 3rem;
-  background: radial-gradient(circle, 
-    rgba(127, 255, 212, 0.2) 0%, 
-    transparent 70%);
-  border-radius: 50%;
-  opacity: 0;
-  transition: all 0.4s ease;
-  z-index: 1;
-}
-
-.logo-section:hover .logo-icon {
-  transform: scale(1.1) rotate(5deg);
-  filter: drop-shadow(0 0 8px rgba(127, 255, 212, 0.6));
-}
-
-.logo-section:hover .logo-text {
-  color: #7fffd4;
-  text-shadow: 0 0 12px rgba(127, 255, 212, 0.8);
-}
-
-.logo-section:hover .logo-glow {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.2);
-}
-
-/* 🔗 LIENS DE NAVIGATION */
-.nav-links {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.nav-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  background: transparent;
-  border: 1px solid rgba(127, 255, 212, 0.2);
-  border-radius: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.nav-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(127, 255, 212, 0.1) 0%, 
-    rgba(106, 90, 205, 0.1) 100%);
-  border-radius: 1rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.nav-button:hover::before {
-  opacity: 1;
-}
-
-.nav-icon {
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  z-index: 2;
-  position: relative;
-}
-
-.nav-text {
-  transition: all 0.3s ease;
-  z-index: 2;
-  position: relative;
-  letter-spacing: 0.02em;
-}
-
-.nav-button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(127, 255, 212, 0.4);
-  box-shadow: 0 4px 12px rgba(127, 255, 212, 0.2);
-}
-
-.nav-button:hover .nav-icon {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 6px rgba(127, 255, 212, 0.5));
-}
-
-.nav-button:hover .nav-text {
-  color: #7fffd4;
-}
-
-/* ✨ ÉTAT ACTIF */
-.nav-button.active {
-  background: linear-gradient(135deg, 
-    rgba(127, 255, 212, 0.15) 0%, 
-    rgba(106, 90, 205, 0.15) 100%);
-  border-color: rgba(127, 255, 212, 0.5);
-  color: #7fffd4;
-  box-shadow: 0 0 20px rgba(127, 255, 212, 0.3);
-}
-
-.nav-button.active .nav-icon {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 8px rgba(127, 255, 212, 0.6));
-}
-
-.nav-button.active .nav-text {
-  color: #7fffd4;
-  text-shadow: 0 0 8px rgba(127, 255, 212, 0.5);
-  font-weight: 600;
-}
-
-.nav-button.active::before {
-  opacity: 1;
-}
-
-/* 📱 RESPONSIVE NAVIGATION */
-@media (max-width: 768px) {
-  .main-nav {
-    padding: 0.8rem 1rem;
-  }
-  
-  .nav-container {
-    gap: 1rem;
-  }
-  
-  .logo-section {
-    gap: 0.5rem;
-    padding: 0.4rem 0.8rem;
-  }
-  
-  .logo-icon {
-    font-size: 1.5rem;
-  }
-  
-  .logo-text {
-    font-size: 1.2rem;
-  }
-  
-  .nav-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
-  
-  .nav-text {
-    display: none;
-  }
-  
-  .nav-button {
-    min-width: 2.5rem;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-nav {
-    padding: 0.6rem 0.8rem;
-  }
-  
-  .logo-text {
-    font-size: 1.1rem;
-  }
-  
-  .nav-button {
-    padding: 0.4rem 0.8rem;
-  }
+@keyframes cosmicFlow {
+  from { transform: scale(1) translateY(0px); opacity: 0.6; }
+  to   { transform: scale(1.15) translateY(10px); opacity: 0.8; }
 }
 
 /* 🪐 STRUCTURE GLOBALE */
@@ -289,8 +44,6 @@ body {
   align-items: center;
   text-align: center;
   z-index: 1;
-  padding-top: 80px; /* Espace pour la navigation principale */
-  padding-bottom: 100px; /* Espace pour le menu du bas */
 }
 
 .app-container {
@@ -301,72 +54,65 @@ body {
 }
 
 /* 🌠 TITRES PRINCIPAUX */
-.header h1, .title {
-  font-size: 2rem;
-  margin-bottom: 0.4rem;
-  text-shadow: 0 0 12px #aabaff, 0 0 22px #6a5acd;
-  animation: titleGlow 5s ease-in-out infinite alternate;
-  letter-spacing: 0.03em;
+.home-title {
+  font-size: 2.3rem;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 0 14px #aabaff, 0 0 28px #6a5acd80;
+  animation: titleGlow 6s ease-in-out infinite alternate;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 
-.subtitle {
+.tagline {
   font-style: italic;
-  color: #b7c4ff;
-  font-size: 1rem;
+  color: #bcd0ff;
+  font-size: 1.05rem;
   opacity: 0.9;
-  text-shadow: 0 0 8px #5555ff40;
-  margin-bottom: 1.2rem;
+  text-shadow: 0 0 8px #6666ff40;
+  margin-bottom: 1.4rem;
+  line-height: 1.5;
 }
 
 /* 🧘‍♀️ TEXTES & PARAGRAPHES */
 .main p,
 .intro-zone {
-  max-width: 360px;
+  max-width: 420px;
   margin: 1.5rem auto;
-  line-height: 1.6;
+  line-height: 1.65;
   color: #e4e6ff;
   font-size: 1rem;
-  text-shadow: 0 0 6px #3a3aff40;
+  text-shadow: 0 0 8px #3a3aff33;
+  font-weight: 300;
 }
 
-.intro-zone strong {
-  color: #7fffd4;
-  text-shadow: 0 0 6px #6ff;
-}
-
-/* 🌠 BOUTON COSMIQUE PHOSPHORESCENT */
-.dream-button,
-.start-btn,
-.enter-btn {
+/* 🌠 BOUTON COSMIQUE */
+.dream-button {
   background: linear-gradient(90deg, #6a5acd, #7fffd4);
   border: none;
   border-radius: 2rem;
   padding: 0.9rem 1.8rem;
   color: #0b0b1a;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 1.1rem;
   margin-top: 1.2rem;
   cursor: pointer;
-  transition: all 0.35s ease;
-  box-shadow: 0 0 10px #7fffd4aa, 0 0 20px rgba(106,90,205,0.3);
+  transition: all 0.4s ease;
+  box-shadow: 0 0 14px #7fffd466, 0 0 24px rgba(106,90,205,0.35);
 }
-
-.dream-button:hover,
-.start-btn:hover,
-.enter-btn:hover {
+.dream-button:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 20px #7fffd4, 0 0 40px #6a5acd;
-  letter-spacing: 0.02em;
+  box-shadow: 0 0 24px #7fffd4, 0 0 48px #6a5acd;
+  letter-spacing: 0.025em;
 }
 
-/* 🌬️ TEXTE DOUX & HINTS */
+/* 🌬️ TEXTE DOUX */
 .hint {
   font-size: 0.9rem;
   color: #b8c8ff;
   margin-top: 1.2rem;
-  opacity: 0.8;
+  opacity: 0.85;
   font-style: italic;
-  text-shadow: 0 0 4px #334;
+  text-shadow: 0 0 5px #334;
 }
 
 /* 🪶 PIED DE PAGE */
@@ -377,161 +123,101 @@ body {
   color: #99aaff;
   text-align: center;
   padding-bottom: 1rem;
+  transition: opacity 0.3s ease;
 }
+.footer:hover { opacity: 0.8; }
 
-/* ✨ ANIMATIONS */
+/* ✨ ANIMATIONS DE LUMIÈRE */
 @keyframes titleGlow {
-  from { text-shadow: 0 0 10px #99f, 0 0 25px #55f; }
-  to   { text-shadow: 0 0 25px #bbf, 0 0 45px #88f; }
+  0% { text-shadow: 0 0 12px #99f, 0 0 28px #55f; color: #dfe6ff; }
+  100% { text-shadow: 0 0 28px #bbf, 0 0 48px #88f; color: #ffffff; }
 }
 
 /* 🌌 ENTRÉE FLUIDE */
 .fade-in {
-  animation: fadeIn 1.2s ease forwards;
+  animation: fadeIn 1.4s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fadeIn {
+/* 💫 LOGO VERTICAL 🌘•° Onimoji */
+.home-logo {
+  display: flex;
+  flex-direction: column;       /* ✅ Vertical */
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  color: #aeeeff;
+  margin-bottom: 1.6rem;
+  opacity: 0;
+  animation: fadeInLogo 1.6s ease forwards;
+}
+
+/* 🌙 Symbole cosmique */
+.moon-symbol {
+  font-size: 2.8rem;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  animation: moonPulse 6s ease-in-out infinite;
+  text-shadow: 0 0 15px rgba(127,255,212,0.6),
+               0 0 30px rgba(106,90,205,0.5);
+  margin-bottom: 0.3rem;
+  color: #aeeeff;
+}
+
+/* ✨ Nom Onimoji dessous */
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #dff;
+  text-shadow: 0 0 8px rgba(127,255,212,0.5),
+               0 0 18px rgba(106,90,205,0.4);
+  animation: textGlow 6s ease-in-out infinite;
+}
+
+/* ✨ Apparition douce */
+@keyframes fadeInLogo {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🌬️ PETIT SOUFFLE VISUEL POUR LES BLOCS */
-.card-glow {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  box-shadow: 0 0 25px rgba(150,180,255,0.1);
-  padding: 1rem 2rem;
-  backdrop-filter: blur(6px);
-  transition: transform 0.3s ease, box-shadow 0.4s ease;
-}
-
-.card-glow:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 35px rgba(150,180,255,0.25);
-}
-
-/* 💫 LOGO ET TITRE HOME */
-.logo-zone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: fadeIn 2s ease forwards;
-}
-
-.logo-svg {
-  filter: drop-shadow(0 0 12px rgba(150,220,255,0.6));
-  margin-bottom: 0.6rem;
-  width: 90px;
-  height: 90px;
-  transition: transform 1s ease;
-}
-
-.logo-svg:hover {
-  transform: rotate(5deg) scale(1.05);
-}
-
-.home-title {
-  font-size: 2.4rem;
-  color: #aeeeff;
-  text-shadow: 0 0 12px rgba(120,240,255,0.8);
-  margin-top: 0.4rem;
-  letter-spacing: 0.05em;
-}
-
-.tagline {
-  font-size: 1.1rem;
-  line-height: 1.5;
-  font-style: italic;
-  color: #bfefff;
-  margin-top: 0.8rem;
-  text-shadow: 0 0 8px rgba(180,220,255,0.4);
-}
-
-/* 🌙 RESPONSIVE GLOBAL */
-@media (max-width: 768px) {
-  .app-root {
-    padding-top: 70px;
-    padding-bottom: 90px;
+/* 🌙 Respiration cosmique */
+@keyframes moonPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+    text-shadow: 0 0 15px rgba(127,255,212,0.4),
+                 0 0 30px rgba(106,90,205,0.3);
   }
-  
-  .home-title {
-    font-size: 1.8rem;
-  }
-  .tagline {
-    font-size: 1rem;
-  }
-  .card-glow {
-    padding: 1rem 1.4rem;
-  }
-  .dream-button {
-    padding: 0.8rem 1.4rem;
-    font-size: 1rem;
-  }
-  .intro-zone, .main p {
-    max-width: 90%;
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    text-shadow: 0 0 25px rgba(127,255,212,0.9),
+                 0 0 45px rgba(106,90,205,0.6);
   }
 }
 
+/* 💫 Halo respirant du mot */
+@keyframes textGlow {
+  0%, 100% { opacity: 0.8; letter-spacing: 0.08em; }
+  50% { opacity: 1; letter-spacing: 0.12em; }
+}
+
+/* 📱 RESPONSIVE */
 @media (max-width: 600px) {
-  .app-root {
-    padding-top: 60px;
-    padding-bottom: 80px;
-  }
-  
-  .home-title {
-    font-size: 1.6rem;
-  }
-  .tagline {
-    font-size: 0.9rem;
-  }
-  .card-glow {
-    padding: 0.8rem 1.2rem;
-  }
-  .dream-button {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  .intro-zone, .main p {
-    max-width: 95%;
-  }
+  .home-title { font-size: 1.8rem; }
+  .tagline { font-size: 1rem; }
+  .dream-button { padding: 0.8rem 1.4rem; font-size: 1rem; }
+  .intro-zone, .main p { max-width: 90%; }
+  .moon-symbol { font-size: 2.2rem; }
+  .brand-name { font-size: 1.2rem; }
 }
-
-/* 🎯 AMÉLIORATIONS D'ACCESSIBILITÉ */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* 🌟 FOCUS VISIBLE POUR ACCESSIBILITÉ */
-.nav-button:focus-visible,
-.menu-item:focus-visible,
-.logo-section:focus-visible {
-  outline: 2px solid #7fffd4;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(127, 255, 212, 0.2);
-}
-
-/* 📱 OPTIMISATION TOUCH */
-@media (hover: none) and (pointer: coarse) {
-  .nav-button,
-  .menu-item,
-  .logo-section {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  .nav-button:hover,
-  .menu-item:hover,
-  .logo-section:hover {
-    transform: none;
-  }
-  
-  .nav-button:active,
-  .menu-item:active,
-  .logo-section:active {
-    transform: scale(0.95);
-  }
+.moon-wrapper {
+  position: relative;
+  z-index: 10;
+  margin-top: -80px;
 }

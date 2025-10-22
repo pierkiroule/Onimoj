@@ -30,7 +30,7 @@ export default function Auth({ onAuth }) {
 
   return (
     <div className="fade-in" style={{ textAlign: 'center', color: '#eee', padding: '1.5rem' }}>
-      <h1>🌘 Onimoji</h1>
+      
       <h3>{mode === 'signup' ? '✨ Crée ton compte onirique' : '🌙 Connecte-toi à ton espace'}</h3>
 
       <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>

@@ -23,12 +23,15 @@ export async function askNebius(prompt, options = {}) {
   const body = {
     model: options.model || "google/gemma-2-2b-it",
     messages: [
+      // system must be first
       {
         role: "system",
         content:
           options.systemPrompt ||
           "Tu es un assistant poétique et bienveillant. Réponds en français, avec des images sensorielles, un ton apaisant et concis.",
       },
+      // optional few-shot examples array: must be valid Nebius message objects
+      ...(Array.isArray(options.examples) ? options.examples : []),
       {
         role: "user",
         content: [{ type: "text", text: prompt }],
@@ -36,6 +39,7 @@ export async function askNebius(prompt, options = {}) {
     ],
     temperature: options.temperature ?? 0.8,
     stream: options.stream ?? false,
+    max_tokens: options.max_tokens,
   }
 
   try {

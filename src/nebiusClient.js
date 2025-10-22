@@ -1,8 +1,12 @@
 // src/nebiusClient.js
 // ⚡ Client universel Nebius Studio Chat (complet + streaming)
 
-const API_URL = "https://api.studio.nebius.com/v1/chat/completions"
-const API_KEY = import.meta.env.VITE_NEBIUS_KEY
+const API_URL =
+  import.meta.env.VITE_NEBIUS_API_URL ||
+  "https://api.studio.nebius.com/v1/chat/completions"
+// Support both the correct name and the older one to avoid prod breakage
+const API_KEY =
+  import.meta.env.VITE_NEBIUS_API_KEY || import.meta.env.VITE_NEBIUS_KEY
 
 /**
  * Fonction principale : demande à Nebius une réponse textuelle.
@@ -35,11 +39,18 @@ export async function askNebius(prompt, options = {}) {
   }
 
   try {
+    if (!API_KEY) {
+      console.error(
+        "⛔ Clé API Nebius absente. Définis VITE_NEBIUS_API_KEY dans tes variables d'environnement (et redéploie)."
+      )
+      return ""
+    }
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
+        Authorization: `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
+        ...(options.stream ? { Accept: "text/event-stream" } : {}),
       },
       body: JSON.stringify(body),
     })

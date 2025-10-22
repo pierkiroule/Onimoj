@@ -67,7 +67,7 @@ export default function App() {
 
   // 🪄 Rendu principal
   const renderPage = () => {
-    if (!session) return <Auth onAuth={(user) => setSession({ user })} />
+    if (!session) return <Auth onAuth={(newSession) => setSession(newSession)} />
 
     switch (page) {
       case "home":

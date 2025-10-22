@@ -29,16 +29,16 @@ export default function Home({ onStart, onLogin, onRegister }) {
           textShadow: "0 0 8px rgba(180,220,255,0.4)",
         }}
       >
-        Prendre soin de ses rêves en explorant les cultures oniriques.
+        Prendre soin de ses rêves en explorant les univers culturels oniriques.
       </h2>
 
       {/* 🌠 TITRE PRINCIPAL */}
-      <h1 className="home-title">Bienvenue à bord de la Navette Oniris</h1>
+      <h1 className="home-title">Bienvenue à bord de la Navette MythOniris</h1>
 
       {/* 🌌 INTRODUCTION */}
       <p className="intro-zone">
         Onimoji est une expérience poétique et culturelle.  
-        Un voyage dans les rêves du monde, à travers des hyperbulles mythiques reliées par la résonance.
+        Un voyage dans les rêves du monde, à travers des hyperbulles mythoniriques reliées par la résonance.
       </p>
 
       {/* 💫 SECTION — POURQUOI */}

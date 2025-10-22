@@ -21,8 +21,23 @@ export default function Auth({ onAuth }) {
       }
 
       if (result.error) throw result.error
+      const { user, session } = result.data || {}
+
+      if (mode === 'signup') {
+        // Si confirmation par email activée → pas de session immédiate
+        if (!session) {
+          setStatus('📧 Vérifie tes emails pour confirmer ton compte.')
+          return
+        }
+        setStatus('✅ Compte créé et connecté !')
+        onAuth(session)
+        return
+      }
+
+      // Sign-in normal
+      if (!session) throw new Error('Session introuvable après connexion')
       setStatus('✅ Connecté !')
-      onAuth(result.data.user)
+      onAuth(session)
     } catch (err) {
       setStatus('❌ ' + err.message)
     }

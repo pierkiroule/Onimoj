@@ -10,12 +10,12 @@ export const onimojiQuizFr = [
       "C. Le feu du volcan"
     ],
     answer: "A",
-    comment: "Je suis Sila, le souffle du monde. Je relie ta respiration au mouvement des nuages, tes pensées au vent qui passe. Dans le rêve, je t’enseigne à écouter la vie circuler partout, en toi et autour de toi."
+    comment: "Je suis Sila, le souffle du monde. Je relie ta respiration au mouvement des nuages; dans le rêve, j’enseigne l’écoute qui équilibre."
   },
   {
     step: 2,
     spirit: "Sedna",
-    symbol: "🦭",
+    symbol: "🌊",
     question: "Je fus trahie et jetée à la mer. Pourquoi suis-je devenue la Mère des océans ?",
     options: [
       "A. Parce que je contrôle les tempêtes",
@@ -23,137 +23,137 @@ export const onimojiQuizFr = [
       "C. Parce que je chasse les mauvais esprits"
     ],
     answer: "B",
-    comment: "Je suis Sedna, la déesse des profondeurs. Dans mes eaux vivent les phoques, les baleines et la mémoire des douleurs anciennes. Quand tu rêves de plonger, c’est mon pardon qui t’enveloppe et te guérit."
+    comment: "Je suis Sedna, mémoire des profondeurs. Quand on respecte la mer, je délie mes cheveux et les vivants reviennent."
   },
   {
     step: 3,
-    spirit: "Nuliajuk",
-    symbol: "🌊",
-    question: "Je suis la voix des courants intérieurs. Que t’invite-je à faire dans le rêve ?",
+    spirit: "Qailertetang",
+    symbol: "🕯️",
+    question: "Je veille sur l’équilibre du vivant. Que symbolise mon rituel ?",
     options: [
-      "A. Lutter contre les émotions",
-      "B. Suivre la marée du cœur",
-      "C. Oublier la mer"
+      "A. La protection par l’attention",
+      "B. La force qui contraint",
+      "C. La prise sans offrande"
     ],
-    answer: "B",
-    comment: "Je suis Nuliajuk. En toi, mes vagues ne veulent pas te noyer mais te porter. Laisse-toi dériver un instant : le rêve est une mer douce, où les émotions deviennent des alliées plutôt que des tempêtes."
+    answer: "A",
+    comment: "Je suis Qailertetang. Mes gestes lents rappellent de rendre soin là où l’on prend, pour que la glace s’ouvre au bon endroit."
   },
   {
     step: 4,
-    spirit: "Qailertetang",
-    symbol: "❄️",
-    question: "Je veille sur les enfants et les voyageurs. Que symbolise ma neige ?",
+    spirit: "Tornarsuk",
+    symbol: "💀",
+    question: "Je traverse les mondes invisibles. Pourquoi les chamans m’appellent-ils ?",
     options: [
-      "A. Le silence protecteur",
-      "B. Le froid mortel",
-      "C. La lumière de la lune"
+      "A. Pour montrer la voie des esprits",
+      "B. Pour dominer les tempêtes",
+      "C. Pour la force brute seulement"
     ],
     answer: "A",
-    comment: "Je suis Qailertetang, la gardienne des neiges et des orages. Ma blancheur protège sans étouffer. Dans tes rêves, je t’enveloppe pour que tu apprennes la douceur qui abrite, non celle qui enferme."
+    comment: "Je suis Tornarsuk. Je ne crie pas; je rallume la braise intérieure et restaure le lien entre l’âme, la terre et le ciel."
   },
   {
     step: 5,
-    spirit: "Tekkeitsertok",
-    symbol: "🐋",
-    question: "Je suis le maître des animaux. Que veux-je t’apprendre ?",
+    spirit: "Nuliajuk",
+    symbol: "🌌",
+    question: "Je garde au fond les animaux quand le lien se rompt. Que t’invite-je à faire ?",
     options: [
-      "A. À dominer la nature",
-      "B. À chasser sans gratitude",
-      "C. À respecter et remercier le vivant"
+      "A. Forcer la mer",
+      "B. Démêler avec douceur",
+      "C. Fermer les rêves"
     ],
-    answer: "C",
-    comment: "Je suis Tekkeitsertok. Chaque vie que tu prends te confie un secret. Dans le rêve, je t’invite à remercier avant de demander, car toute offrande nourrit le cercle invisible du vivant."
+    answer: "B",
+    comment: "Je suis Nuliajuk. Un peigne de respect, une eau claire d’intention: alors les phoques respirent à nouveau."
   },
   {
     step: 6,
-    spirit: "Mahaha",
-    symbol: "💨",
-    question: "Je ris dans le froid. Que fais-je lorsque tu me rencontres en rêve ?",
+    spirit: "Igaluk",
+    symbol: "🌕",
+    question: "Je marche en cycles. Que fais-je pour ta nuit intérieure ?",
     options: [
-      "A. Je t’effraie jusqu’à la fuite",
-      "B. Je dissous ta peur par le rire",
-      "C. Je t’enduis de glace"
+      "A. Je révèle sans hâter",
+      "B. J’éteins les rêves",
+      "C. J’accélère tout sans mesure"
     ],
-    answer: "B",
-    comment: "Je suis Mahaha, le rire du vent. Mes doigts glacés chatouillent ton sérieux. Quand je ris, la peur s’évapore. Le rêve n’a plus de poids : il devient éclat de rire cosmique."
+    answer: "A",
+    comment: "Je suis Igaluk, la Lune. Le rythme juste répare; la patience éclaire ce qui mûrit."
   },
   {
     step: 7,
-    spirit: "Tornarsuk",
-    symbol: "💫",
-    question: "Je traverse les mondes. Pourquoi les chamans m’appellent-ils ?",
+    spirit: "Aningan",
+    symbol: "🔥",
+    question: "Je poursuis la clarté. Que t’enseigne ma quête ?",
     options: [
-      "A. Pour que je leur montre la voie des esprits",
-      "B. Pour contrôler les tempêtes",
-      "C. Pour guérir les corps seulement"
+      "A. Courir sans repos",
+      "B. Alterner élan et nourrissement",
+      "C. Renoncer au but"
     ],
-    answer: "A",
-    comment: "Je suis Tornarsuk, grand esprit des chamans. Je souffle dans les rêves des guérisseurs. Je ne soigne pas les blessures, je restaure le lien : celui entre l’âme, la terre et le ciel."
+    answer: "B",
+    comment: "Je suis Aningan. L’élan a besoin d’alternance: partir, se nourrir, reprendre; la trace reste visible."
   },
   {
     step: 8,
-    spirit: "Pinga",
-    symbol: "🌕",
-    question: "Je veille sur les saisons et la fécondité. Que t’enseigne mon cycle ?",
+    spirit: "Malina",
+    symbol: "🌞",
+    question: "Je suis la clarté qui réchauffe. Que fais-je à tes peurs ?",
     options: [
-      "A. Craindre le changement",
-      "B. Honorer le retour du vivant",
-      "C. Refuser la transformation"
+      "A. Je les brûle sans discernement",
+      "B. Je les éclaire et les adoucis",
+      "C. Je les ignore"
     ],
     answer: "B",
-    comment: "Je suis Pinga, celle qui régule les cycles. Rien ne meurt, tout se transforme. Dans le rêve, je te rappelle que chaque fin contient déjà le recommencement."
+    comment: "Je suis Malina, Soleil. La clarté est un soin: elle sèche les vêtements et réveille les rires."
   },
   {
     step: 9,
-    spirit: "Anguta",
-    symbol: "⚰️",
-    question: "Je guide les âmes vers le repos. Que suis-je pour les rêveurs ?",
+    spirit: "Amaruq",
+    symbol: "🐺",
+    question: "Je marche d’un pas régulier. Qui suis-je pour l’égaré de nuit ?",
     options: [
-      "A. La fin absolue",
-      "B. Le passeur entre les mondes",
-      "C. Le gardien des tempêtes"
+      "A. Un piège",
+      "B. Un guide au pas qui réchauffe",
+      "C. Une menace qui poursuit"
     ],
     answer: "B",
-    comment: "Je suis Anguta, le marcheur entre vie et mort. Je t’invite à mourir un peu pour renaître mieux. Dans le rêve, chaque adieu ouvre un passage vers une forme nouvelle d’existence."
+    comment: "Je suis Amaruq, loup du large. Répéter un bon pas vaut mieux que courir au hasard."
   },
   {
     step: 10,
-    spirit: "Igaluk",
-    symbol: "🌙",
-    question: "Je brille sur la nuit intérieure. Que fais-je pour ton âme endormie ?",
+    spirit: "Qiqirn",
+    symbol: "🌪️",
+    question: "Je fais trembler. Que se passe-t-il si tu t’immobilises ?",
     options: [
-      "A. Je révèle ce qui se cache dans l’ombre",
-      "B. Je fais taire les rêves",
-      "C. Je détourne les pensées"
+      "A. Je grandis",
+      "B. Je perds ma force",
+      "C. Je te poursuis plus fort"
     ],
-    answer: "A",
-    comment: "Je suis Igaluk, la Lune masculine. J’éclaire tes zones obscures sans les juger. Je t’aide à voir la beauté de ce qui est resté dans l’ombre, car le rêve est la lumière du dedans."
+    answer: "B",
+    comment: "Je suis Qiqirn. Ce que tu ne nourris pas s’éteint; l’immobilité me désoriente."
   },
   {
     step: 11,
-    spirit: "Aurora",
-    symbol: "🌈",
-    question: "Je danse dans le ciel. Que vois-tu lorsque je m’anime au-dessus de toi ?",
+    spirit: "Nanook",
+    symbol: "🐻",
+    question: "Je suis maître des ours. Que veux-je t’apprendre ?",
     options: [
-      "A. Des âmes heureuses en mouvement",
-      "B. Un feu qui détruit",
-      "C. Des baleines en migration"
+      "A. La force qui se vante",
+      "B. La dignité qui partage",
+      "C. La chasse sans gratitude"
     ],
-    answer: "A",
-    comment: "Je suis Aurora, la lumière chantante. Quand je danse, les âmes rient et se saluent entre les mondes. Rêver de moi, c’est sentir la joie des liens retrouvés."
+    answer: "B",
+    comment: "Je suis Nanook. Là où la dignité précède la force, la chance revient."
   },
   {
     step: 12,
-    spirit: "Nanook",
-    symbol: "🐻",
-    question: "Je suis l’ours blanc. Que veux-je t’apprendre au terme de ton voyage ?",
+    spirit: "Pinga",
+    symbol: "🌈",
+    question: "Je veille sur les cycles et le soin. Quel est mon enseignement ?",
     options: [
-      "A. La peur et la force brute",
-      "B. La sagesse tranquille du gardien",
-      "C. Le sommeil sans rêve"
+      "A. Craindre la fin",
+      "B. Honorer le retour et remercier",
+      "C. Forcer les passages"
     ],
     answer: "B",
-    comment: "Je suis Nanook, seigneur des glaces. Je t’enseigne la puissance qui veille sans violence. Rêver avec moi, c’est apprendre à protéger sans dominer — à être fort sans cesser d’aimer."
+    comment: "Je suis Pinga. La gratitude nourrit ce qui doit revenir; les cycles se souviennent."
   }
 ]
 

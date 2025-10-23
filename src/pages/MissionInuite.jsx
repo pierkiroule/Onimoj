@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "../supabaseClient"
 import HublotResonant from "../components/HublotResonant"
+import ModuleInuitStep from "../components/ModuleInuitStep"
 import OnimojiCard from "../components/OnimojiCard"
 import OnimojiNarration from "../components/OnimojiNarration"
 import OnimojiQuiz from "../components/OnimojiQuiz"
@@ -17,6 +18,7 @@ export default function MissionInuite() {
   const [title, setTitle] = useState("")
   const [saving, setSaving] = useState(false)
   const [onimoji, setOnimoji] = useState(null)
+  const [showHublot, setShowHublot] = useState(false)
 
   // Charge mission + étape
   useEffect(() => {
@@ -128,8 +130,16 @@ export default function MissionInuite() {
         {current.description || "Aucune description."}
       </p>
 
-      {/* 1) Hublot réseau pour choisir 3 esprits */}
-      {!pendingData && !onimoji && (
+      {/* 1) Module inuit (lecture/ressenti) */}
+      {!onimoji && (
+        <ModuleInuitStep
+          step={current}
+          onOpenHublot={() => setShowHublot(true)}
+        />
+      )}
+
+      {/* 2) Hublot réseau pour choisir 3 esprits */}
+      {showHublot && !pendingData && !onimoji && (
         <HublotResonant
           culture="Inuite"
           userId={user.id}
@@ -137,11 +147,12 @@ export default function MissionInuite() {
           onComplete={(data) => {
             setPendingData(data)
             setTitle(data.title || "")
+            setShowHublot(false)
           }}
         />
       )}
 
-      {/* 2) Titre + Enregistrer */}
+      {/* 3) Titre + Enregistrer */}
       {pendingData && !onimoji && (
         <div style={{ marginTop: "1rem" }}>
           <input
@@ -172,7 +183,7 @@ export default function MissionInuite() {
         </div>
       )}
 
-      {/* 3) Bulle affichée + narration + quiz */}
+      {/* 4) Bulle affichée + narration + quiz */}
       {onimoji && (
         <>
           <OnimojiCard star={onimoji} />

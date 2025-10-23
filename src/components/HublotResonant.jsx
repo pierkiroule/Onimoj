@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
 import { inuitNodes, inuitLinks } from "../data/InuitNetwork" // => { id, emoji, label?, group? }
+import "./HublotResonant.css"
 
 export default function HublotResonant({ culture = "Inuite", userId, step = {}, onComplete }) {
   const svgRef = useRef(null)
@@ -19,6 +20,7 @@ export default function HublotResonant({ culture = "Inuite", userId, step = {}, 
 
     svg
       .attr("viewBox", [0, 0, width, height])
+      .attr("class", "hublot__svg")
       .style("touch-action", "none")
       .style("background", "radial-gradient(circle at 50% 50%, #08121a, #000)")
       .style("border-radius", "50%")
@@ -162,51 +164,29 @@ export default function HublotResonant({ culture = "Inuite", userId, step = {}, 
   }
 
   return (
-    <div style={{ textAlign: "center", color: "#eef" }}>
+    <div className="hublot">
       <h3>🌌 Hublot résonant</h3>
-      <p style={{ opacity: 0.8, marginTop: -6 }}>Sélectionne 3 bulles (tap).</p>
+      <p className="hublot__subtitle">Sélectionne 3 bulles (tap).</p>
 
-      <svg ref={svgRef} width="320" height="320" style={{ margin: "1rem auto" }} />
+      <svg ref={svgRef} width="320" height="320" />
 
       {/* sélection en cours */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+      <div className="hublot__selected">
         {selected.map((id) => {
           const n = inuitNodes.find(x => x.id === id)
           return (
-            <span
-              key={id}
-              style={{
-                background: "#7fffd422",
-                border: "1px solid #7fffd4",
-                borderRadius: 12,
-                padding: "4px 8px",
-                fontSize: 16,
-                color: "#bff",
-              }}
-            >
+            <span key={id} className="hublot__chip">
               {n?.emoji || "✨"}
             </span>
           )
         })}
       </div>
 
-      <button
-        onClick={handleValidate}
-        style={{
-          marginTop: 12,
-          background: "linear-gradient(90deg,#6a5acd,#7fffd4)",
-          border: "none",
-          borderRadius: 10,
-          padding: "10px 18px",
-          fontWeight: 700,
-          color: "#111",
-          cursor: "pointer",
-        }}
-      >
+      <button className="hublot__validate-btn" onClick={handleValidate}>
         Valider (3)
       </button>
 
-      {status && <p style={{ marginTop: 10, opacity: 0.8, fontStyle: "italic" }}>{status}</p>}
+      {status && <p className="hublot__status">{status}</p>}
     </div>
   )
 }

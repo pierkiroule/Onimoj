@@ -1,12 +1,27 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useMemo } from "react"
 
-export default function OnimojiCard({ star }) {
+export default function BulleMythonirique({ bulle }) {
   const canvasRef = useRef()
+
+  const phrasePoetique = useMemo(() => {
+    const map = {
+      "🌬️": "le souffle du monde",
+      "🐋": "la mer-mère des transformations",
+      "🦌": "le voyage de l’âme",
+      "🧙‍♂️": "le passeur des mondes",
+      "🌘": "le rythme du rêve",
+      "🪶": "le messager du ciel"
+    }
+    const l = bulle.emojis.map(e => map[e] || e)
+    if (l.length === 3)
+      return `Entre ${l[0]}, ${l[1]} et ${l[2]}, une bulle de rêve s’élève.`
+    return `Une bulle s’éveille entre terre et ciel.`
+  }, [bulle.emojis])
 
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext("2d")
-    const emojis = (star.emojis || []).slice(0, 3)
+    const emojis = bulle.emojis
     const cx = 120, cy = 120
     const baseR = 80
     const innerR = 35
@@ -18,15 +33,15 @@ export default function OnimojiCard({ star }) {
 
       const pulse = 1 + 0.05 * Math.sin(t * 2)
       const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, baseR * pulse)
-      grad.addColorStop(0, "rgba(110,255,180,0.08)")
-      grad.addColorStop(1, "rgba(30,60,70,0.35)")
+      grad.addColorStop(0, "rgba(150,255,200,0.08)")
+      grad.addColorStop(1, "rgba(20,40,60,0.4)")
       ctx.fillStyle = grad
       ctx.beginPath()
       ctx.arc(cx, cy, baseR * pulse, 0, Math.PI * 2)
       ctx.fill()
 
       for (let i = 0; i < emojis.length; i++) {
-        const angle = (i * (2 * Math.PI)) / 3 + t * 0.5
+        const angle = (i * (2 * Math.PI)) / emojis.length + t * 0.5
         const r = innerR + 10 * Math.sin(t * 1.2 + i)
         const x = cx + Math.cos(angle) * r
         const y = cy + Math.sin(angle) * r
@@ -43,19 +58,16 @@ export default function OnimojiCard({ star }) {
         ctx.textBaseline = "middle"
         ctx.fillText(emojis[i], x, y)
       }
+
       requestAnimationFrame(draw)
     }
     draw()
-  }, [star])
-
-  const reso = Number(star.resonance_level ?? 1)
+  }, [bulle])
 
   return (
     <div style={{ textAlign: "center", marginTop: "1rem" }}>
-      <h3 style={{ color: "#bff", marginBottom: "0.3rem" }}>{star.title}</h3>
-      <p style={{ opacity: 0.7, fontSize: "0.9rem" }}>
-        🌌 Résonance : {(reso * 100).toFixed(0)}%
-      </p>
+      <h3 style={{ color: "#bff", marginBottom: "0.3rem" }}>{bulle.titre}</h3>
+      <p style={{ opacity: 0.75, fontSize: "0.9rem" }}>{phrasePoetique}</p>
       <canvas
         ref={canvasRef}
         width={240}
@@ -63,8 +75,8 @@ export default function OnimojiCard({ star }) {
         style={{
           background: "radial-gradient(circle,#010a10,#000)",
           borderRadius: "50%",
-          boxShadow: "0 0 30px rgba(110,255,180,0.3)",
-          marginTop: "0.5rem",
+          boxShadow: "0 0 30px rgba(150,255,200,0.3)",
+          marginTop: "0.5rem"
         }}
       />
     </div>

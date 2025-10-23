@@ -18,6 +18,7 @@
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
     "framer-motion": "^12.23.24",
+    "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4",
@@ -25,6 +26,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
@@ -32,16 +36,11 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
-    "vite": "npm:rolldown-vite@7.1.14",
-    "vitest": "^2.1.5",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@testing-library/jest-dom": "^6.6.3",
-    "jsdom": "^25.0.1"
+    "jsdom": "^25.0.1",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.5"
   },
-  "overrides": {
-    "vite": "npm:rolldown-vite@7.1.14"
-  },
+  
   "vitest": {
     "environment": "jsdom",
     "setupFiles": [

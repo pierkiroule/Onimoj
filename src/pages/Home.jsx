@@ -37,8 +37,8 @@ export default function Home({ onStart, onLogin, onRegister }) {
 
       {/* 🌌 INTRODUCTION */}
       <p className="intro-zone">
-        Onimoji est une expérience poétique et culturelle.  
-        Un voyage dans les rêves du monde, à travers des hyperbulles mythoniriques reliées par la résonance.
+        Onimoji est une expérience de décentration culturelle pour expérimenter d'autres conceptions du monde et autre rapport aux fonctions du sommeil et des rêves.  
+    
       </p>
 
       {/* 💫 SECTION — POURQUOI */}

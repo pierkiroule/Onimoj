@@ -120,20 +120,23 @@ export default function MissionInuite() {
   }
 
   if (loading) return <p style={{ color: "#eee", textAlign: "center" }}>🌘 Chargement…</p>
-  if (!mission || !current) return <p style={{ color: "#eee", textAlign: "center" }}>{status}</p>
+  if (!mission) return <p style={{ color: "#eee", textAlign: "center" }}>{status}</p>
+
+  // Fallback d'étape si la ligne correspondante manque dans mission_steps_inuite
+  const viewStep = current || { step_number: mission.current_step }
 
   return (
     <div style={{ textAlign: "center", color: "#eee", padding: "1rem" }}>
       <h2>❄️ Mission Inuite</h2>
-      <h3>Étape {current.step_number}/12 — {current.spirit_name} {current.symbol}</h3>
+      <h3>Étape {viewStep.step_number}/12 — {viewStep.spirit_name} {viewStep.symbol}</h3>
       <p style={{ maxWidth: "85%", margin: "1rem auto", opacity: 0.8 }}>
-        {current.description || "Aucune description."}
+        {viewStep.description || "Aucune description."}
       </p>
 
       {/* 1) Module inuit (lecture/ressenti) */}
       {!onimoji && (
         <ModuleInuitStep
-          step={current}
+          step={viewStep}
           onOpenHublot={() => setShowHublot(true)}
         />
       )}
@@ -143,7 +146,7 @@ export default function MissionInuite() {
         <HublotResonant
           culture="Inuite"
           userId={user.id}
-          step={current}
+          step={viewStep}
           onComplete={(data) => {
             setPendingData(data)
             setTitle(data.title || "")
@@ -189,7 +192,7 @@ export default function MissionInuite() {
           <OnimojiCard star={onimoji} />
           <OnimojiNarration star={onimoji} />
           <OnimojiQuiz
-            stepNumber={current.step_number}
+            stepNumber={viewStep.step_number}
             userId={user.id}
             onComplete={handleQuizComplete}
           />

@@ -1,16 +1,25 @@
-# React + Vite
+# Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is built with React + Vite.
 
-Currently, two official plugins are available:
+## Flux pédagogique Inuit
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Le parcours de la mission Inuite introduit un module d’étape culturel avant l’interaction du hublot :
 
-## React Compiler
+1. Étape courante chargée via Supabase depuis `mission_steps_inuite`.
+2. Affichage du module `ModuleInuitStep` (texte culturel, question, pratique, intégration).
+3. Clic sur « 🌌 Ouvrir le Hublot » pour lancer `HublotResonant` (sélection de 3 esprits).
+4. Validation renvoie un payload (titre, emojis, culture, esprit, step_number).
+5. Titrage + sauvegarde dans `dream_stars`, puis narration et quiz.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Fichiers clés
 
-## Expanding the ESLint configuration
+- `src/pages/MissionInuite.jsx` — orchestre le flux (étape, module, hublot, enregistrement, quiz).
+- `src/components/ModuleInuitStep.jsx` — présente le contenu culturel de l’étape.
+- `src/components/ModuleInuitStep.css` — styles du module inuit.
+- `src/components/HublotResonant.jsx` — hublot D3 de sélection (3 esprits).
+- `src/data/InuitNetwork.js` — nœuds/liens utilisés par le hublot.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Données
+
+Le contenu textuel (ex. `spirit_name`, `symbol`, `theme`, `description`, `question`, `practice`, `integration`) provient de la table `mission_steps_inuite` et est récupéré via Supabase dans `MissionInuite.jsx`.

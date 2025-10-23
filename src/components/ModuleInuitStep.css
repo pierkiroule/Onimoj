@@ -1,0 +1,70 @@
+.module-inuit {
+  margin: 1rem auto;
+  padding: 1rem;
+  max-width: 680px;
+  background: linear-gradient(180deg, rgba(8, 18, 26, 0.8), rgba(0, 0, 0, 0.7));
+  border: 1px solid rgba(127, 255, 212, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 0 36px rgba(127, 255, 212, 0.15);
+  color: #e9fffd;
+  text-align: left;
+}
+
+.module-inuit__header {
+  margin-bottom: 12px;
+}
+
+.module-inuit__step {
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+.module-inuit__title {
+  margin: 6px 0 0 0;
+  font-size: 20px;
+}
+
+.module-inuit__theme {
+  opacity: 0.9;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.module-inuit__description {
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.module-inuit__block {
+  margin-top: 12px;
+}
+
+.module-inuit__block:first-of-type {
+  margin-top: 10px;
+}
+
+.module-inuit__label {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.module-inuit__content {
+  margin: 0;
+  opacity: 0.92;
+}
+
+.module-inuit__actions {
+  display: flex;
+  justify-content: center;
+}
+
+.module-inuit__open-btn {
+  margin-top: 16px;
+  background: linear-gradient(90deg, #6a5acd, #7fffd4);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 700;
+  color: #111;
+  cursor: pointer;
+}

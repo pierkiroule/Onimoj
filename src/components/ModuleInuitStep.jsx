@@ -23,8 +23,9 @@ export default function ModuleInuitStep({ step = {} }) {
   // 🎬 Lecture vidéo onirique
   const handleVideoClick = async (meta) => {
     try {
-      const videoFile = await import(`../assets/video/${meta.file}`)
-      setVideoSrc(videoFile.default)
+      // Utilise une URL statique résolue par Vite au lieu d'un import dynamique
+      const url = new URL(`../assets/video/${meta.file}`, import.meta.url).href
+      setVideoSrc(url)
       setSelectedMeta(meta)
       setOpenVideo(true)
       setShowTagForm(false)

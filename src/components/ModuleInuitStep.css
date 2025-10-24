@@ -1,65 +1,115 @@
 .module-inuit {
   margin: 1rem auto;
-  padding: 1rem;
+  padding: 1.6rem 1.4rem;
   max-width: 680px;
-  background: linear-gradient(180deg, rgba(8, 18, 26, 0.8), rgba(0, 0, 0, 0.7));
+  background: radial-gradient(circle at 50% 20%, rgba(8, 18, 26, 0.85), rgba(0, 0, 0, 0.75));
   border: 1px solid rgba(127, 255, 212, 0.25);
   border-radius: 16px;
-  box-shadow: 0 0 36px rgba(127, 255, 212, 0.15);
+  box-shadow: 0 0 30px rgba(127, 255, 212, 0.12);
   color: #e9fffd;
   text-align: left;
+  position: relative;
+  overflow: hidden; /* ✅ empêche tout débordement visuel */
+  isolation: isolate; /* ✅ isole les effets internes */
+  backdrop-filter: blur(4px);
 }
 
 .module-inuit__header {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
 }
 
 .module-inuit__step {
-  opacity: 0.85;
-  font-size: 14px;
+  opacity: 0.7;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
 }
 
 .module-inuit__title {
-  margin: 6px 0 0 0;
-  font-size: 20px;
+  margin: 4px 0 2px 0;
+  font-size: 1.4rem;
+  color: #7fffd4;
+  text-shadow: 0 0 8px rgba(127,255,212,0.25);
+  font-weight: 600;
 }
 
 .module-inuit__theme {
-  opacity: 0.9;
-  margin-top: 4px;
+  opacity: 0.85;
   font-style: italic;
+  color: #cde;
+  margin-bottom: 0.4rem;
 }
 
+/* 🌌 Corps du texte */
 .module-inuit__description {
-  opacity: 0.9;
-  line-height: 1.5;
+  opacity: 0.95;
+  line-height: 1.6;
+  font-size: 1.03rem;
+  z-index: 2;
+  position: relative;
+  white-space: pre-line;
+  overflow-wrap: break-word;
 }
 
+/* 🌙 Bloc rituel */
 .module-inuit__block {
-  margin-top: 12px;
-}
-
-.module-inuit__block:first-of-type {
-  margin-top: 10px;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(127,255,212,0.06);
+  border-left: 3px solid rgba(127,255,212,0.3);
+  border-radius: 12px;
+  position: relative;
+  z-index: 2;
 }
 
 .module-inuit__label {
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-weight: 600;
+  color: #7fffd4;
+  margin-bottom: 0.4rem;
 }
 
 .module-inuit__content {
   margin: 0;
-  opacity: 0.92;
+  opacity: 0.9;
+  line-height: 1.5;
 }
 
+/* ✨ Mots-clés */
+.module-inuit__keywords {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.keyword-bubble {
+  background: rgba(127,255,212,0.1);
+  color: #aee;
+  border-radius: 14px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+  box-shadow: 0 0 10px rgba(127,255,212,0.15);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.keyword-bubble:hover {
+  background: rgba(127,255,212,0.25);
+  transform: scale(1.08);
+}
+
+/* 🌠 Bouton hublot */
 .module-inuit__actions {
   display: flex;
   justify-content: center;
+  margin-top: 1.2rem;
+  z-index: 2;
 }
 
 .module-inuit__open-btn {
-  margin-top: 16px;
   background: linear-gradient(90deg, #6a5acd, #7fffd4);
   border: none;
   border-radius: 10px;
@@ -67,4 +117,105 @@
   font-weight: 700;
   color: #111;
   cursor: pointer;
+  box-shadow: 0 0 18px rgba(127,255,212,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.module-inuit__open-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 28px rgba(127,255,212,0.35);
+}
+
+/* 💫 halo interne (discret et contenu) */
+.module-inuit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(127,255,212,0.05), transparent 70%);
+  animation: breathe 18s ease-in-out infinite alternate;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.dream-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.dream-card {
+  position: relative;
+  border: 1px solid rgba(127, 255, 212, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.dream-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(127, 255, 212, 0.3);
+}
+
+.dream-thumb {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  filter: brightness(0.8);
+  transition: filter 0.4s ease;
+}
+
+.dream-card:hover .dream-thumb {
+  filter: brightness(1);
+}
+
+.dream-caption {
+  padding: 0.5rem;
+  background: rgba(0, 10, 15, 0.6);
+  font-size: 0.85rem;
+}
+
+.dream-caption h4 {
+  font-size: 0.9rem;
+  margin: 0.2rem 0;
+  color: #7fffd4;
+}
+
+.dream-tag-form {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.dream-input {
+  width: 80%;
+  max-width: 360px;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: none;
+  background: #111;
+  color: #bff;
+  font-size: 1rem;
+}
+
+.dream-btn {
+  margin-top: 0.8rem;
+  background: linear-gradient(90deg, #6a5acd, #7fffd4);
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  color: #111;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dream-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(127, 255, 212, 0.4);
 }

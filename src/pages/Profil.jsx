@@ -1,16 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import './Home.css'
 
 export default function Profil({ user, onLogout, onNavigate }) {
   const [mission, setMission] = useState(null)
+  const [bulles, setBulles] = useState([])
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
+  const channelRef = useRef(null)
 
+  // ✅ Canal de synchro local (EchoCreation <-> Profil)
   useEffect(() => {
-    if (user) fetchMission(user.id)
+    channelRef.current = new BroadcastChannel('sky-sync')
+    return () => channelRef.current?.close()
+  }, [])
+
+  // Chargement initial
+  useEffect(() => {
+    if (user) {
+      fetchMission(user.id)
+      fetchBulles(user.id)
+    }
   }, [user])
 
+  // ---- Lecture mission active ----
   async function fetchMission(userId) {
     const { data, error } = await supabase
       .from('missions')
@@ -19,13 +32,37 @@ export default function Profil({ user, onLogout, onNavigate }) {
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
-
     if (error && error.code !== 'PGRST116') {
       console.error('❌ Lecture mission :', error.message)
       setStatus('Erreur lecture mission')
     } else setMission(data || null)
   }
 
+  // ---- Lecture bulles actives ----
+  async function fetchBulles(userId) {
+    const { data, error } = await supabase
+      .from('dream_stars')
+      .select('id, title, emojis, culture, created_at, completed')
+      .eq('creator_id', userId)
+      .eq('completed', true)
+      .order('created_at', { ascending: false })
+
+    if (error) console.error('❌ Lecture bulles :', error.message)
+    else setBulles(data || [])
+  }
+
+  // ✅ Retirer une bulle du ciel + synchro instantanée
+  async function removeBulle(id) {
+    if (!confirm('Retirer cette bulle du ciel ?')) return
+    const { error } = await supabase.from('dream_stars').delete().eq('id', id)
+    if (error) return setStatus('❌ Suppression impossible')
+
+    setBulles(prev => prev.filter(b => b.id !== id))
+    setStatus('🌀 Bulle retirée du ciel.')
+    channelRef.current?.postMessage({ type: 'remove', id }) // synchro EchoCreation
+  }
+
+  // ---- Acheter mission ----
   async function buyMission(culture) {
     if (!user) return setStatus('⚠️ Non connecté.')
     if (mission && !isMissionFinished(mission))
@@ -62,6 +99,7 @@ export default function Profil({ user, onLogout, onNavigate }) {
     }, 1500)
   }
 
+  // ---- Avancer mission ----
   async function nextStep() {
     if (!mission || isMissionFinished(mission)) return
     const newProgress = Math.min(mission.progress + 1, 12)
@@ -100,6 +138,7 @@ export default function Profil({ user, onLogout, onNavigate }) {
     </div>
   )
 
+  // ---- Rendu principal ----
   return (
     <div className="fade-in" style={{ padding: '1rem', color: '#eee', textAlign: 'center' }}>
       <h2>👤 Profil Onimoji</h2>
@@ -112,6 +151,7 @@ export default function Profil({ user, onLogout, onNavigate }) {
         <p>Chargement du profil...</p>
       )}
 
+      {/* 🌍 Mission actuelle */}
       <h3 style={{ marginTop: '1.5rem' }}>🌍 Mission actuelle</h3>
 
       {mission && !isMissionFinished(mission) ? (
@@ -163,13 +203,60 @@ export default function Profil({ user, onLogout, onNavigate }) {
         </>
       )}
 
+      {/* 🌌 Bulles oniriques */}
+      <h3 style={{ marginTop: '2rem' }}>🌕 Mes bulles en maturation</h3>
+      <p style={{ fontSize: '0.9rem', opacity: 0.8, maxWidth: '80%', margin: '0 auto' }}>
+        Ces bulles poursuivent leur maturation dans le ciel des Échos.  
+        Tu peux les laisser vivre ou les retirer avant leur métamorphose.
+      </p>
+
+      {bulles.length > 0 ? (
+        <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          {bulles.map((b) => (
+            <div
+              key={b.id}
+              style={{
+                background: 'radial-gradient(circle, #0a0f15, #000)',
+                border: '1px solid #7fffd4',
+                borderRadius: '12px',
+                padding: '0.8rem',
+                boxShadow: '0 0 12px rgba(127,255,212,0.2)',
+                animation: 'pulse 4s ease-in-out infinite',
+              }}
+            >
+              <h4 style={{ color: '#7fffd4', marginBottom: '0.2rem' }}>{b.title}</h4>
+              <p style={{ fontSize: '1.4rem' }}>{b.emojis?.join(' ')}</p>
+              <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+                {new Date(b.created_at).toLocaleDateString('fr-FR')}
+              </p>
+              <button
+                onClick={() => removeBulle(b.id)}
+                style={{
+                  background: '#ff7070',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.3rem 0.8rem',
+                  fontSize: '0.8rem',
+                  marginTop: '0.4rem',
+                }}
+              >
+                🌀 Retirer du ciel
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ marginTop: '1rem', opacity: 0.7 }}>Aucune bulle active pour l’instant.</p>
+      )}
+
+      <p style={{ marginTop: '1.2rem', opacity: 0.8 }}>{status}</p>
+
       <div style={{ opacity: 0.4, marginTop: '1rem' }}>
         <h4>🏜️ Mission Berbère — verrouillée 🔒</h4>
         <h4>🌳 Mission Celtique — verrouillée 🔒</h4>
       </div>
 
-      <p style={{ marginTop: '1rem', opacity: 0.8 }}>{status}</p>
-
+      {/* 🚪 Déconnexion */}
       <button
         onClick={onLogout}
         style={{
@@ -185,8 +272,8 @@ export default function Profil({ user, onLogout, onNavigate }) {
         🚪 Se déconnecter
       </button>
 
-      {/* 🔐 Bouton vers le Labo (privé admin) */}
-      {user?.id === "2d4955ad-4eb6-47c3-bfc9-8d76dedcbc97" && (
+      {/* 🧪 Accès labo privé */}
+      {user?.id === '2d4955ad-4eb6-47c3-bfc9-8d76dedcbc97' && (
         <p
           onClick={() => onNavigate('labo-login')}
           style={{
@@ -199,6 +286,15 @@ export default function Profil({ user, onLogout, onNavigate }) {
           🧪 Accès Labo (privé)
         </p>
       )}
+
+      <style>
+        {`
+        @keyframes pulse {
+          0%,100%{box-shadow:0 0 8px rgba(127,255,212,0.1);}
+          50%{box-shadow:0 0 18px rgba(127,255,212,0.4);}
+        }
+        `}
+      </style>
     </div>
   )
 }

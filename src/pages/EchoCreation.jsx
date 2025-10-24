@@ -10,6 +10,7 @@ export default function EchoCreation() {
   const [status, setStatus] = useState("🌌 Connexion au champ de résonance…")
   const [selectedStar, setSelectedStar] = useState(null)
 
+  // 🔄 Chargement initial des étoiles et liens
   useEffect(() => {
     async function load() {
       try {
@@ -34,6 +35,29 @@ export default function EchoCreation() {
     load()
   }, [])
 
+  // 🌐 Synchro avec Profil.jsx (BroadcastChannel)
+  useEffect(() => {
+    const channel = new BroadcastChannel("sky-sync")
+
+    channel.onmessage = (e) => {
+      if (e.data?.type === "remove") {
+        const id = e.data.id
+        console.log("🌀 Bulle retirée du ciel (synchro locale) :", id)
+        // fade-out avant suppression
+        setStars((prev) =>
+          prev.map((s) =>
+            s.id === id ? { ...s, fading: true } : s
+          )
+        )
+        setTimeout(() => {
+          setStars((prev) => prev.filter((s) => s.id !== id))
+        }, 600)
+      }
+    }
+
+    return () => channel.close()
+  }, [])
+
   return (
     <div
       className="fade-in"
@@ -42,9 +66,11 @@ export default function EchoCreation() {
         color: "#eee",
         textAlign: "center",
         overflow: "hidden",
+        minHeight: "100vh",
+        background: "radial-gradient(circle at 50% 40%, #02060a, #000)",
       }}
     >
-      <h2>🌠 Champ de Résonance Cosmique</h2>
+      <h2 style={{ marginTop: "1rem" }}>🌠 Champ de Résonance Cosmique</h2>
       <p style={{ opacity: 0.8 }}>{status}</p>
 
       {/* 🌌 Fond du ciel */}
@@ -57,13 +83,42 @@ export default function EchoCreation() {
       </div>
 
       {/* 🌘 Lune Résonante */}
-      <div style={{ position: "absolute", top: "45%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 5 }}>
+      <div
+        style={{
+          position: "absolute",
+          top: "45%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 5,
+        }}
+      >
         <ResonantMoon />
       </div>
 
+      {/* 🌟 Détails d'une étoile sélectionnée */}
       {selectedStar && (
-        <EchoStarModal star={selectedStar} onClose={() => setSelectedStar(null)} />
+        <EchoStarModal
+          star={selectedStar}
+          onClose={() => setSelectedStar(null)}
+        />
       )}
+
+      {/* 🌙 Style fade-out */}
+      <style>
+        {`
+          .fade-in {
+            animation: fadeIn 1.2s ease;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+          }
+          .fading {
+            opacity: 0;
+            transition: opacity 0.6s ease-out;
+          }
+        `}
+      </style>
     </div>
   )
 }

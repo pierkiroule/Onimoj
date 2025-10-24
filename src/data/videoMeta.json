@@ -1,0 +1,32 @@
+[
+  {
+    "tag": "inconscient",
+    "file": "inconscient.mp4",
+    "title": "Rêve : L’inconscient",
+    "legend": "Un espace intérieur s’ouvre, vaste et tranquille. Là, les images se forment d’elles-mêmes, comme des bulles de clarté au fond de la mer du rêve."
+  },
+  {
+    "tag": "descente",
+    "file": "descente.mp4",
+    "title": "Rêve : La descente",
+    "legend": "Une lente plongée commence. Chaque souffle t’invite à rejoindre les profondeurs calmes, où la lumière se fait douceur et le temps devient respiration."
+  },
+  {
+    "tag": "silence",
+    "file": "silence.mp4",
+    "title": "Rêve : Le silence",
+    "legend": "Un silence vivant s’étend, vibrant comme une onde. Il relie la terre et le ciel, et ton souffle y trouve sa juste place."
+  },
+  {
+    "tag": "rêve profond",
+    "file": "rêve_profond.mp4",
+    "title": "Rêve : Le rêve profond",
+    "legend": "Le monde intérieur s’enveloppe d’un bleu apaisant. Chaque image devient un courant léger, guidant le corps vers une mer de paix."
+  },
+  {
+    "tag": "transformation",
+    "file": "transformation.mp4",
+    "title": "Rêve : La transformation",
+    "legend": "Tout se déploie doucement. L’eau devient souffle, la lumière devient forme, et la forme devient une présence nouvelle, paisible et claire."
+  }
+]

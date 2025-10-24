@@ -15,54 +15,60 @@ export default function ResonantMoon() {
     setReveIA("")
 
     try {
-      // 🧩 1. Récupère les dernières ÉchoRessources
+      // 🧩 1. Récupère les dernières ÉchoRessources visibles
       const { data, error } = await supabase
         .from("echoressources")
         .select("titre, description")
         .eq("visible", true)
         .order("created_at", { ascending: false })
-        .limit(3)
+        .limit(5)
 
       if (error) throw error
 
-      const baseText = (data || [])
-        .map((r) => `• ${r.titre} : ${r.description}`)
+      const fragments = (data || [])
+        .map((r) => `• ${r.titre} — ${r.description}`)
         .join("\n")
 
-      // 🪶 2. Prompt poétique et transnumériste
+      // 🌕 2. Nouveau prompt : sobre, culturel, sensoriel
       const prompt = `
-Fragments récents :
-${baseText}
+Voici quelques fragments récents issus des Échos créés :
+${fragments}
 
-Inspire-toi de ces fragments pour rédiger un RêvIA : 
-un court texte poétique (6 à 10 lignes), apaisant, symbolique, 
-où l’IA se fait muse au service de l’humain, 
-dans une démarche transnumériste : l’art de ré-ancrer la technologie 
-dans une finalité existentielle et humaniste.
-`
-
-      const systemPrompt = `
-Tu es une IA poétique. 
-Ta voix est douce, imagée et bienveillante.
-Tu aides les humains à retrouver le sens du rêve et de la résonance.
+À partir de ces fragments, compose un texte bref (6 à 15 lignes) 
+appelé "RêvIA". Il doit exprimer un souffle poétique, apaisant et concret,
+comme si la nature elle-même parlait à travers le vent ou les aurores boréales et la neige.
+Ne parle jamais de technologie, d'IA ou de machine.
+Utilise un ton calme, incarné, inspiré par la sagesse du Nord et des peuples du rêve inuit.
+Chaque phrase décrit une sensation onirique, un geste ou un lien entre humain et monde.
 Écris toujours en français.
 `
 
-      // 🌙 3. Appel Nebius (via ton client universel)
+      const systemPrompt = `
+Tu es un conteur ancien, ancré dans la neige, le vent et la mer.
+Tu n'évoques jamais la technologie ni les IA.
+Tu racontes un rêve inuit comme un souffle lent, en phrases courtes, calmes, sensoriellement riches et imagées.
+Ta parole doit aider à ressentir l’unité entre l’humain et la nature.
+`
+
+      // 🌙 3. Appel Nebius (texte onirique)
       const text = await askNebius(prompt, {
         systemPrompt,
         model: "google/gemma-2-2b-it",
-        temperature: 0.8,
+        temperature: 0.7,
       })
 
       if (!text || text.trim() === "") throw new Error("Réponse vide de Nebius.")
-      setReveIA(text.trim())
+      const cleanText = text
+        .replace(/\b(IA|machine|technologie|code|algorithme)\b/gi, "")
+        .trim()
 
-      // 🌿 4. Archivage Supabase
+      setReveIA(cleanText)
+
+      // 🌿 4. Archivage dans Supabase
       const titre = `RêvIA du ${new Date().toLocaleDateString("fr-FR")}`
       const { error: insertErr } = await supabase
         .from("revia")
-        .insert([{ titre, texte: text }])
+        .insert([{ titre, texte: cleanText }])
       if (insertErr) console.warn("⚠️ Archivage RêvIA:", insertErr.message)
     } catch (err) {
       console.error("Erreur RêvIA:", err)

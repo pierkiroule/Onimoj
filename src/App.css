@@ -221,3 +221,41 @@ body::after {
   z-index: 10;
   margin-top: -80px;
 }
+
+/* 🌫️ CARTES GLASSMORPHIQUES — douceur et respiration */
+.card-glow {
+  max-width: 520px;
+  margin: 1.4rem auto;
+  padding: 1.4rem 1.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1.2rem;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 12px rgba(127,255,212,0.06),
+              0 0 28px rgba(106,90,205,0.12);
+  text-align: left;
+  line-height: 1.6;
+  transition: all 0.4s ease;
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 18px rgba(127,255,212,0.12),
+              0 0 36px rgba(106,90,205,0.2);
+  transform: translateY(-2px);
+}
+
+/* 🩵 TITRES DANS LES CARTES */
+.card-glow h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px rgba(127,255,212,0.3);
+}
+
+/* 📖 TEXTE DES CARTES */
+.card-glow p {
+  color: #dde3ff;
+  font-weight: 300;
+  font-size: 0.95rem;
+  margin: 0;
+}

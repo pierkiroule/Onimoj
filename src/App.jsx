@@ -17,6 +17,7 @@ import TestSupabase from "./pages/TestSupabase"
 import Auth from "./pages/Auth"
 import LaboLogin from "./pages/LaboLogin"
 import Labo from "./pages/Labo"
+import InuiteAdmin from "./pages/InuiteAdmin"
 
 import "./App.css"
 
@@ -102,6 +103,9 @@ export default function App() {
 
       case "labo":
         return <Labo onNavigate={setPage} session={session} />
+
+      case "admin-inuite":
+        return <InuiteAdmin onNavigate={setPage} session={session} />
 
       default:
         return <Home onStart={() => setPage("mission-select")} />

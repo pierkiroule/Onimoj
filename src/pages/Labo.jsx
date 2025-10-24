@@ -24,8 +24,8 @@ export default function Labo({ onNavigate, session }) {
     if (error) console.error("Erreur chargement:", error.message)
     setRecent(data || [])
   }
-console.log("👤 Session test :", session)
-console.log("👤 User ID :", session?.user?.id)
+  // console.log("👤 Session :", session)
+  // console.log("👤 User ID :", session?.user?.id)
   async function handleSubmit(e) {
     e.preventDefault()
     setMessage("")
@@ -41,7 +41,7 @@ console.log("👤 User ID :", session?.user?.id)
 
     setSending(true)
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("echoressources")
         .insert([
           {
@@ -79,6 +79,23 @@ console.log("👤 User ID :", session?.user?.id)
       <p style={{ opacity: 0.6, fontSize: "0.85rem" }}>
         {user ? `👤 ${user.id.slice(0, 8)}…` : "⚠️ Non authentifié"}
       </p>
+
+      <div style={{ marginTop: "1rem" }}>
+        <button
+          onClick={() => onNavigate("admin-inuite")}
+          style={{
+            background: "linear-gradient(90deg,#35a0ff,#6eff8d)",
+            color: "#111",
+            border: "none",
+            borderRadius: 8,
+            padding: "0.6rem 1.2rem",
+            fontWeight: 800,
+            cursor: "pointer",
+          }}
+        >
+          ❄️ Administrer la Mission Inuite
+        </button>
+      </div>
 
       <form
         onSubmit={handleSubmit}

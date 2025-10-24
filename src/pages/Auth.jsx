@@ -21,7 +21,7 @@ export default function Auth({ onAuth }) {
       }
 
       if (result.error) throw result.error
-      const { user, session } = result.data || {}
+      const { session } = result.data || {}
 
       if (mode === 'signup') {
         // Si confirmation par email activée → pas de session immédiate

@@ -32,7 +32,7 @@ function createSupabaseStub() {
       signUp: async () => ({ data: { user: null, session: null }, error: missingEnvError }),
       signInWithPassword: async () => ({ data: null, error: missingEnvError }),
       signOut: async () => ({ error: missingEnvError }),
-      onAuthStateChange: (_cb) => ({
+      onAuthStateChange: () => ({
         data: {
           subscription: {
             unsubscribe: () => {},

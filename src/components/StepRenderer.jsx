@@ -72,8 +72,14 @@ export default function StepRenderer({ step, userId, onComplete }) {
               Enregistrer dans l’échocreation
             </button>
           </div>
-          {status && <p className="status-text">{status}</p>}
         </div>
+      )}
+
+      {/* Statut persistant de sauvegarde */}
+      {status && (
+        <p className="status-text" style={{ textAlign: "center", marginTop: "0.6rem" }}>
+          {status}
+        </p>
       )}
 
       <div className="quiz-zone">

@@ -133,7 +133,7 @@ function syncUrl(nextIndex) {
     if (slug) params.set("etape", slug)
     url.search = params.toString()
     window.history.pushState({}, "", url)
-  } catch (_) {
+  } catch {
     // ignore
   }
 }

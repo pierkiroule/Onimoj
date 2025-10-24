@@ -24,8 +24,8 @@ export default function Labo({ onNavigate, session }) {
     if (error) console.error("Erreur chargement:", error.message)
     setRecent(data || [])
   }
-console.log("👤 Session test :", session)
-console.log("👤 User ID :", session?.user?.id)
+  // console.log("👤 Session :", session)
+  // console.log("👤 User ID :", session?.user?.id)
   async function handleSubmit(e) {
     e.preventDefault()
     setMessage("")
@@ -41,7 +41,7 @@ console.log("👤 User ID :", session?.user?.id)
 
     setSending(true)
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("echoressources")
         .insert([
           {

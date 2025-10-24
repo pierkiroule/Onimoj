@@ -15,6 +15,7 @@ export default function InuiteAdmin({ onNavigate, session }) {
 
   useEffect(() => {
     fetchSteps()
+    // dependency intentionally empty to fetch once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -91,8 +92,7 @@ export default function InuiteAdmin({ onNavigate, session }) {
 
   async function handleDelete(id) {
     if (!id) return
-    // eslint-disable-next-line no-alert
-    if (!confirm("Supprimer cette étape ?")) return
+    if (!window.confirm("Supprimer cette étape ?")) return
     setError("")
     const { error } = await supabase
       .from("mission_steps_inuite")

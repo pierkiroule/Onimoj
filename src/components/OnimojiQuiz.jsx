@@ -23,7 +23,7 @@ export default function OnimojiQuiz({ stepNumber, userId, onComplete }) {
         if (saved?.selected) setSelected(saved.selected)
         if (saved?.revealed) setRevealed(true)
       }
-    } catch (_) {
+    } catch {
       // ignore
     }
   }, [storageKey])
@@ -45,7 +45,7 @@ export default function OnimojiQuiz({ stepNumber, userId, onComplete }) {
         storageKey,
         JSON.stringify({ selected, revealed: true, at: new Date().toISOString() })
       )
-    } catch (_) {
+    } catch {
       // ignore
     }
   }

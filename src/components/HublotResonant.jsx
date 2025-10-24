@@ -5,7 +5,6 @@ import "./HublotResonant.css"
 
 export default function HublotResonant({
   culture = "Inuite",
-  userId,
   step = {},
   onComplete,
 }) {

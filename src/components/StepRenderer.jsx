@@ -32,7 +32,7 @@ export default function StepRenderer({ step, userId, onComplete }) {
       setStatus("Bulle enregistrée")
       setStarDraft(null)
       setTitle("")
-    } catch (e) {
+    } catch {
       setStatus("Erreur d’enregistrement")
     } finally {
       setSaving(false)
@@ -48,7 +48,6 @@ export default function StepRenderer({ step, userId, onComplete }) {
         <div style={{ marginTop: "1rem" }}>
           <HublotResonant
             culture="Inuite"
-            userId={userId}
             step={step}
             onComplete={(payload) => {
               setShowHublot(false)

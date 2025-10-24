@@ -23,7 +23,7 @@ export default function MissionInuite() {
         if (Array.isArray(rows) && rows.length > 0) {
           setSteps(rows)
         }
-      } catch (_) {
+      } catch {
         // fallback to JSON already set
       } finally {
         setLoading(false)

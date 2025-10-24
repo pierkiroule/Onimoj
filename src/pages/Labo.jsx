@@ -80,6 +80,23 @@ console.log("👤 User ID :", session?.user?.id)
         {user ? `👤 ${user.id.slice(0, 8)}…` : "⚠️ Non authentifié"}
       </p>
 
+      <div style={{ marginTop: "1rem" }}>
+        <button
+          onClick={() => onNavigate("admin-inuite")}
+          style={{
+            background: "linear-gradient(90deg,#35a0ff,#6eff8d)",
+            color: "#111",
+            border: "none",
+            borderRadius: 8,
+            padding: "0.6rem 1.2rem",
+            fontWeight: 800,
+            cursor: "pointer",
+          }}
+        >
+          ❄️ Administrer la Mission Inuite
+        </button>
+      </div>
+
       <form
         onSubmit={handleSubmit}
         style={{

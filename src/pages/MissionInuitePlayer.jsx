@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { assetUrl } from "../utils/assetUrl"
 import HublotResonant from "../components/HublotResonant"
 import "./MissionInuitePlayer.css"
 
@@ -32,7 +33,7 @@ export default function MissionInuitePlayer() {
   useEffect(() => {
     async function loadMission() {
       try {
-        const res = await fetch("/data/missions/inuite/mission.json")
+        const res = await fetch(assetUrl("/data/missions/inuite/mission.json"))
         if (!res.ok) throw new Error("Mission non trouvée")
         const data = await res.json()
         setMission(data)
@@ -51,7 +52,7 @@ export default function MissionInuitePlayer() {
 
     async function loadStep() {
       try {
-        const res = await fetch(stepFile)
+        const res = await fetch(assetUrl(`/data/missions/inuite/${stepFile}`))
         if (!res.ok) throw new Error(`Fichier manquant : ${stepFile}`)
         const data = await res.json()
         setStepData(data)

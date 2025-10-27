@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { assetUrl } from "../utils/assetUrl"
 import "./MissionInuiteEditor.css"
 
 export default function MissionInuiteEditor() {
@@ -9,7 +10,7 @@ export default function MissionInuiteEditor() {
 
   // 📥 Charge le fichier mission.json
   useEffect(() => {
-    fetch("/data/missions/inuite/mission.json")
+    fetch(assetUrl("/data/missions/inuite/mission.json"))
       .then((res) => res.json())
       .then(setMission)
       .catch((err) => setStatus("Erreur de chargement : " + err.message))
@@ -18,7 +19,7 @@ export default function MissionInuiteEditor() {
   // 📖 Charge le fichier de l’étape sélectionnée
   async function loadStep(stepFile) {
     try {
-      const res = await fetch(`/data/missions/inuite/${stepFile}`)
+      const res = await fetch(assetUrl(`/data/missions/inuite/${stepFile}`))
       const text = await res.text()
       setContent(text)
       setSelectedStep(stepFile)

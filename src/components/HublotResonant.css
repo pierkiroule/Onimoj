@@ -1,47 +1,92 @@
-.hublot {
-  text-align: center;
-  color: #eef;
+.hublot-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.6s ease forwards;
 }
 
-.hublot__subtitle {
-  opacity: 0.8;
-  margin-top: -6px;
+/* Empêche le scroll du fond quand la modale est ouverte */
+body.hublot-open {
+  overflow: hidden;
+}
+
+.hublot-card {
+  position: relative;
+  width: 340px;
+  max-width: 90vw;
+  background: radial-gradient(circle at 50% 50%, #08121a, #000);
+  border: 1px solid rgba(127, 255, 212, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 0 36px rgba(127, 255, 212, 0.4);
+  padding: 1rem;
+  color: #eafff6;
+  text-align: center;
+  animation: popIn 0.4s ease;
+}
+
+.hublot-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: none;
+  color: #7fffd4;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.hublot-close:hover {
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .hublot__svg {
   display: block;
-  margin: 1rem auto;
+  margin: 0 auto;
+  border-radius: 50%;
 }
 
 .hublot__selected {
+  margin-top: 0.8rem;
   display: flex;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .hublot__chip {
-  background: rgba(127, 255, 212, 0.13);
-  border: 1px solid #7fffd4;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 16px;
-  color: #bff;
+  font-size: 1.4rem;
 }
 
 .hublot__validate-btn {
-  margin-top: 12px;
   background: linear-gradient(90deg, #6a5acd, #7fffd4);
   border: none;
   border-radius: 10px;
-  padding: 10px 18px;
-  font-weight: 700;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
   color: #111;
   cursor: pointer;
+  margin-top: 0.8rem;
+  box-shadow: 0 0 10px rgba(127,255,212,0.4);
 }
 
 .hublot__status {
-  margin-top: 10px;
-  opacity: 0.8;
-  font-style: italic;
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-top: 0.5rem;
+  color: #7fffd4;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }

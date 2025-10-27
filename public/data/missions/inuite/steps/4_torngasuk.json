@@ -1,0 +1,53 @@
+{
+  "step_number": 4,
+  "spirit_name": "Torngasuk",
+  "symbol": "🪶",
+  "title": "L’Esprit des Ancêtres",
+  "activities": [
+    {
+      "type": "text",
+      "content": "<h3>Torngasuk, gardien du souffle ancien</h3><p><b>Torngasuk</b> est l’esprit des anciens. Il veille sur les vivants depuis le monde invisible, là où se mêlent les chants, les gestes et les rêves transmis. Chez les Inuit, Torngasuk n’est pas un dieu lointain, mais une <i>présence qui accompagne</i>. Il est celui qui relie les chasseurs au souffle de leurs aïeux, les enfants aux voix du passé, la mémoire à la respiration du monde.</p><p>Quand le vent souffle depuis la banquise, il porte parfois des murmures : c’est le souvenir des anciens qui traverse le présent. Ils ne reviennent pas pour hanter, mais pour <b>rappeler la justesse du lien</b> — celui entre les vivants, les morts, et la terre qui les unit.</p>"
+    },
+    {
+      "type": "text",
+      "content": "<p>Dans une lecture <b>mythanalytique</b>, Torngasuk incarne le <i>principe de résonance verticale</i> : la capacité d’un être à puiser dans la mémoire du monde. Il symbolise la continuité, la filiation, la résonance entre générations. Anthropologiquement, il rappelle que nous ne sommes jamais seuls : nos gestes sont habités par ceux qui les ont transmis.</p><p>Se relier à Torngasuk, c’est reconnaître les forces invisibles qui nous précèdent, et les laisser <b>respirer à travers nous</b>. Chaque souffle devient une offrande à ceux qui ont marché avant.</p>"
+    },
+    {
+      "type": "video",
+      "url": "/data/missions/inuite/media/torngasuk_rituel.mp4",
+      "caption": "Regarde la fumée s’élever. Chaque volute porte une prière vers le ciel."
+    },
+    {
+      "type": "ritual",
+      "title": "Rituel du Souvenir",
+      "content": "<p>Assieds-toi calmement. Ferme les yeux. Inspire le souvenir, expire la gratitude. Pense à ceux qui t’ont guidé — un ancêtre, un ami, un animal, un arbre. Chacun laisse une trace de chaleur dans ton cœur. Laisse ces présences respirer avec toi. Trois souffles, trois merci.</p>",
+      "sound": "/data/missions/inuite/media/torngasuk_rituel.mp3"
+    },
+    {
+      "type": "quiz",
+      "question": "Dans la cosmologie inuit, que représente Torngasuk ?",
+      "options": [
+        "L’esprit des ancêtres qui veille sur les vivants",
+        "Le vent du sud et des tempêtes",
+        "Une divinité lointaine et toute-puissante"
+      ],
+      "correct": 0,
+      "feedback": [
+        "🪶 Exact ! Torngasuk est la mémoire vivante des ancêtres.",
+        "🌬️ Pas tout à fait... les tempêtes peuvent porter sa voix, mais il n’est pas le vent.",
+        "❄️ Non, Torngasuk est proche, intime, respirant dans le monde des humains."
+      ]
+    },
+    {
+      "type": "text",
+      "content": "<p>Torngasuk nous invite à tisser des ponts entre passé et présent. Dans le souffle, la mémoire devient une force de guidance. Comme un tambour qui bat au rythme du cœur du monde, la lignée continue de chanter à travers toi.</p>"
+    },
+    {
+      "type": "hublot",
+      "title": "Souvenir vivant",
+      "text": "<p>Ferme les yeux. Respire lentement. Sens que les anciens respirent encore à travers toi. Leur souffle devient ton souffle. Leur mémoire t’habite comme un chant du vent. Ouvre ton cœur : tu n’es pas la fin d’une histoire, mais sa continuité vivante.</p>",
+      "sound": "/data/missions/inuite/media/hublot_torngasuk.mp3",
+      "transition": "next_step"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "step_number": 5,
+  "spirit_name": "Nuliajuk",
+  "symbol": "🐋",
+  "title": "L’Épouse de la Mer",
+  "activities": [
+    { "type": "text", "content": "Nuliajuk nourrit ceux qui respectent la mer. Elle tisse la confiance entre les règnes." },
+    { "type": "ritual", "content": "Pose la main sur ton cœur. Sens les vagues de gratitude monter." },
+    { "type": "quiz", "question": "Nuliajuk relie ?", "options": ["Les vents", "Les vivants", "Les pierres"], "correct": 1 },
+    { "type": "hublot", "title": "Marée du cœur", "text": "Ton souffle suit les marées du monde.", "transition": "next_step" }
+  ]
+}

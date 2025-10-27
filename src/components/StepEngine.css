@@ -1,0 +1,203 @@
+.se2 {
+  margin: 1rem auto;
+  padding: 1rem;
+  max-width: 820px;
+  color: #e9fffd;
+  background: radial-gradient(circle at 50% 20%, rgba(8,18,26,.75), rgba(0,0,0,.7));
+  border: 1px solid rgba(127,255,212,.25);
+  border-radius: 16px;
+  box-shadow: 0 0 24px rgba(127,255,212,.12);
+  backdrop-filter: blur(4px);
+  transition: background 1.2s ease, box-shadow 1.2s ease;
+}
+
+/* ——— HEADER ——— */
+.se2__header { margin-bottom: .8rem; }
+.se2__crumbs { opacity:.75; font-size:.9rem; }
+.se2__title {
+  margin:.2rem 0;
+  font-size:1.35rem;
+  text-shadow:0 0 8px rgba(127,255,212,.22);
+}
+.se2__mantra {
+  opacity:.85;
+  font-style:italic;
+  margin-bottom:.6rem;
+}
+
+/* ——— BARRE DE PROGRESSION ——— */
+.se2__progress {
+  background: rgba(255,255,255,.08);
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.se2__bar {
+  height:100%;
+  background: linear-gradient(90deg,#6a5acd,#7fffd4);
+  width:0%;
+  transition: width .6s ease;
+}
+
+/* ——— LISTE DES ACTIVITÉS ——— */
+.se2__list { margin-top: .8rem; }
+
+.se2__item {
+  border:1px solid rgba(127,255,212,.18);
+  border-radius: 12px;
+  margin-bottom:.6rem;
+  overflow: hidden;
+  transition: all .4s ease;
+}
+.se2__item.open {
+  box-shadow: 0 0 18px rgba(127,255,212,.12) inset;
+  border-color: rgba(127,255,212,.3);
+}
+
+.se2__acc {
+  width: 100%;
+  text-align:left;
+  background: rgba(255,255,255,.04);
+  color:#dff;
+  border:0;
+  padding:.7rem .9rem;
+  display:flex;
+  gap:.6rem;
+  align-items:center;
+  cursor:pointer;
+  transition: background .3s ease;
+}
+.se2__acc:hover { background: rgba(127,255,212,.08); }
+
+.se2__num {
+  font-weight:800;
+  opacity:.9;
+  color:#7fffd4;
+  min-width: 2.2rem;
+}
+.se2__label { flex:1; }
+.se2__chev { opacity:.8; }
+
+.se2__panel {
+  padding: .9rem;
+  background: rgba(0,0,0,.25);
+  animation: fadeIn .5s ease both;
+}
+
+/* ——— TYPES D’ACTIVITÉS ——— */
+.se2__text { line-height:1.6; }
+.se2__media { margin:0; }
+.se2__img, .se2__video {
+  width:100%;
+  border-radius:12px;
+  box-shadow:0 0 12px rgba(127,255,212,.2);
+}
+.se2__cap { font-size:.9rem; opacity:.8; margin-top:.35rem; }
+.se2__ritualTitle { color:#7fffd4; margin:0 0 .4rem 0; }
+
+/* ——— QUIZ ——— */
+.se2__quizQ { font-weight:600; margin-bottom:.5rem; }
+.se2__quizOpts { display:flex; flex-wrap:wrap; gap:.5rem; }
+
+.se2__quizBtn {
+  border:1px solid rgba(127,255,212,.3);
+  background: rgba(127,255,212,.08);
+  color:#e9fffd;
+  border-radius: 10px;
+  padding:.45rem .8rem;
+  cursor:pointer;
+  transition: all .3s ease;
+}
+.se2__quizBtn:hover {
+  background: rgba(127,255,212,.15);
+}
+.se2__quizBtn.ok {
+  background:#1f3;
+  color:#112;
+  border-color:#1f3;
+}
+.se2__quizBtn.ko {
+  background:#f66;
+  color:#111;
+  border-color:#f66;
+}
+.se2__quizFb {
+  margin-top:.6rem;
+  font-style:italic;
+  opacity:.9;
+}
+
+.se2__hublotWrap { padding-top:.4rem; }
+
+/* ——— NAVIGATION ——— */
+.se2__nav {
+  display:flex;
+  justify-content: space-between;
+  gap:.6rem;
+  margin-top: .9rem;
+}
+.se2__btn {
+  border-radius:10px;
+  padding:.6rem 1rem;
+  cursor:pointer;
+  border:1px solid transparent;
+  transition: all .3s ease;
+}
+.se2__btn.primary {
+  background:linear-gradient(90deg,#6a5acd,#7fffd4);
+  color:#111;
+  font-weight:800;
+  box-shadow:0 0 10px rgba(127,255,212,.25);
+}
+.se2__btn.primary:hover {
+  box-shadow:0 0 16px rgba(127,255,212,.45);
+  transform: translateY(-2px);
+}
+.se2__btn.secondary {
+  background:transparent;
+  color:#7fffd4;
+  border-color:#7fffd4;
+}
+.se2__btn.secondary:hover {
+  background:rgba(127,255,212,.08);
+  transform: translateY(-1px);
+}
+
+.se2__status {
+  text-align:center;
+  opacity:.85;
+  margin-top:.45rem;
+  font-size:.9rem;
+}
+
+/* ——— Sablier onirique (entre étapes) ——— */
+.se2__timer {
+  position: relative;
+  width: 36px;
+  height: 60px;
+  margin: 1.2rem auto;
+  border: 2px solid rgba(127,255,212,.4);
+  border-radius: 12px;
+  box-shadow: 0 0 14px rgba(127,255,212,.25);
+  background: rgba(0,0,0,.25);
+  overflow: hidden;
+}
+.se2__sand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(180deg,#7fffd4 0%,#6a5acd 100%);
+  animation: sandFlow 3s ease-in-out forwards;
+}
+@keyframes sandFlow {
+  0% { height: 0; }
+  100% { height: 100%; }
+}
+
+/* ——— FADE IN ——— */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

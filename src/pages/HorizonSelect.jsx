@@ -6,7 +6,6 @@ export default function HorizonSelect({ onChoose }) {
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
-    // 🫧 Génère quelques bulles oniriques
     const newBubbles = Array.from({ length: 12 }).map((_, i) => ({
       id: i,
       left: Math.random() * 100,
@@ -18,7 +17,6 @@ export default function HorizonSelect({ onChoose }) {
     setBubbles(newBubbles)
   }, [])
 
-  // 🌈 Animation au clic
   function handleChoose(culture, name) {
     setSelected(culture)
     setTimeout(() => onChoose({ culture, name }), 800)
@@ -36,7 +34,6 @@ export default function HorizonSelect({ onChoose }) {
         minHeight: "85vh",
       }}
     >
-      {/* 🫧 Bulles flottantes */}
       {bubbles.map((b) => (
         <div
           key={b.id}
@@ -52,7 +49,6 @@ export default function HorizonSelect({ onChoose }) {
         />
       ))}
 
-      {/* 🌍 Titre principal */}
       <h2
         style={{
           fontSize: "1.8rem",
@@ -79,7 +75,6 @@ export default function HorizonSelect({ onChoose }) {
         Chaque horizon ouvre un voyage de 12 défis-doux vers un monde onirique.
       </p>
 
-      {/* 🌠 Boutons d’horizon */}
       <div
         style={{
           display: "grid",
@@ -113,17 +108,14 @@ export default function HorizonSelect({ onChoose }) {
         </button>
       </div>
 
-      {/* 🌬 Effet visuel d’entrée */}
       {selected && (
         <div className="dream-transition">
           <p>✨ Entrée dans le rêve {selected}...</p>
         </div>
       )}
 
-      {/* ✨ Styles internes */}
       <style>
         {`
-          /* 🫧 Bulles flottantes */
           .floating-bubble {
             position: absolute;
             bottom: -40px;
@@ -141,7 +133,6 @@ export default function HorizonSelect({ onChoose }) {
             100% { transform: translateY(-100vh) scale(0.95); opacity: 0; }
           }
 
-          /* 🌌 Boutons d’horizon */
           .horizon-button {
             padding: 1rem 1.6rem;
             border-radius: 40px;
@@ -186,7 +177,6 @@ export default function HorizonSelect({ onChoose }) {
             }
           }
 
-          /* ✨ Transition de rêve */
           .dream-transition {
             position: fixed;
             top: 0;

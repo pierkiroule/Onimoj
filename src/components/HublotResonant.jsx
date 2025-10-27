@@ -13,9 +13,9 @@ export default function HublotResonant({
   const [status, setStatus] = useState("")
 
   useEffect(() => {
-    const width = 320
-    const height = 320
-    const radiusLimit = 130
+    const width = 300
+    const height = 300
+    const radiusLimit = 120
     const nodes = inuitNodes.map((n) => ({ ...n }))
     const links = inuitLinks.map((l) => ({ ...l }))
 
@@ -24,24 +24,15 @@ export default function HublotResonant({
 
     svg
       .attr("viewBox", [0, 0, width, height])
-      .attr("class", "hublot__svg")
-      .style("touch-action", "none")
-      .style(
-        "background",
-        "radial-gradient(circle at 50% 50%, #08121a, #000)"
-      )
+      .style("background", "radial-gradient(circle at 50% 50%, #0a141c, #000)")
       .style("border-radius", "50%")
-      .style("overflow", "hidden")
-      .style("box-shadow", "0 0 36px rgba(127,255,212,0.25)")
+      .style("box-shadow", "0 0 24px rgba(127,255,212,0.25)")
 
     const defs = svg.append("defs")
     const glow = defs.append("filter").attr("id", "glow")
-    glow
-      .append("feGaussianBlur")
-      .attr("stdDeviation", 2.2)
-      .attr("result", "coloredBlur")
+    glow.append("feGaussianBlur").attr("stdDeviation", 2).attr("result", "blur")
     const feMerge = glow.append("feMerge")
-    feMerge.append("feMergeNode").attr("in", "coloredBlur")
+    feMerge.append("feMergeNode").attr("in", "blur")
     feMerge.append("feMergeNode").attr("in", "SourceGraphic")
 
     const color = d3.scaleOrdinal(d3.schemeTableau10)
@@ -49,15 +40,14 @@ export default function HublotResonant({
     const simulation = d3
       .forceSimulation(nodes)
       .force("link", d3.forceLink(links).id((d) => d.id).distance(65))
-      .force("charge", d3.forceManyBody().strength(-120))
+      .force("charge", d3.forceManyBody().strength(-100))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide(25))
+      .force("collision", d3.forceCollide(22))
 
     const link = svg
       .append("g")
       .attr("stroke", "#7fffd4")
-      .attr("stroke-opacity", 0.22)
-      .attr("stroke-width", 1)
+      .attr("stroke-opacity", 0.2)
       .selectAll("line")
       .data(links)
       .join("line")
@@ -69,18 +59,14 @@ export default function HublotResonant({
       .join("g")
       .attr("class", "node")
       .style("cursor", "pointer")
-      .on("click touchstart", (event, d) => {
-        event.preventDefault()
-        toggleSelect(d.id)
-      })
+      .on("click", (event, d) => toggleSelect(d.id))
 
     nodeG
       .append("circle")
-      .attr("r", 22)
+      .attr("r", 20)
       .attr("fill", (d) => color(d.group))
-      .attr("fill-opacity", 0.85)
       .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5)
+      .attr("stroke-width", 1.2)
       .attr("filter", "url(#glow)")
 
     nodeG
@@ -88,17 +74,16 @@ export default function HublotResonant({
       .text((d) => d.emoji || "✨")
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
-      .attr("font-size", 18)
+      .attr("font-size", 16)
       .attr("y", 1)
 
     nodeG
       .append("text")
       .text((d) => d.label || "")
       .attr("text-anchor", "middle")
-      .attr("font-size", 9.5)
-      .attr("fill", "#dfe")
-      .attr("y", 28)
-      .attr("opacity", 0.9)
+      .attr("font-size", 9)
+      .attr("fill", "#cfe")
+      .attr("y", 26)
 
     simulation.on("tick", () => {
       nodeG.attr("transform", (d) => {
@@ -112,7 +97,6 @@ export default function HublotResonant({
         }
         return `translate(${d.x},${d.y})`
       })
-
       link
         .attr("x1", (d) => d.source.x)
         .attr("y1", (d) => d.source.y)
@@ -123,7 +107,6 @@ export default function HublotResonant({
     return () => simulation.stop()
   }, [])
 
-  // animation / update selection
   useEffect(() => {
     const svg = d3.select(svgRef.current)
     svg.selectAll("g.node").each(function (d) {
@@ -132,14 +115,9 @@ export default function HublotResonant({
       g.select("circle")
         .transition()
         .duration(120)
-        .attr("r", isSel ? 26 : 22)
-        .attr("stroke-width", isSel ? 3 : 1.5)
-        .attr("fill-opacity", isSel ? 1 : 0.8)
+        .attr("r", isSel ? 24 : 20)
+        .attr("stroke-width", isSel ? 3 : 1.2)
         .attr("stroke", isSel ? "#7fffd4" : "#fff")
-      g.select("text")
-        .transition()
-        .duration(120)
-        .attr("font-size", isSel ? 20 : 18)
     })
   }, [selected])
 
@@ -160,23 +138,20 @@ export default function HublotResonant({
     const emojis = chosen.map((n) => n.emoji || "✨")
 
     const payload = {
-      title: `${culture} — ${step.spirit_name || "Bulle mythonirique"}`,
-      emojis,
       culture,
-      spirit: step.spirit_name || "",
-      step_number: step.step_number || 1,
+      spirit: step.spirit_name,
+      emojis,
+      step_number: step.step_number,
     }
-    setStatus("🌟 Bulle prête à être tissée !")
-    onComplete?.(payload)
+    setStatus("🌟 Résonance créée.")
+    setTimeout(() => onComplete?.(payload), 1000)
   }
 
   return (
-    <div className="hublot">
-      <h3>🌌 Hublot résonant</h3>
-      <p className="hublot__subtitle">Sélectionne 3 bulles pour créer ta résonance.</p>
-
-      <svg ref={svgRef} width="320" height="320" />
-
+    <div className="hublot-inline fade-in">
+      <h3>🌌 Hublot résonant – {step.spirit_name}</h3>
+      <p className="subtitle">Choisis 3 bulles pour clore ton voyage intérieur.</p>
+      <svg ref={svgRef} width="300" height="300" />
       <div className="hublot__selected">
         {selected.map((id) => {
           const n = inuitNodes.find((x) => x.id === id)
@@ -187,11 +162,9 @@ export default function HublotResonant({
           )
         })}
       </div>
-
       <button className="hublot__validate-btn" onClick={handleValidate}>
-        Valider (3)
+        🌬️ Valider (3)
       </button>
-
       {status && <p className="hublot__status">{status}</p>}
     </div>
   )

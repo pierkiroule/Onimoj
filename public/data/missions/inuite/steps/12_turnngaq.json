@@ -1,0 +1,12 @@
+{
+  "step_number": 12,
+  "spirit_name": "Tuurngaq",
+  "symbol": "👁️",
+  "title": "L’Esprit des Passages",
+  "activities": [
+    { "type": "text", "content": "Tuurngaq est l’esprit du passage. Il transforme la peur en connaissance." },
+    { "type": "ritual", "content": "Ferme les yeux. Respire. Laisse une ancienne part de toi se dissoudre." },
+    { "type": "quiz", "question": "Tuurngaq ouvre ?", "options": ["Une porte", "Une blessure", "Un tunnel"], "correct": 0 },
+    { "type": "hublot", "title": "Passage final", "text": "Tu es prêt à renaître avec le souffle du monde.", "transition": "end" }
+  ]
+}

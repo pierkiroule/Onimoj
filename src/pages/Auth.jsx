@@ -5,7 +5,7 @@ import '../App.css'
 export default function Auth({ onAuth }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [mode, setMode] = useState('signin')
+  const [mode, setMode] = useState('signin') // signin | signup | reset
   const [status, setStatus] = useState('')
 
   async function handleSubmit(e) {
@@ -14,39 +14,39 @@ export default function Auth({ onAuth }) {
 
     try {
       let result
+
       if (mode === 'signup') {
         result = await supabase.auth.signUp({ email, password })
-      } else {
+      } else if (mode === 'signin') {
         result = await supabase.auth.signInWithPassword({ email, password })
-      }
-
-      if (result.error) throw result.error
-      const { session } = result.data || {}
-
-      if (mode === 'signup') {
-        // Si confirmation par email activée → pas de session immédiate
-        if (!session) {
-          setStatus('📧 Vérifie tes emails pour confirmer ton compte.')
-          return
-        }
-        setStatus('✅ Compte créé et connecté !')
-        onAuth(session)
+      } else if (mode === 'reset') {
+        const { error } = await supabase.auth.resetPasswordForEmail(email)
+        if (error) throw error
+        setStatus('📩 Lien de réinitialisation envoyé à ton adresse e-mail.')
         return
       }
 
-      // Sign-in normal
-      if (!session) throw new Error('Session introuvable après connexion')
-      setStatus('✅ Connecté !')
-      onAuth(session)
+      if (result.error) throw result.error
+
+      // ✅ Connexion réussie
+      setStatus('✅ Connecté au champ de rêves !')
+      onAuth(result.data.session)
+
     } catch (err) {
       setStatus('❌ ' + err.message)
     }
   }
 
+  // 🌙 Titre dynamique
+  const titles = {
+    signin: '🌙 Connecte-toi à ton espace onirique',
+    signup: '✨ Crée ton compte onirique',
+    reset: '🔑 Réinitialise ton mot de passe',
+  }
+
   return (
     <div className="fade-in" style={{ textAlign: 'center', color: '#eee', padding: '1.5rem' }}>
-      
-      <h3>{mode === 'signup' ? '✨ Crée ton compte onirique' : '🌙 Connecte-toi à ton espace'}</h3>
+      <h3>{titles[mode]}</h3>
 
       <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
         <input
@@ -54,32 +54,77 @@ export default function Auth({ onAuth }) {
           placeholder="Email onirique..."
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: '0.5rem', margin: '0.3rem', borderRadius: '8px', width: '80%' }}
+          required
+          style={{
+            padding: '0.6rem',
+            margin: '0.3rem',
+            borderRadius: '8px',
+            width: '80%',
+            border: 'none',
+          }}
         />
-        <input
-          type="password"
-          placeholder="Mot de passe secret..."
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: '0.5rem', margin: '0.3rem', borderRadius: '8px', width: '80%' }}
-        />
+
+        {mode !== 'reset' && (
+          <input
+            type="password"
+            placeholder="Mot de passe secret..."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              padding: '0.6rem',
+              margin: '0.3rem',
+              borderRadius: '8px',
+              width: '80%',
+              border: 'none',
+            }}
+          />
+        )}
+
         <button
           type="submit"
           className="dream-button"
-          style={{ marginTop: '0.8rem', background: '#6eff8d', border: 'none', borderRadius: '8px', padding: '0.6rem 1.2rem' }}
+          style={{
+            marginTop: '0.8rem',
+            background: '#6eff8d',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '0.6rem 1.2rem',
+          }}
         >
-          {mode === 'signup' ? 'Créer un compte' : 'Connexion'}
+          {mode === 'signup'
+            ? 'Créer un compte'
+            : mode === 'signin'
+            ? 'Connexion'
+            : 'Envoyer le lien'}
         </button>
       </form>
 
-      <p style={{ marginTop: '1rem', opacity: 0.8, cursor: 'pointer' }}
-        onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}>
-        {mode === 'signup'
-          ? '🌀 Déjà inscrit ? Connecte-toi'
-          : '🌱 Nouveau voyageur ? Crée ton compte'}
-      </p>
+      {/* 🔁 Changement de mode */}
+      <div style={{ marginTop: '1rem', opacity: 0.8 }}>
+        {mode === 'signup' && (
+          <p onClick={() => setMode('signin')} style={{ cursor: 'pointer' }}>
+            🌀 Déjà inscrit ? Connecte-toi
+          </p>
+        )}
+        {mode === 'signin' && (
+          <>
+            <p onClick={() => setMode('signup')} style={{ cursor: 'pointer' }}>
+              🌱 Nouveau voyageur ? Crée ton compte
+            </p>
+            <p onClick={() => setMode('reset')} style={{ cursor: 'pointer', fontSize: '0.9rem', opacity: 0.6 }}>
+              🔑 Mot de passe oublié ?
+            </p>
+          </>
+        )}
+        {mode === 'reset' && (
+          <p onClick={() => setMode('signin')} style={{ cursor: 'pointer' }}>
+            🌙 Retour à la connexion
+          </p>
+        )}
+      </div>
 
-      <p style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.7 }}>{status}</p>
+      <p style={{ fontSize: '0.9rem', marginTop: '0.8rem', opacity: 0.7 }}>{status}</p>
     </div>
   )
 }

@@ -1,133 +1,185 @@
-.module-inuit {
-  margin: 1rem auto;
-  padding: 1.6rem 1.4rem;
-  max-width: 680px;
-  background: radial-gradient(circle at 50% 20%, rgba(8, 18, 26, 0.85), rgba(0, 0, 0, 0.75));
+/* 🌌 Bloc principal */
+.module-inuit-step {
+  position: relative;
+  width: 100%;
+  min-height: 100vh; /* ✅ pas de scroll cassé sur mobile */
+  overflow: hidden;
+  color: #e9fffd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+  isolation: isolate;
+  background: radial-gradient(circle at 50% 20%, rgba(8, 18, 26, 0.85), rgba(0, 0, 0, 0.85));
   border: 1px solid rgba(127, 255, 212, 0.25);
   border-radius: 16px;
   box-shadow: 0 0 30px rgba(127, 255, 212, 0.12);
-  color: #e9fffd;
-  text-align: left;
-  position: relative;
-  overflow: hidden; /* ✅ empêche tout débordement visuel */
-  isolation: isolate; /* ✅ isole les effets internes */
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 
-.module-inuit__header {
-  margin-bottom: 10px;
+/* 🎥 Vidéo de fond */
+.module-inuit-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+
+.module-inuit-video.visible {
+  opacity: 1;
+}
+
+/* 🌀 Placeholder poétique si pas de vidéo */
+.module-inuit-placeholder {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, #00151d, #000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #7fffd4;
+  text-align: center;
+  z-index: 0;
+  animation: pulse-bg 8s ease-in-out infinite alternate;
+  padding: 1rem;
+}
+
+.placeholder-symbol {
+  font-size: clamp(3rem, 12vw, 5rem);
+  opacity: 0.8;
+  animation: float 4s ease-in-out infinite;
+}
+
+.placeholder-text p {
+  font-size: clamp(0.9rem, 4vw, 1.1rem);
+  opacity: 0.75;
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { background: radial-gradient(circle at 50% 30%, #00151d, #000); }
+  50% { background: radial-gradient(circle at 50% 40%, #00323d, #000); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* 🌙 Contenu textuel surimposé */
+.module-inuit-overlay {
   position: relative;
   z-index: 2;
+  padding: clamp(1rem, 5vw, 2rem) clamp(1rem, 4vw, 1.4rem);
+  max-width: 720px;
+  width: 100%;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 24px rgba(127, 255, 212, 0.1);
+  animation: fadeIn 1.2s ease both;
 }
 
-.module-inuit__step {
-  opacity: 0.7;
-  font-size: 0.9rem;
-  letter-spacing: 0.03em;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.module-inuit__title {
-  margin: 4px 0 2px 0;
-  font-size: 1.4rem;
-  color: #7fffd4;
-  text-shadow: 0 0 8px rgba(127,255,212,0.25);
+.module-inuit-header {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.module-inuit-stepnum {
+  opacity: 0.75;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  letter-spacing: 0.04em;
+}
+
+.module-inuit-title {
+  font-size: clamp(1.3rem, 5vw, 1.7rem);
   font-weight: 600;
+  color: #7fffd4;
+  margin: 0.4rem 0;
+  text-shadow: 0 0 8px rgba(127,255,212,0.25);
 }
 
-.module-inuit__theme {
-  opacity: 0.85;
+.module-inuit-theme {
   font-style: italic;
+  opacity: 0.85;
   color: #cde;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
 }
 
-/* 🌌 Corps du texte */
-.module-inuit__description {
+/* 🪶 Texte et rituel */
+.module-inuit-description {
   opacity: 0.95;
   line-height: 1.6;
-  font-size: 1.03rem;
-  z-index: 2;
-  position: relative;
+  font-size: clamp(0.95rem, 3.5vw, 1.05rem);
   white-space: pre-line;
   overflow-wrap: break-word;
+  margin-bottom: 1.5rem;
 }
 
-/* 🌙 Bloc rituel */
-.module-inuit__block {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: rgba(127,255,212,0.06);
+.module-inuit-ritual {
+  background: rgba(127,255,212,0.08);
   border-left: 3px solid rgba(127,255,212,0.3);
   border-radius: 12px;
-  position: relative;
-  z-index: 2;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.module-inuit__label {
+.module-inuit-label {
   font-weight: 600;
   color: #7fffd4;
   margin-bottom: 0.4rem;
 }
 
-.module-inuit__content {
-  margin: 0;
+.module-inuit-content {
   opacity: 0.9;
   line-height: 1.5;
-}
-
-/* ✨ Mots-clés */
-.module-inuit__keywords {
-  margin-top: 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  position: relative;
-  z-index: 2;
-}
-
-.keyword-bubble {
-  background: rgba(127,255,212,0.1);
-  color: #aee;
-  border-radius: 14px;
-  padding: 0.35rem 0.8rem;
-  font-size: 0.85rem;
-  box-shadow: 0 0 10px rgba(127,255,212,0.15);
-  transition: transform 0.3s ease, background 0.3s ease;
-}
-
-.keyword-bubble:hover {
-  background: rgba(127,255,212,0.25);
-  transform: scale(1.08);
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
 }
 
 /* 🌠 Bouton hublot */
-.module-inuit__actions {
-  display: flex;
-  justify-content: center;
+.module-inuit-actions {
+  text-align: center;
   margin-top: 1.2rem;
-  z-index: 2;
 }
 
-.module-inuit__open-btn {
+.dream-btn {
   background: linear-gradient(90deg, #6a5acd, #7fffd4);
   border: none;
   border-radius: 10px;
-  padding: 10px 18px;
+  padding: clamp(0.6rem, 2.5vw, 0.8rem) clamp(1rem, 5vw, 1.2rem);
   font-weight: 700;
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
   color: #111;
   cursor: pointer;
   box-shadow: 0 0 18px rgba(127,255,212,0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.module-inuit__open-btn:hover {
+.dream-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 0 28px rgba(127,255,212,0.35);
 }
 
-/* 💫 halo interne (discret et contenu) */
-.module-inuit::before {
+.dream-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+
+/* 💫 halo interne respirant */
+.module-inuit-step::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -142,80 +194,30 @@
   50% { opacity: 0.8; transform: scale(1.05); }
 }
 
-.dream-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
+/* 📱 Ajustements spécifiques mobile portrait */
+@media (max-width: 600px) {
+  .module-inuit-step {
+    border-radius: 0;
+    box-shadow: none;
+    height: auto;
+    min-height: 100vh;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
 
-.dream-card {
-  position: relative;
-  border: 1px solid rgba(127, 255, 212, 0.2);
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
+  .module-inuit-overlay {
+    margin-top: 3.5rem;
+    padding: 1.2rem;
+    background: rgba(0, 0, 0, 0.55);
+  }
 
-.dream-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(127, 255, 212, 0.3);
-}
+  .module-inuit-description,
+  .module-inuit-content {
+    text-align: justify;
+  }
 
-.dream-thumb {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  filter: brightness(0.8);
-  transition: filter 0.4s ease;
-}
-
-.dream-card:hover .dream-thumb {
-  filter: brightness(1);
-}
-
-.dream-caption {
-  padding: 0.5rem;
-  background: rgba(0, 10, 15, 0.6);
-  font-size: 0.85rem;
-}
-
-.dream-caption h4 {
-  font-size: 0.9rem;
-  margin: 0.2rem 0;
-  color: #7fffd4;
-}
-
-.dream-tag-form {
-  margin-top: 2rem;
-  text-align: center;
-}
-
-.dream-input {
-  width: 80%;
-  max-width: 360px;
-  padding: 0.6rem;
-  border-radius: 8px;
-  border: none;
-  background: #111;
-  color: #bff;
-  font-size: 1rem;
-}
-
-.dream-btn {
-  margin-top: 0.8rem;
-  background: linear-gradient(90deg, #6a5acd, #7fffd4);
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.2rem;
-  font-weight: bold;
-  color: #111;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dream-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(127, 255, 212, 0.4);
+  .dream-btn {
+    width: 100%;
+    max-width: 280px;
+  }
 }

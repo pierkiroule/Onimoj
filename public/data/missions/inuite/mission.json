@@ -1,0 +1,24 @@
+{
+  "mission_id": "inuite",
+  "title": "Les 12 Souffles du Grand Nord",
+  "description": "Un voyage de 12 jours à travers les esprits du vent, de la glace, de la mer et du ciel — à l’écoute du monde inuit.",
+  "author": "Pier",
+  "version": "1.0.0",
+  "culture": "Inuite",
+  "color": "#7fffd4",
+  "cover": "media/sila_intro.mp4",
+  "steps": [
+    { "file": "steps/1_sila.json" },
+    { "file": "steps/2_sedna.json" },
+    { "file": "steps/3_qilak.json" },
+    { "file": "steps/4_torngasuk.json" },
+    { "file": "steps/5_nuliajuk.json" },
+    { "file": "steps/6_tuktu.json" },
+    { "file": "steps/7_qajaq.json" },
+    { "file": "steps/8_amaruq.json" },
+    { "file": "steps/9_aniu.json" },
+    { "file": "steps/10_nanuq.json" },
+    { "file": "steps/11_ayarnaq.json" },
+    { "file": "steps/12_turnngaq.json" }
+  ]
+}

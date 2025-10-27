@@ -1,0 +1,12 @@
+{
+  "step_number": 11,
+  "spirit_name": "Ayarnaq",
+  "symbol": "🌠",
+  "title": "L’Étoile du Retour",
+  "activities": [
+    { "type": "text", "content": "Ayarnaq éclaire le chemin du retour. Elle guide les voyageurs perdus." },
+    { "type": "ritual", "content": "Regarde une lumière au loin. Laisse-la t’appeler doucement vers l’équilibre." },
+    { "type": "quiz", "question": "Ayarnaq symbolise ?", "options": ["La fin", "L’espoir", "Le danger"], "correct": 1 },
+    { "type": "hublot", "title": "Lumière douce", "text": "Tu retrouves ton nord intérieur.", "transition": "next_step" }
+  ]
+}

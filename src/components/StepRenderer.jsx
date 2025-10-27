@@ -6,58 +6,73 @@ import HublotResonant from "./HublotResonant"
 import { supabase } from "../supabaseClient"
 
 export default function StepRenderer({ step, userId, onComplete }) {
-  // Phase 0: rendu minimal + hublot simplifié pour test/intégration
   const [showHublot, setShowHublot] = useState(false)
   const [starDraft, setStarDraft] = useState(null)
   const [title, setTitle] = useState("")
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState("")
 
+  const handleOpenHublot = () => {
+    console.log("🌀 Ouverture du Hublot Résonnant…")
+    setShowHublot(true)
+    setStatus("🌌 Hublot résonant ouvert")
+  }
+
+  const handleCloseHublot = () => {
+    console.log("❄️ Fermeture du Hublot Résonnant")
+    setShowHublot(false)
+  }
+
   async function saveStar() {
     if (!starDraft) return
     const payload = {
-      title: title?.trim() || starDraft.title || `Étoile — Étape ${step.step_number}`,
+      title: title?.trim() || `Étoile — Étape ${step.step_number}`,
       emojis: starDraft.emojis,
-      culture: starDraft.culture,
-      spirit: starDraft.spirit,
-      step_number: starDraft.step_number,
+      culture: "Inuite",
+      spirit: step.spirit_name,
+      step_number: step.step_number,
       user_id: userId || null,
       resonance_level: 0.25,
       poetic_chain: [],
     }
+
     setSaving(true)
     setStatus("")
     try {
-      await supabase.from("dreamstars").insert([payload]).select().single()
-      setStatus("Bulle enregistrée")
+      await supabase.from("dream_stars").insert([payload]).select().single()
+      setStatus("💾 Bulle enregistrée avec succès")
       setStarDraft(null)
       setTitle("")
-    } catch {
-      setStatus("Erreur d’enregistrement")
+    } catch (err) {
+      console.error("❌ Erreur Supabase :", err)
+      setStatus("⚠️ Erreur d’enregistrement")
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div>
-      <ModuleInuitStep step={step} onOpenHublot={() => setShowHublot(true)} />
+    <div className="step-renderer">
+      <ModuleInuitStep step={step} onOpenHublot={handleOpenHublot} />
 
-      {/* Hublot résonant minimal */}
+      {/* Hublot résonnant */}
       {showHublot && (
-        <div style={{ marginTop: "1rem" }}>
+        <div className="hublot-wrapper">
           <HublotResonant
             culture="Inuite"
             step={step}
+            onClose={handleCloseHublot}
             onComplete={(payload) => {
-              setShowHublot(false)
+              console.log("✅ Hublot complété :", payload)
               setStarDraft(payload)
+              setShowHublot(false)
+              setStatus("✨ Inspiration reçue du hublot")
             }}
           />
         </div>
       )}
 
-      {/* Éditeur minimal d’étoile mytho-onirique */}
+      {/* Éditeur de bulle */}
       {starDraft && (
         <div style={{ marginTop: "1rem", textAlign: "center" }}>
           <input
@@ -68,19 +83,20 @@ export default function StepRenderer({ step, userId, onComplete }) {
           />
           <div>
             <button className="save-btn" onClick={saveStar} disabled={saving}>
-              Enregistrer dans l’échocreation
+              {saving ? "⏳ Enregistrement…" : "💾 Sauvegarder"}
             </button>
           </div>
         </div>
       )}
 
-      {/* Statut persistant de sauvegarde */}
+      {/* Statut */}
       {status && (
         <p className="status-text" style={{ textAlign: "center", marginTop: "0.6rem" }}>
           {status}
         </p>
       )}
 
+      {/* Quiz */}
       <div className="quiz-zone">
         <OnimojiQuiz stepNumber={step.step_number} userId={userId} onComplete={onComplete} />
       </div>
@@ -89,7 +105,7 @@ export default function StepRenderer({ step, userId, onComplete }) {
 }
 
 StepRenderer.propTypes = {
-  step: PropTypes.object,
+  step: PropTypes.object.isRequired,
   userId: PropTypes.string,
   onComplete: PropTypes.func,
 }

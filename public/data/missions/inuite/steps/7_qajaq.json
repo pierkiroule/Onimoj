@@ -1,0 +1,12 @@
+{
+  "step_number": 7,
+  "spirit_name": "Qajaq",
+  "symbol": "🛶",
+  "title": "Le Voyageur Intérieur",
+  "activities": [
+    { "type": "text", "content": "Qajaq est le kayak. Il avance sur l’eau calme ou agitée, toujours à l’écoute du vent." },
+    { "type": "ritual", "content": "Ferme les yeux. Imagine-toi glissant sur l’eau, sans effort." },
+    { "type": "quiz", "question": "Qajaq évoque ?", "options": ["La chasse", "Le voyage intérieur", "La peur"], "correct": 1 },
+    { "type": "hublot", "title": "Navigation douce", "text": "Tu avances porté par le courant de ton souffle.", "transition": "next_step" }
+  ]
+}

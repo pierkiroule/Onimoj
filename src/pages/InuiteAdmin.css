@@ -1,0 +1,187 @@
+.admin-page {
+  color: #e9fffd;
+  max-width: 960px;
+  margin: 5vh auto;
+  padding: 0 1rem;
+}
+
+.admin-title {
+  text-align: center;
+  color: #7fffd4;
+}
+
+.admin-subtitle {
+  text-align: center;
+  opacity: 0.8;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.admin-grid.mobile {
+  grid-template-columns: 1fr;
+}
+
+/* --- PANELS --- */
+.panel {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.step-item {
+  border-bottom: 1px solid rgba(127, 255, 212, 0.15);
+  padding: 8px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-item:nth-child(odd) {
+  background: rgba(127, 255, 212, 0.03);
+}
+
+.step-sub {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.step-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* --- FORMULAIRE --- */
+.admin-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.admin-form input,
+.admin-form textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  color: #e9fffd;
+  border: 1px solid rgba(127, 255, 212, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 4px;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 10px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.error {
+  color: #ff8080;
+  margin-top: 6px;
+}
+
+/* --- BOUTONS --- */
+.btn-primary {
+  background: linear-gradient(145deg, #6eff8d, #35a0ff);
+  color: #111;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #7fffd4;
+  border: 1px solid #7fffd4;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-danger {
+  background: #ff8080;
+  color: #111;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-small {
+  background: transparent;
+  color: #7fffd4;
+  border: 1px solid #7fffd4;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-danger-small {
+  background: #ff8080;
+  color: #111;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --- AUTRES --- */
+.admin-denied {
+  text-align: center;
+  margin-top: 15vh;
+}
+
+.admin-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* ✅ Priorité d'interaction */
+.admin-page {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* ✅ Force tous les boutons à être cliquables */
+.admin-page button {
+  position: relative;
+  z-index: 20;
+  pointer-events: auto !important;
+}

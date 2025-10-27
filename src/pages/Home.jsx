@@ -29,90 +29,99 @@ export default function Home({ onStart, onLogin, onRegister }) {
           textShadow: "0 0 8px rgba(180,220,255,0.4)",
         }}
       >
-        Prendre soin de ses rêves. Explorer les cultures oniriques.
+        Prendre soin de son sommeil en cultivant ses rêves.  
+        Explorer les univers culturels oniriques.
       </h2>
 
       {/* 🌠 INTRO */}
-      <h1 className="home-title">Bienvenue dans l’aventure Onimoji</h1>
-      <p className="intro-zone">
-        Une expérience poétique et culturelle, où les rêves du monde se relient par résonance.  
-        Chaque culture éclaire une manière d’habiter le monde :  
-        ❄️ les Inuits écoutent le souffle du vent,  
-        🌵 les Berbères dialoguent avec les étoiles du désert,  
-        🌲 les Celtes conversent avec la forêt et les rivières.  
-        Rêver devient un acte d’écoute : un lien entre soi, les autres et le vivant.
+      <h1 className="home-title">Bienvenue à bord de la navette Oniris 🚀</h1>
+      <p className="intro-zone" style={{ maxWidth: "600px", margin: "1rem auto" }}>
+        Une exploration de l’univers poétique, onirique et culturel,  
+        où les rêves du monde se relient en résonance.
+        <br /><br />
+        Chaque culture éclaire une manière d’habiter le monde et de rêver :
+        <br />
+        ❄️ Les Inuits écoutent le souffle du vent.  
+        <br />
+        🌵 Les Berbères dialoguent avec les étoiles du désert.  
+        <br />
+        🌲 Les Celtes conversent avec la forêt et les rivières.  
+        <br /><br />
+        Rêver devient un acte d’écoute :  
+        un lien entre soi, les autres et le vivant.
       </p>
 
       {/* 💫 POURQUOI */}
-      <div className="card-glow">
+      <div className="card-glow" style={{ maxWidth: "600px", margin: "1.5rem auto" }}>
         <h3 style={{ color: "#7fffd4" }}>Pourquoi Onimoji ?</h3>
         <p>
-          Notre époque nous relie sans cesse, mais rarement en profondeur.  
+          Nous sommes connectés à tout, sauf à nos rêves.  
           <strong>Onimoji</strong> invite à une écologie du rêve :  
-          un espace de résonance où symboles, chants et paysages deviennent des passerelles.  
-          Chaque rêve partagé rallume une mémoire du monde.
+          un espace de résonance où les symboles et les émotions deviennent des passerelles.  
+          Chaque rêve partagé fait vibrer les sagesses du monde.
         </p>
       </div>
 
       {/* 🌀 COMMENT */}
-      <div className="card-glow" style={{ marginTop: "1rem" }}>
+      <div className="card-glow" style={{ marginTop: "1rem", maxWidth: "600px", margin: "0 auto" }}>
         <h3 style={{ color: "#7fffd4" }}>Comment participer ?</h3>
         <p>
           🌿 Choisis un horizon culturel.  
+          <br />
           💭 Découvre ses symboles et récits.  
-          ✨ Laisse l’IA poétique t’aider à tisser ton propre rêve.
+          <br />
+          ✨ Cocrée chaque jour, avec notre inspir-IA, tes ressources oniriques.
         </p>
       </div>
 
-{/* ✨ BOUTONS */}
-<div
-  style={{
-    marginTop: "1.6rem",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "0.6rem",
-  }}
->
-  <button className="dream-button" onClick={onStart}>
-    Explorer Onimoji
-  </button>
+      {/* ✨ BOUTONS */}
+      <div
+        style={{
+          marginTop: "1.6rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "0.6rem",
+        }}
+      >
+        <button className="dream-button" onClick={onStart}>
+          Explorer Onimoji
+        </button>
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      gap: "0.6rem",
-    }}
-  >
-    <button
-      className="dream-button"
-      style={{
-        background: "rgba(127,255,212,0.15)",
-        color: "#7fffd4",
-      }}
-      onClick={onLogin}
-    >
-      Connexion
-    </button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "0.6rem",
+          }}
+        >
+          <button
+            className="dream-button"
+            style={{
+              background: "rgba(127,255,212,0.15)",
+              color: "#7fffd4",
+            }}
+            onClick={onLogin}
+          >
+            Connexion
+          </button>
 
-    <button
-      className="dream-button"
-      style={{
-        background: "rgba(110,255,141,0.15)",
-        color: "#6eff8d",
-      }}
-      onClick={onRegister}
-    >
-      Inscription
-    </button>
-  </div>
-</div>
+          <button
+            className="dream-button"
+            style={{
+              background: "rgba(110,255,141,0.15)",
+              color: "#6eff8d",
+            }}
+            onClick={onRegister}
+          >
+            Inscription
+          </button>
+        </div>
+      </div>
 
       {/* 🌙 FOOTER */}
-      <div className="footer">
-        <p>Des voyages mythiques et oniriques pour apprendre à rêver vivant.</p>
-        
+      <div className="footer" style={{ marginTop: "1.5rem", opacity: 0.85 }}>
+        <p>Des voyages culturels pour apprendre à rêver vivant.</p>
       </div>
     </div>
   )

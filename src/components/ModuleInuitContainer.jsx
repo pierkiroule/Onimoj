@@ -1,4 +1,5 @@
 import { useState } from "react"
+import PropTypes from "prop-types"
 import ModuleInuitStep from "./ModuleInuitStep"
 import inuitSteps from "../data/inuitSteps.json"
 import "./ModuleInuitContainer.css"
@@ -8,14 +9,20 @@ export default function ModuleInuitContainer({ onOpenHublot }) {
   const totalSteps = inuitSteps.length
   const step = inuitSteps[currentStep]
 
+  // 🧭 Fonctions de navigation
   const nextStep = () => {
-    setCurrentStep((prev) => (prev + 1 < totalSteps ? prev + 1 : prev))
-  }
-  const prevStep = () => {
-    setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev))
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep((s) => s + 1)
+    }
   }
 
-  // 💫 Classe du fond selon l’étape
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep((s) => s - 1)
+    }
+  }
+
+  // 💫 Classe du fond selon l’esprit
   const bgClass = (() => {
     const name = step.spirit_name?.toLowerCase() || ""
     if (name.includes("sila")) return "bg-sila"
@@ -26,7 +33,7 @@ export default function ModuleInuitContainer({ onOpenHublot }) {
   })()
 
   return (
-    <div className={`inuit-container fade-in ${bgClass}`}>
+    <div className={`inuit-container ${bgClass}`}>
       {/* 🌌 Barre de progression */}
       <div className="inuit-progress">
         {inuitSteps.map((s, i) => (
@@ -48,7 +55,9 @@ export default function ModuleInuitContainer({ onOpenHublot }) {
       </div>
 
       {/* 🌙 Étape culturelle */}
-      <ModuleInuitStep step={step} onOpenHublot={onOpenHublot} />
+      <div key={step.step_number} className="fade-step">
+        <ModuleInuitStep step={step} onOpenHublot={onOpenHublot} />
+      </div>
 
       {/* 🔘 Navigation */}
       <div className="inuit-nav">
@@ -59,6 +68,7 @@ export default function ModuleInuitContainer({ onOpenHublot }) {
         >
           ← Précédent
         </button>
+
         <button
           className="dream-button"
           onClick={nextStep}
@@ -69,4 +79,8 @@ export default function ModuleInuitContainer({ onOpenHublot }) {
       </div>
     </div>
   )
+}
+
+ModuleInuitContainer.propTypes = {
+  onOpenHublot: PropTypes.func,
 }

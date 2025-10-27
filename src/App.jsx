@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react"
 import { supabase } from "./supabaseClient"
 
-// 🧩 Composants
+// 🌠 Composants globaux
 import StarField from "./components/StarField"
 import BottomMenu from "./components/BottomMenu"
 import Notifications from "./components/Notifications"
 
-// 🌙 Pages
+// 📄 Pages
 import Home from "./pages/Home"
-import MissionSelect from "./pages/MissionSelect"
+import HorizonSelect from "./pages/HorizonSelect"
 import MissionInuite from "./pages/MissionInuite"
+import MissionInuiteEditor from "./pages/MissionInuiteEditor"
 import DreamStarCreator from "./pages/DreamStarCreator"
 import Profil from "./pages/Profil"
 import EchoCreation from "./pages/EchoCreation"
 import TestSupabase from "./pages/TestSupabase"
 import Auth from "./pages/Auth"
+import Register from "./pages/Register"
 import LaboLogin from "./pages/LaboLogin"
 import Labo from "./pages/Labo"
 import InuiteAdmin from "./pages/InuiteAdmin"
@@ -23,62 +25,80 @@ import "./App.css"
 
 export default function App() {
   const [page, setPage] = useState("home")
-  const [supabaseStatus, setSupabaseStatus] = useState("⏳ Connexion...")
+  const [supabaseStatus, setSupabaseStatus] = useState("⏳ Connexion à Supabase…")
   const [session, setSession] = useState(null)
+  const [checkingSession, setCheckingSession] = useState(true)
 
-  // 🚀 Vérifie la connexion Supabase
+  // 🚀 Vérifie la connexion à Supabase
   useEffect(() => {
+    let interval
     async function testSupabase() {
       try {
         const { error } = await supabase.from("test_table").select("*").limit(1)
         if (error) throw error
-        setSupabaseStatus("✅ Supabase OK")
+        setSupabaseStatus("✅ Supabase connecté")
       } catch (err) {
-        console.error("❌ Supabase erreur:", err.message)
-        setSupabaseStatus("❌ Supabase erreur")
+        console.warn("⚠️ Mode local :", err.message)
+        setSupabaseStatus("⚠️ Mode local (offline)")
       }
     }
     testSupabase()
+    interval = setInterval(testSupabase, 30000)
+    return () => clearInterval(interval)
   }, [])
 
-  // 🔐 Gestion session
+  // 🔐 Gestion de session persistante
   useEffect(() => {
-    async function getSession() {
+    async function initSession() {
       const { data } = await supabase.auth.getSession()
-      setSession(data.session)
+      if (data?.session) setSession(data.session)
+      setCheckingSession(false)
+
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, sess) => {
+        setSession(sess)
+      })
+      return () => listener?.subscription?.unsubscribe()
     }
-    getSession()
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-
-    return () => listener.subscription.unsubscribe()
+    initSession()
   }, [])
 
-  // 🧭 Navigation
+  // 🔁 Navigation simple
   const handleNavigation = (pageId) => setPage(pageId)
 
-  // 🔓 Déconnexion
-  const handleLogout = async () => {
+  // 🚪 Déconnexion utilisateur
+  async function handleLogout() {
     await supabase.auth.signOut()
     setSession(null)
     setPage("home")
   }
 
-  // 🪄 Rendu principal
+  // 🪄 Routing principal
   const renderPage = () => {
-    if (!session) return <Auth onAuth={(newSession) => setSession(newSession)} />
-
     switch (page) {
+      // 🏠 Page d'accueil
       case "home":
-        return <Home onStart={() => setPage("mission-select")} />
+        return (
+          <Home
+            onStart={() => setPage("mission-select")}
+            onLogin={() => setPage("login")}
+            onRegister={() => setPage("register")}
+          />
+        )
 
+      // 🔐 Connexion
+      case "login":
+        return <Auth onAuth={setSession} onNavigate={setPage} />
+
+      // 🆕 Inscription
+      case "register":
+        return <Register onAuth={setSession} onNavigate={setPage} />
+
+      // 🌍 Sélection d’horizon
       case "mission-select":
         return (
-          <MissionSelect
-            onChoose={(selected) => {
-              if (selected.culture === "Inuite") setPage("mission-inuite")
+          <HorizonSelect
+            onChoose={(sel) => {
+              if (sel.culture === "Inuite") setPage("mission-inuite")
             }}
           />
         )
@@ -86,11 +106,21 @@ export default function App() {
       case "mission-inuite":
         return <MissionInuite />
 
+      case "mission-editor":
+        return <MissionInuiteEditor />
+
       case "create":
         return <DreamStarCreator />
 
+      // 👤 Profil utilisateur
       case "profil":
-        return <Profil user={session?.user} onLogout={handleLogout} onNavigate={setPage} />
+        return (
+          <Profil
+            user={session?.user}
+            onLogout={handleLogout}
+            onNavigate={setPage}
+          />
+        )
 
       case "echo-creation":
         return <EchoCreation />
@@ -108,38 +138,53 @@ export default function App() {
         return <InuiteAdmin onNavigate={setPage} session={session} />
 
       default:
-        return <Home onStart={() => setPage("mission-select")} />
+        return (
+          <Home
+            onStart={() => setPage("mission-select")}
+            onLogin={() => setPage("login")}
+            onRegister={() => setPage("register")}
+          />
+        )
     }
   }
 
-  // 🌌 Interface principale
+  // 🌙 Attente initiale
+  if (checkingSession)
+    return (
+      <div
+        className="app-root"
+        style={{ color: "#7fffd4", textAlign: "center", marginTop: "40vh" }}
+      >
+        🌌 Restauration de la session...
+      </div>
+    )
+
+  // 🌌 Rendu principal
   return (
     <div className="app-root">
       <StarField />
-
-      {/* 🔔 Notifications visibles si session active */}
       {session && <Notifications session={session} />}
 
-      {/* 🌌 Contenu principal */}
       <main className="main-container fade-in">{renderPage()}</main>
 
-      {/* 🌠 Menu global */}
-      {session && <BottomMenu currentPage={page} onNavigate={handleNavigation} />}
+      {session && (
+        <BottomMenu currentPage={page} onNavigate={handleNavigation} />
+      )}
 
-      {/* ✅ Indicateur Supabase + user */}
+      {/* ✅ Statut Supabase */}
       <div
         style={{
           position: "fixed",
           bottom: "0.6rem",
           right: "0.8rem",
           fontSize: "0.8rem",
-          opacity: 0.7,
-          color:
-            supabaseStatus.includes("OK")
-              ? "#6eff8d"
-              : supabaseStatus.includes("erreur")
-              ? "#ff6b6b"
-              : "#ffcc66",
+          opacity: 0.75,
+          color: supabaseStatus.startsWith("✅")
+            ? "#6eff8d"
+            : supabaseStatus.includes("offline")
+            ? "#ffcc66"
+            : "#ff6b6b",
+          textShadow: "0 0 6px rgba(0,0,0,0.5)",
         }}
       >
         {supabaseStatus}
@@ -150,7 +195,9 @@ export default function App() {
         )}
       </div>
 
-      <footer className="footer">© 2025 Onimoji • Prototype Onirix Beta One</footer>
+      <footer className="footer">
+        © 2025 Onimoji • Prototype Onirix Beta One
+      </footer>
     </div>
   )
 }

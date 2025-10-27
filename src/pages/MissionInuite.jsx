@@ -1,52 +1,63 @@
 import { useEffect, useState } from "react"
-import { supabase } from "../supabaseClient"
-import inuitSteps from "../data/inuitSteps.json"
 import StepEngine from "../components/StepEngine"
 import "./MissionInuite.css"
 
 export default function MissionInuite() {
-  const [userId, setUserId] = useState(null)
-  const [steps, setSteps] = useState(inuitSteps)
+  const [mission, setMission] = useState(null)
+  const [steps, setSteps] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    async function loadAll() {
-      const { data } = await supabase.auth.getUser()
-      if (data?.user) setUserId(data.user.id)
-
+    async function loadMission() {
       try {
-        const { data: rows, error } = await supabase
-          .from("mission_steps_inuite")
-          .select("*")
-          .order("step_number", { ascending: true })
-        if (error) throw error
-        if (Array.isArray(rows) && rows.length > 0) {
-          setSteps(rows)
-        }
-      } catch {
-        // fallback to JSON already set
+        setLoading(true)
+        setError("")
+        console.log("📖 Lecture du fichier mission.json...")
+
+        const res = await fetch("/data/missions/inuite/mission.json")
+        if (!res.ok) throw new Error("Mission introuvable.")
+        const missionData = await res.json()
+        console.log("✅ Mission trouvée :", missionData.title)
+
+        // Charge toutes les étapes depuis le bon dossier
+        const stepPromises = missionData.steps.map(async (s) => {
+          const filePath = `/data/missions/inuite/${s.file}`
+          const r = await fetch(filePath)
+          if (!r.ok) throw new Error(`Fichier manquant : ${filePath}`)
+          return await r.json()
+        })
+        const stepData = await Promise.all(stepPromises)
+
+        setMission(missionData)
+        setSteps(stepData)
+      } catch (err) {
+        console.error("⚠️ Erreur mission :", err)
+        setError("Impossible de charger la mission locale.")
       } finally {
         setLoading(false)
       }
     }
-    loadAll()
+
+    loadMission()
   }, [])
 
-  // Expose slugs globally for URL sync in StepEngine
-  if (!window.__inuit_slugs__) {
-    window.__inuit_slugs__ = steps.map((s) =>
-      String(s?.spirit_name || s?.title || `etape-${s?.step_number || "1"}`)
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
-    )
-  }
+  if (loading)
+    return <p style={{ textAlign: "center", marginTop: "40vh" }}>🌘 Chargement du rêve…</p>
 
-  if (loading && (!steps || steps.length === 0)) {
-    return <p style={{ textAlign: "center", opacity: 0.9 }}>🌘 Chargement du rêve…</p>
-  }
+  if (error)
+    return <p style={{ color: "#ff8080", textAlign: "center", marginTop: "40vh" }}>{error}</p>
 
-  return <StepEngine steps={steps} userId={userId || undefined} />
+  if (!steps.length)
+    return <p style={{ textAlign: "center", marginTop: "40vh" }}>Aucune étape trouvée.</p>
+
+  return (
+    <div className="mission-inuite fade-in">
+      <h2 style={{ textAlign: "center", color: mission.color }}>{mission.title}</h2>
+      <p style={{ textAlign: "center", opacity: 0.8, marginTop: "-0.5rem" }}>
+        {mission.description}
+      </p>
+      <StepEngine steps={steps} />
+    </div>
+  )
 }

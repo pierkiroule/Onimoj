@@ -1,0 +1,79 @@
+.mission-player {
+  color: #e9fffd;
+  max-width: 720px;
+  margin: 5vh auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.activity-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  margin: 1rem 0;
+  padding: 1rem;
+  box-shadow: 0 0 12px rgba(127, 255, 212, 0.1);
+}
+
+.caption {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.activity-quiz button {
+  margin: 0.3rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e9fffd;
+}
+
+.activity-quiz button.selected {
+  background: #35a0ff;
+  color: #fff;
+}
+
+.activity-quiz button.correct {
+  background: #6eff8d;
+  color: #111;
+}
+
+.activity-quiz button.wrong {
+  background: #ff6b6b;
+}
+
+.quiz-result {
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6eff8d, #35a0ff);
+  color: #111;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 700;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #7fffd4;
+  border: 1px solid #7fffd4;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 20vh;
+  opacity: 0.7;
+}

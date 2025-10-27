@@ -1,0 +1,12 @@
+{
+  "step_number": 10,
+  "spirit_name": "Nanuq",
+  "symbol": "🐻‍❄️",
+  "title": "L’Ours du Nord",
+  "activities": [
+    { "type": "text", "content": "Nanuq avance seul, fort et tranquille. Il protège les passages." },
+    { "type": "ritual", "content": "Redresse-toi. Inspire profondément. Ressens la puissance tranquille de l’ours." },
+    { "type": "quiz", "question": "Nanuq incarne ?", "options": ["La peur", "Le courage", "La fuite"], "correct": 1 },
+    { "type": "hublot", "title": "Force calme", "text": "Ta force est dans ta paix.", "transition": "next_step" }
+  ]
+}

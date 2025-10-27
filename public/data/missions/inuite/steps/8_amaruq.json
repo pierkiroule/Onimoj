@@ -1,0 +1,12 @@
+{
+  "step_number": 8,
+  "spirit_name": "Amaruq",
+  "symbol": "🐺",
+  "title": "Le Loup du Silence",
+  "activities": [
+    { "type": "text", "content": "Amaruq écoute avant d’agir. Son silence est sa force." },
+    { "type": "ritual", "content": "Assieds-toi. Ne parle pas. Respire le silence jusqu’à sentir sa douceur." },
+    { "type": "quiz", "question": "Amaruq symbolise ?", "options": ["Le bruit", "Le silence", "La peur"], "correct": 1 },
+    { "type": "hublot", "title": "Silence vibrant", "text": "Dans le silence, tu deviens écho du monde.", "transition": "next_step" }
+  ]
+}

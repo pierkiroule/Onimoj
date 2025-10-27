@@ -259,3 +259,16 @@ body::after {
   font-size: 0.95rem;
   margin: 0;
 }
+
+.activity-block {
+  transition: all 0.3s ease;
+}
+.activity-header:hover {
+  background: rgba(127,255,212,0.1);
+}
+.activity-content {
+  background: rgba(255,255,255,0.03);
+  color: #eef;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}

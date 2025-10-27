@@ -48,3 +48,4 @@ Thumbs.db
 # 🧠 Cursor / AI assistants
 .cursor/
 .cursorrun/
+.vercel

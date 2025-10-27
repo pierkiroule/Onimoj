@@ -1,0 +1,49 @@
+{
+  "step_number": 3,
+  "spirit_name": "Qilak",
+  "symbol": "🌌",
+  "title": "Le Ciel des Liens",
+  "color": "#9ae7ff",
+  "activities": [
+    {
+      "type": "text",
+      "title": "Lecture contemplative",
+      "content": "<p><b>Qilak</b> est la grande peau du monde. Elle s’étend au-dessus des têtes et au-dedans des âmes. Pour les Inuit, le ciel n’est pas un vide : c’est un être, une conscience, un souffle collectif où voyagent les liens invisibles.</p><p>Chaque vent y transporte un message, chaque aurore y trace une mémoire. Qilak relie les glaciers aux étoiles, les vivants aux ancêtres, les paroles aux silences. Quand une âme quitte la terre, son souffle rejoint la trame du ciel et s’y tisse avec les autres. Ainsi, rien ne s’efface — tout devient étoile, souffle ou chant.</p><p>Qilak nous enseigne que l’existence est un réseau de résonances : tout ce qui respire s’appelle, se répond, se souvient.</p>"
+    },
+    {
+      "type": "video",
+      "title": "Regard guidé — Danse du ciel vivant",
+      "url": "/data/missions/inuite/media/qilak_ciel.mp4",
+      "caption": "Regarde la danse des aurores. Chaque lumière est une pensée d’amour, chaque pulsation un cœur qui bat au loin. Le ciel te parle si tu respires lentement."
+    },
+    {
+      "type": "ritual",
+      "title": "Rituel du souffle céleste",
+      "content": "<p>Allonge-toi ou reste debout, les bras légèrement ouverts. Respire lentement, comme si ton thorax s’accordait à la respiration du monde. Imagine que l’air entre par le sommet de ton crâne et sort par la plante de tes pieds.</p><p>À chaque inspiration, une étoile s’allume. À chaque expiration, elle se repose. Ton corps devient constellation, ton souffle devient ciel. Murmure le nom de quelqu’un que tu veux relier, puis laisse le vent l’emporter. Tu viens de tisser un fil de lumière dans Qilak.</p>",
+      "sound": "/data/missions/inuite/media/aurore_sonore.mp3"
+    },
+    {
+      "type": "quiz",
+      "title": "Énigme du lien",
+      "question": "Que symbolise Qilak dans la pensée inuit ?",
+      "options": [
+        "Le vent du sud et la chaleur",
+        "La lumière du feu et la force solaire",
+        "Le ciel et les liens invisibles entre tous les êtres"
+      ],
+      "correct": 2,
+      "feedback": [
+        "🌬️ Non. Qilak n’est pas un vent particulier, mais l’espace qui les accueille tous.",
+        "🔥 Pas le feu, mais la lumière respirante du cosmos.",
+        "🌌 Exact. Qilak est le ciel vivant, tissant la résonance entre tout ce qui respire."
+      ]
+    },
+    {
+      "type": "hublot",
+      "title": "Hublot résonant — Ciel des Liens",
+      "text": "<p>Ferme les yeux. Sens ton souffle s’unir à celui du vent. Au-dessus de toi, des milliers de fils de lumière se rejoignent. Chaque être, chaque souvenir, chaque étoile en tisse un autre. Tu es un point dans la grande toile de Qilak. Respire profondément. Le monde entier respire avec toi.</p><p>Si tu tends ton cœur, tu sentiras peut-être la réponse d’un être lointain, ou d’une étoile amie. Rien n’est séparé. Tout dialogue, même dans le silence.</p>",
+      "sound": "/data/missions/inuite/media/hublot_qilak.mp3",
+      "transition": "end"
+    }
+  ]
+}

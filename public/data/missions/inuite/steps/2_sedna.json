@@ -1,0 +1,45 @@
+{
+  "step_number": 2,
+  "spirit_name": "Sedna",
+  "symbol": "🧜‍♀️",
+  "title": "La Gardienne des Profondeurs",
+  "color": "#5acdfc",
+  "activities": [
+    {
+      "type": "text",
+      "title": "Lecture contemplative",
+      "content": "<p>Au fond de l’océan glacé, Sedna veille. Ses cheveux se mêlent aux algues et aux courants. Elle connaît les secrets du froid et de la lenteur. Jadis trahie, rejetée par les siens, elle s’est retirée dans les abysses pour protéger le royaume marin.</p><p>Les émotions humaines, comme les vagues, troublent parfois son sommeil. Quand l’humanité oublie de respecter le vivant, Sedna ferme sa main : les poissons disparaissent, les vents se figent, le monde se tait. Elle attend qu’un souffle sincère remonte des profondeurs — un souffle de gratitude et d’alliance.</p>"
+    },
+    {
+      "type": "video",
+      "title": "Regard guidé",
+      "url": "/data/missions/inuite/media/sedna_mer.mp4",
+      "caption": "Observe les reflets du monde sous la glace. L’eau devient miroir : ce que tu fuis s’y reflète, mais s’y adoucit."
+    },
+    {
+      "type": "ritual",
+      "title": "Rituel du soir — Lâcher dans l’eau",
+      "content": "<p>Ferme les yeux. Imagine la mer s’ouvrant lentement devant toi. Sa surface est calme, comme une peau respirante. Laisse ton souffle s’y fondre.</p><p>À chaque expiration, un souvenir ou une peur se détache et descend vers Sedna. Elle les recueille dans ses cheveux. Elle ne juge pas : elle transforme. Respire encore, plus profond, jusqu’à sentir la paix s’installer comme une marée intérieure.</p>",
+      "sound": "/data/missions/inuite/media/eau_calme.mp3"
+    },
+    {
+      "type": "quiz",
+      "title": "Énigme des abysses",
+      "question": "Que fait Sedna lorsque les humains oublient de respecter le vivant ?",
+      "options": [
+        "Elle déclenche une tempête",
+        "Elle retient les poissons et les vents",
+        "Elle quitte l’océan"
+      ],
+      "correct": 1,
+      "feedback": "<p>Oui. Sedna retient la respiration du monde. Elle nous rappelle que la nature ne se venge pas : elle attend qu’on rouvre le lien.</p>"
+    },
+    {
+      "type": "hublot",
+      "title": "Hublot résonant — Plonger en soi",
+      "text": "Ferme les yeux et descends lentement à travers les couches d’eau, plus profond, encore... Jusqu’à ce que tout bruit s’efface. Là, tu rencontres Sedna, assise dans le noir bleu, les mains ouvertes. Que veux-tu lui confier ? Quelle part de toi as-tu gardée prisonnière au fond ?",
+      "sound": "/data/missions/inuite/media/hublot_sedna.mp3",
+      "transition": "next_step"
+    }
+  ]
+}

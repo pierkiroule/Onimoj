@@ -1,0 +1,12 @@
+{
+  "step_number": 6,
+  "spirit_name": "Tuktu",
+  "symbol": "🦌",
+  "title": "Le Caribou des Cycles",
+  "activities": [
+    { "type": "text", "content": "Tuktu enseigne la migration et le retour. Il marche au rythme des saisons." },
+    { "type": "ritual", "content": "Ressens tes pieds. Marche lentement, comme un animal sage." },
+    { "type": "quiz", "question": "Tuktu symbolise ?", "options": ["La peur", "Le cycle de la vie", "La colère"], "correct": 1 },
+    { "type": "hublot", "title": "Marche intérieure", "text": "Chaque pas t’enracine dans la Terre.", "transition": "next_step" }
+  ]
+}

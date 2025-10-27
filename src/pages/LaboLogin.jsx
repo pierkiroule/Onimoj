@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 
 export default function LaboLogin({ onNavigate }) {
@@ -6,13 +6,40 @@ export default function LaboLogin({ onNavigate }) {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const ADMIN_ID = "2d4955ad-4eb6-47c3-bfc9-8d76dedcbc97"
+
+  // ✅ Vérifie au chargement si une session existe déjà
+  useEffect(() => {
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession()
+      const session = data?.session
+      if (session?.user?.id === ADMIN_ID) {
+        console.log("🔄 Session restaurée :", session.user.id)
+        onNavigate("labo") // redirige directement vers le Labo
+      }
+    }
+
+    checkSession()
+
+    // Surveille les changements d’état d’auth (connexion/déconnexion)
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.id === ADMIN_ID) {
+        console.log("✅ Admin connecté :", session.user.id)
+        onNavigate("labo")
+      } else if (!session) {
+        console.log("🚪 Déconnecté")
+      }
+    })
+
+    return () => listener.subscription.unsubscribe()
+  }, [])
 
   async function handleLogin() {
     setError("")
     setLoading(true)
 
     try {
-      // 🔐 Connexion Supabase
+      // 🔐 Connexion Supabase standard
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -22,26 +49,18 @@ export default function LaboLogin({ onNavigate }) {
       const user = data?.user
       if (!user) throw new Error("Aucun utilisateur trouvé.")
 
-      console.log("✅ Connecté :", user.id)
-
-      // 🧙 Vérifie ton UUID admin
-      if (user.id !== "2d4955ad-4eb6-47c3-bfc9-8d76dedcbc97") {
+      // 🧙 Vérifie le droit d’accès admin
+      if (user.id !== ADMIN_ID) {
         await supabase.auth.signOut()
         throw new Error("⛔ Accès réservé à l’administrateur Onimoji.")
       }
 
-      // ✅ Session sauvegardée
-      const { data: sessionData } = await supabase.auth.getSession()
-      if (sessionData.session) {
-        sessionStorage.setItem("laboAuth", "true")
-        localStorage.setItem("supabaseSession", JSON.stringify(sessionData.session))
-      }
-
-      setLoading(false)
+      console.log("✅ Connecté :", user.id)
       onNavigate("labo")
     } catch (err) {
       console.error("⚠️ Erreur connexion :", err.message)
       setError("❌ " + err.message)
+    } finally {
       setLoading(false)
     }
   }
@@ -75,11 +94,7 @@ export default function LaboLogin({ onNavigate }) {
       />
       <br />
 
-      <button
-        onClick={handleLogin}
-        disabled={loading}
-        style={buttonStyle}
-      >
+      <button onClick={handleLogin} disabled={loading} style={buttonStyle}>
         {loading ? "Connexion..." : "Entrer"}
       </button>
 
@@ -102,6 +117,7 @@ export default function LaboLogin({ onNavigate }) {
   )
 }
 
+/* 🎨 Styles */
 const inputStyle = {
   padding: "0.6rem",
   borderRadius: "6px",

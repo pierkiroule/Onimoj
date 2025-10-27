@@ -51,7 +51,7 @@ export default function Profil({ user, onLogout, onNavigate }) {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .maybeSingle?.()
+      .maybeSingle()
 
     if (error && error.code !== 'PGRST116') {
       console.error('❌ Lecture mission :', error.message)
@@ -120,7 +120,9 @@ export default function Profil({ user, onLogout, onNavigate }) {
         }
         try {
           localStorage.setItem(LOCAL_MISSION_KEY, JSON.stringify(localMission))
-        } catch {}
+        } catch (e) {
+          console.warn('⚠️ Impossible d’enregistrer la mission locale:', e && e.message ? e.message : e)
+        }
         setMission(localMission)
         setStatus(`✅ Mission ${culture} activée (mode local)`)
         setLoading(false)
@@ -165,7 +167,9 @@ export default function Profil({ user, onLogout, onNavigate }) {
     if (!isSupabaseConfigured || mission?.local) {
       const updated = { ...mission, progress: newProgress, status: newStatus }
       setMission(updated)
-      try { localStorage.setItem(LOCAL_MISSION_KEY, JSON.stringify(updated)) } catch {}
+      try { localStorage.setItem(LOCAL_MISSION_KEY, JSON.stringify(updated)) } catch (e) {
+        console.warn('⚠️ Impossible de mettre à jour la mission locale:', e && e.message ? e.message : e)
+      }
       setStatus(`🌟 Étape ${newProgress}/12 atteinte ! (local)`)
       return
     }
@@ -239,7 +243,9 @@ export default function Profil({ user, onLogout, onNavigate }) {
 
           <button
             onClick={nextStep}
-            disabled={loading || mission.progress >= 12}
+            disabled={
+              loading || (Number.isFinite(mission?.progress) && mission.progress >= 12)
+            }
             style={{
               background: '#6eff8d',
               border: 'none',

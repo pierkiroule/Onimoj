@@ -9,6 +9,12 @@ export default function Profil({ user, onLogout, onNavigate }) {
   const [loading, setLoading] = useState(false)
   const channelRef = useRef(null)
 
+  // 🧭 Mode hors-ligne si Supabase non configuré
+  const isSupabaseConfigured = Boolean(
+    import.meta?.env?.VITE_SUPABASE_URL && import.meta?.env?.VITE_SUPABASE_ANON_KEY
+  )
+  const LOCAL_MISSION_KEY = 'onimoji.local_mission'
+
   // ✅ Canal de synchro local (EchoCreation <-> Profil)
   useEffect(() => {
     channelRef.current = new BroadcastChannel('sky-sync')
@@ -25,13 +31,28 @@ export default function Profil({ user, onLogout, onNavigate }) {
 
   // ---- Lecture mission active ----
   async function fetchMission(userId) {
+    // Fallback local si non configuré
+    if (!isSupabaseConfigured) {
+      try {
+        const raw = localStorage.getItem(LOCAL_MISSION_KEY)
+        const local = raw ? JSON.parse(raw) : null
+        setMission(local?.user_id === userId ? local : null)
+      } catch (e) {
+        console.warn('⚠️ Lecture mission locale impossible:', e?.message)
+        setMission(null)
+      }
+      return
+    }
+
+    // Lecture distante
     const { data, error } = await supabase
       .from('missions')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle?.()
+
     if (error && error.code !== 'PGRST116') {
       console.error('❌ Lecture mission :', error.message)
       setStatus('Erreur lecture mission')
@@ -54,6 +75,14 @@ export default function Profil({ user, onLogout, onNavigate }) {
   // ✅ Retirer une bulle du ciel + synchro instantanée
   async function removeBulle(id) {
     if (!confirm('Retirer cette bulle du ciel ?')) return
+    if (!isSupabaseConfigured) {
+      // Pas de persistance hors-ligne, on simule juste la suppression dans l'UI
+      setBulles(prev => prev.filter(b => b.id !== id))
+      setStatus('🌀 Bulle retirée (mode local).')
+      channelRef.current?.postMessage({ type: 'remove', id })
+      return
+    }
+
     const { error } = await supabase.from('dream_stars').delete().eq('id', id)
     if (error) return setStatus('❌ Suppression impossible')
 
@@ -75,25 +104,52 @@ export default function Profil({ user, onLogout, onNavigate }) {
       const startDate = new Date().toISOString()
       const endDate = new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString()
 
-      const { error } = await supabase.from('missions').insert([
-        {
+      if (!isSupabaseConfigured) {
+        // Mode local: on simule la création
+        const localMission = {
+          id: 'local-mission',
           user_id: user.id,
           culture,
           start_date: startDate,
           end_date: endDate,
-          price: 1.8,
+          price: 0,
           status: 'active',
           progress: 0,
           current_step: 1,
-        },
-      ])
+          local: true,
+        }
+        try {
+          localStorage.setItem(LOCAL_MISSION_KEY, JSON.stringify(localMission))
+        } catch {}
+        setMission(localMission)
+        setStatus(`✅ Mission ${culture} activée (mode local)`)
+        setLoading(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('missions')
+        .insert([
+          {
+            user_id: user.id,
+            culture,
+            start_date: startDate,
+            end_date: endDate,
+            price: 1.8,
+            status: 'active',
+            progress: 0,
+            current_step: 1,
+          },
+        ])
+        .select('*')
+        .single()
 
       if (error) {
         console.error('❌ Erreur mission :', error.message)
-        setStatus('Erreur mission')
+        setStatus('❌ Erreur mission: ' + (error?.message || 'inconnue'))
       } else {
         setStatus(`✅ Mission ${culture} activée !`)
-        fetchMission(user.id)
+        setMission(data)
       }
       setLoading(false)
     }, 1500)
@@ -102,8 +158,17 @@ export default function Profil({ user, onLogout, onNavigate }) {
   // ---- Avancer mission ----
   async function nextStep() {
     if (!mission || isMissionFinished(mission)) return
-    const newProgress = Math.min(mission.progress + 1, 12)
+    const currentProgress = Number.isFinite(mission.progress) ? mission.progress : 0
+    const newProgress = Math.min(currentProgress + 1, 12)
     const newStatus = newProgress === 12 ? 'completed' : 'active'
+
+    if (!isSupabaseConfigured || mission?.local) {
+      const updated = { ...mission, progress: newProgress, status: newStatus }
+      setMission(updated)
+      try { localStorage.setItem(LOCAL_MISSION_KEY, JSON.stringify(updated)) } catch {}
+      setStatus(`🌟 Étape ${newProgress}/12 atteinte ! (local)`)
+      return
+    }
 
     const { error } = await supabase
       .from('missions')
@@ -118,7 +183,10 @@ export default function Profil({ user, onLogout, onNavigate }) {
   }
 
   function isMissionFinished(m) {
-    return m.progress >= 12 || new Date(m.end_date) < new Date()
+    if (!m) return true
+    const progress = Number.isFinite(m.progress) ? m.progress : 0
+    const end = m.end_date ? new Date(m.end_date) : null
+    return progress >= 12 || (end && end < new Date())
   }
 
   const renderBadges = (progress) => (
@@ -165,9 +233,9 @@ export default function Profil({ user, onLogout, onNavigate }) {
             boxShadow: '0 0 10px rgba(255,255,255,0.1)',
           }}
         >
-          <h4>❄️ Mission Inuite</h4>
-          <p>Étape {mission.progress}/12</p>
-          {renderBadges(mission.progress)}
+          <h4>❄️ Mission Inuite {mission?.local ? '— mode local' : ''}</h4>
+          <p>Étape {Number.isFinite(mission?.progress) ? mission.progress : 0}/12</p>
+          {renderBadges(Number.isFinite(mission?.progress) ? mission.progress : 0)}
 
           <button
             onClick={nextStep}

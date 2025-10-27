@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { assetUrl } from "../utils/assetUrl"
 import StepEngine from "../components/StepEngine"
 import "./MissionInuite.css"
 
@@ -15,7 +16,7 @@ export default function MissionInuite() {
         setError("")
         console.log("📖 Lecture du fichier mission.json...")
 
-        const res = await fetch("/data/missions/inuite/mission.json")
+        const res = await fetch(assetUrl("/data/missions/inuite/mission.json"))
         if (!res.ok) throw new Error("Mission introuvable.")
         const missionData = await res.json()
         console.log("✅ Mission trouvée :", missionData.title)
@@ -23,7 +24,7 @@ export default function MissionInuite() {
         // Charge toutes les étapes depuis le bon dossier
         const stepPromises = missionData.steps.map(async (s) => {
           const filePath = `/data/missions/inuite/${s.file}`
-          const r = await fetch(filePath)
+          const r = await fetch(assetUrl(filePath))
           if (!r.ok) throw new Error(`Fichier manquant : ${filePath}`)
           return await r.json()
         })

@@ -41,6 +41,7 @@ export default function MissionInuite() {
   // Flux principal
   return (
     <div style={{minHeight:"100vh",padding:"1rem",color:"#e9fffd"}}>
+      <h1 style={{textAlign:"center",marginBottom:"1.5rem",color:"#7fffd4"}}>❄️ Mission Inuite</h1>
       <InuitFlow userId={userId} />
     </div>
   )

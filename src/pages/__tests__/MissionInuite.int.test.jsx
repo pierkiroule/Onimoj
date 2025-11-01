@@ -17,16 +17,19 @@ vi.mock('../../components/ModuleInuitStep', () => ({
 // Mock HublotResonant: expose a way to complete with 3 emojis
 vi.mock('../../components/HublotResonant', () => ({
   __esModule: true,
-  default: ({ onComplete, step, culture }) => (
+  default: ({ onComplete, step, culture = 'Inuite' }) => (
     <div>
       <div>Hublot {culture} step {step?.step_number}</div>
-      <button aria-label="complete-hublot" onClick={() => onComplete?.({
-        title: `${culture} — ${step?.spirit_name || 'Bulle mythonirique'}`,
-        emojis: ['🌬️','🐋','🦌'],
-        culture,
-        spirit: step?.spirit_name || '',
-        step_number: step?.step_number || 1,
-      })}>complete</button>
+      <button
+        aria-label="complete-hublot"
+        onClick={() => onComplete?.([
+          { fr: 'Souffle', en: 'Breath' },
+          { fr: 'Glace', en: 'Ice' },
+          { fr: 'Océan', en: 'Ocean' },
+        ])}
+      >
+        complete
+      </button>
     </div>
   ),
 }))
@@ -73,6 +76,19 @@ vi.mock('../../supabaseClient.js', async () => {
     supabase: {
       auth: {
         getUser: async () => ({ data: { user }, error: null }),
+        getSession: async () => ({ data: { session: user ? { user } : null }, error: null }),
+        onAuthStateChange: (callback) => {
+          callback('SIGNED_IN', user ? { user } : null)
+          return {
+            data: {
+              subscription: {
+                unsubscribe: () => {},
+              },
+            },
+            error: null,
+          }
+        },
+        signInWithOAuth: vi.fn(),
       },
       from: (table) => ({
         select: () => (table === 'missions' ? makeMissionSelectChain() : makeStepsSelectChain()),
@@ -106,20 +122,20 @@ describe('MissionInuite flow', () => {
     // Wait for mission to load
     await waitFor(() => expect(screen.getByText('❄️ Mission Inuite')).toBeInTheDocument())
 
-    // Open hublot via module button
-    fireEvent.click(screen.getByLabelText('open-hublot'))
+    // Parcours des phases inuit
+    fireEvent.click(screen.getByText('✨ Continuer'))
+    fireEvent.click(screen.getByText('🌬️ Énigme'))
 
-    // Complete hublot selection
-    await waitFor(() => expect(screen.getByText(/Hublot Inuite/)).toBeInTheDocument())
+    // Quiz → sélectionner la bonne réponse
+    fireEvent.click(screen.getByRole('button', { name: 'Le vent' }))
+    await waitFor(() => expect(screen.getByText('✅ Bonne réponse')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('🌕 Continuer'))
+
+    // Hublot (mock) puis passage en phase rêve
+    await waitFor(() => expect(screen.getByText(/Hublot Inuite step 1/)).toBeInTheDocument())
     fireEvent.click(screen.getByLabelText('complete-hublot'))
 
-    // Enter title and save
-    const input = await screen.findByPlaceholderText('Titre de ta bulle mythonirique…')
-    fireEvent.change(input, { target: { value: 'Ma bulle' } })
-    const saveBtn = screen.getByRole('button', { name: /Enregistrer dans l’échocreation/ })
-    fireEvent.click(saveBtn)
-
-    // Expect success status to appear
-    await waitFor(() => expect(screen.getByText(/Bulle enregistrée/)).toBeInTheDocument())
+    // Phase rêve affichée
+    await waitFor(() => expect(screen.getByText('🌱 Générer la graine OnimojIA')).toBeInTheDocument())
   })
 })

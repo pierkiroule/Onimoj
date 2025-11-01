@@ -126,7 +126,12 @@ Fais des phrases sensorielles, poétiques, simples, comme des images mentales.`
           culture={culture}
           spirit={step.spirit_name}
           step_number={step.step_number}
-          onSaved={() => setSaved(true)}
+          onSaved={(words) => {
+            setSaved(true)
+            if (Array.isArray(words) && words.length) {
+              onComplete?.(words)
+            }
+          }}
         />
 
         {saved && (

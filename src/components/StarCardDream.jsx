@@ -44,7 +44,7 @@ export default function StarCardDream({
       })
       if (error) throw error
       setStatus("🌟 Étoile sauvegardée dans ta Rêvothèque.")
-      onSaved && onSaved()
+      onSaved && onSaved(words)
     } catch (err) {
       console.error("⚠️ Erreur sauvegarde :", err)
       setStatus("Erreur de sauvegarde.")

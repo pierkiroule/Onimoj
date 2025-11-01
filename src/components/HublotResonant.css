@@ -1,92 +1,138 @@
-.hublot-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+/* 🌌 Hublot résonant — réseau poétique et immersif */
+
+.hublot-inline {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.6s ease forwards;
-}
-
-/* Empêche le scroll du fond quand la modale est ouverte */
-body.hublot-open {
-  overflow: hidden;
-}
-
-.hublot-card {
-  position: relative;
-  width: 340px;
-  max-width: 90vw;
-  background: radial-gradient(circle at 50% 50%, #08121a, #000);
-  border: 1px solid rgba(127, 255, 212, 0.3);
-  border-radius: 20px;
-  box-shadow: 0 0 36px rgba(127, 255, 212, 0.4);
-  padding: 1rem;
-  color: #eafff6;
+  color: #eaffff;
+  font-family: "Inter", system-ui, sans-serif;
   text-align: center;
-  animation: popIn 0.4s ease;
+  padding: 1rem;
+  animation: fadeIn 1.2s ease-in;
 }
 
-.hublot-close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  border: none;
-  background: none;
-  color: #7fffd4;
+/* --- Titre & sous-titre --- */
+.hublot-inline h3 {
   font-size: 1.3rem;
-  cursor: pointer;
-  transition: 0.2s;
+  color: #7fffd4;
+  text-shadow: 0 0 10px rgba(127, 255, 212, 0.5);
+  margin-bottom: 0.2rem;
 }
-.hublot-close:hover {
-  color: #fff;
-  transform: scale(1.1);
+.hublot-inline .subtitle {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.6rem;
 }
 
-.hublot__svg {
-  display: block;
-  margin: 0 auto;
+/* --- SVG --- */
+svg {
   border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #031016, #000);
+  box-shadow: 0 0 22px rgba(127, 255, 212, 0.15),
+              inset 0 0 30px rgba(0, 60, 60, 0.2);
+  animation: auroraFlow 25s linear infinite;
 }
 
+/* --- Halo respirant sur chaque bulle --- */
+.node circle {
+  animation: pulseHalo 6s ease-in-out infinite;
+  transition: transform 0.3s ease, r 0.3s ease, fill 0.5s ease;
+  fill: rgba(0, 40, 50, 0.85);
+  stroke: rgba(127,255,212,0.3);
+  stroke-width: 1.4px;
+}
+.node:hover circle {
+  transform: scale(1.1);
+  stroke: rgba(127,255,212,0.8);
+  fill: rgba(20, 80, 90, 0.9);
+  filter: drop-shadow(0 0 10px rgba(127,255,212,0.8));
+}
+
+/* --- Émojis dans les bulles --- */
+.node text {
+  pointer-events: none;
+  font-size: 20px;
+  text-shadow: 
+    0 0 3px rgba(0, 0, 0, 0.9),
+    0 0 6px rgba(0, 0, 0, 0.8),
+    0 0 12px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  filter: brightness(1.1);
+}
+.node:hover text {
+  transform: scale(1.3);
+  opacity: 1;
+  filter: brightness(1.3);
+}
+
+/* --- Liste des bulles sélectionnées --- */
 .hublot__selected {
-  margin-top: 0.8rem;
   display: flex;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.4rem;
 }
 
 .hublot__chip {
-  font-size: 1.4rem;
-}
-
-.hublot__validate-btn {
-  background: linear-gradient(90deg, #6a5acd, #7fffd4);
-  border: none;
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  color: #111;
-  cursor: pointer;
-  margin-top: 0.8rem;
-  box-shadow: 0 0 10px rgba(127,255,212,0.4);
-}
-
-.hublot__status {
-  font-size: 0.9rem;
-  opacity: 0.85;
-  margin-top: 0.5rem;
+  background: rgba(0, 40, 45, 0.9);
+  border: 1px solid rgba(127, 255, 212, 0.4);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
   color: #7fffd4;
+  box-shadow: 0 0 10px rgba(127,255,212,0.2);
+  transition: all 0.3s ease;
+}
+.hublot__chip:hover {
+  background: rgba(127, 255, 212, 0.2);
+  transform: scale(1.15);
 }
 
+/* --- Bouton principal --- */
+.hublot__validate-btn {
+  background: linear-gradient(90deg, rgba(127,255,212,0.25), rgba(80,190,170,0.3));
+  color: #7fffd4;
+  border: 1px solid rgba(127,255,212,0.6);
+  border-radius: 14px;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+.hublot__validate-btn:hover {
+  background: rgba(127,255,212,0.35);
+  color: #002020;
+  box-shadow: 0 0 16px rgba(127,255,212,0.8);
+}
+.hublot__validate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Animations cosmiques --- */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+@keyframes pulseHalo {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(127,255,212,0.5));
+    opacity: 0.9;
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(127,255,212,0.9));
+    opacity: 1;
+  }
+}
+
+@keyframes auroraFlow {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(60deg); }
 }

@@ -1,0 +1,40 @@
+.constellation {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  overflow: hidden;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 45%, #02060a 0%, #000 95%);
+  box-shadow: 0 0 30px rgba(127,255,212,0.15);
+  animation: fadeIn 1.2s ease;
+}
+
+.bulle-ame {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(127,255,212,0.4), rgba(0,60,60,0.1));
+  color: #eaffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(127,255,212,0.3);
+  transition: transform 0.3s ease, background 0.5s ease;
+  animation: pulse 6s infinite ease-in-out;
+}
+
+.bulle-ame:hover {
+  transform: scale(1.3);
+  background: radial-gradient(circle, rgba(255,200,150,0.5), rgba(0,40,40,0.1));
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(127,255,212,0.3); }
+  50% { box-shadow: 0 0 20px rgba(127,255,212,0.7); }
+}

@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
+import timerVideo from "../assets/video/timer.mp4"
 import "./EcumeDesReves.css"
 
 export default function EcumeDesReves({
@@ -10,80 +11,82 @@ export default function EcumeDesReves({
     "🌕",
   ],
   cycle = 6000,
-  repeat = 3,
+  duration = 43200, // 12h = 12*60*60 secondes
   onComplete,
 }) {
   const [i, setI] = useState(0)
-  const [count, setCount] = useState(0)
-  const intervalRef = useRef(null)
-  const timeoutRef = useRef(null)
+  const [timeLeft, setTimeLeft] = useState(duration)
 
-  // --- gestion du cycle
+  // 💬 rotation des phrases
   useEffect(() => {
-    // fin normale
-    if (count >= repeat) {
-      timeoutRef.current = setTimeout(() => onComplete?.(), 800)
-      return () => clearTimeout(timeoutRef.current)
-    }
-
-    // sinon on continue à défiler les phrases
-    intervalRef.current = setInterval(() => {
+    const interval = setInterval(() => {
       setI((p) => (p + 1) % phrases.length)
-      setCount((c) => c + 1)
     }, cycle)
+    return () => clearInterval(interval)
+  }, [cycle, phrases.length])
 
-    return () => clearInterval(intervalRef.current)
-  }, [count, repeat, cycle, phrases.length, onComplete])
+  // ⏳ décompte visuel (en secondes)
+  useEffect(() => {
+    if (timeLeft <= 0) return
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [timeLeft])
 
-  // --- bouton passer
-  const handleSkip = () => {
-    clearInterval(intervalRef.current)
-    clearTimeout(timeoutRef.current)
-    onComplete?.()
+  const formatTime = (s) => {
+    const h = Math.floor(s / 3600)
+    const m = Math.floor((s % 3600) / 60)
+    const sec = s % 60
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`
   }
 
   return (
     <div className="resotimer">
-      {/* halo respirant et ondes */}
-      <div className="resotimer__halo"></div>
-      <div className="resotimer__circle resotimer__circle--1"></div>
-      <div className="resotimer__circle resotimer__circle--2"></div>
-      <div className="resotimer__circle resotimer__circle--3"></div>
-
-      {/* phrase centrale */}
-      <div key={i} className="resotimer__phrase fade-in">
-        {phrases[i]}
+      {/* ——— Horloge haute ——— */}
+      <div className="resotimer__topTimer">
+        <span className="resotimer__time">{formatTime(timeLeft)}</span>
+        <div className="particles">
+          {[...Array(12)].map((_, k) => (
+            <span key={k} className="dot" />
+          ))}
+        </div>
       </div>
 
-      {/* texte guide */}
+      {/* ——— Vidéo onirique ——— */}
+      <div className="resotimer__videoWrap">
+        <video
+          src={timerVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="resotimer__video"
+        />
+        <div key={i} className="resotimer__phrase fade-in">
+          {phrases[i]}
+        </div>
+      </div>
+
+      {/* ——— Texte poétique Durand ——— */}
       <div className="resotimer__guide">
         <p>
-          Nous te proposons de ralentir.  
-          De laisser ton regard flotter, ton souffle se poser.  
-          Chaque onde est un temps de respiration.  
-          Quand la dernière se dissipera, le rêve s’ouvrira.
+          Ton rêve Onimoji sera RÊVélé dans 12h. En attendant ton Onimoji est disponible dans l'espace d'Échocréation pour s'enrichir des échos des autres membres et de notre inspirIA. Ton Onimoji va maturer pendant 12h. Patience, déconnexion et ralentissement... Quand le jour rêve la nuit, la nuit inspire le jour.  
+          Ce voyage de douze heures suit le rythme des imaginaires chers à <b>Gilbert Durand</b> :  
+          <br /><br />
+          Le <b>régime diurne</b> — solaire, ascendant, porteur d’élan et de clarté —  
+          s’incline devant le <b>régime nocturne</b> — lunaire, intérieur,  
+          où le monde s’enveloppe et se régénère.  
+          <br /><br />
+          Ensemble, ils tissent la respiration symbolique de l’âme :  
+          le souffle du jour éclaire ton rêve,  
+          et le rêve de la nuit éclaire ton jour.
         </p>
-      </div>
 
-      {/* ⏭️ Bouton Passer */}
-      <button
-        onClick={handleSkip}
-        style={{
-          position: "absolute",
-          bottom: "1rem",
-          right: "1rem",
-          background: "rgba(127,255,212,0.15)",
-          color: "#7fffd4",
-          border: "1px solid rgba(127,255,212,0.4)",
-          borderRadius: "8px",
-          padding: "0.4rem 0.8rem",
-          cursor: "pointer",
-          fontSize: "0.9rem",
-          zIndex: 5,
-        }}
-      >
-        ⏭️ Passer
-      </button>
+        <button className="dream-button" onClick={() => onComplete?.()}>
+          ⏭️ Passer
+        </button>
+      </div>
     </div>
   )
 }

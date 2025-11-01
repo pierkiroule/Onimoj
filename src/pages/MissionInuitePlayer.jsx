@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { assetUrl } from "../utils/assetUrl"
 import HublotResonant from "../components/HublotResonant"
 import "./MissionInuitePlayer.css"
 
@@ -11,40 +10,37 @@ export default function MissionInuitePlayer() {
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
 
-  // 🔎 Récupère les paramètres d’URL (ex: ?i=2 ou ?etape=sila)
+  // 🔎 Paramètres URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const i = parseInt(params.get("i"))
     const etape = params.get("etape")
 
     if (!isNaN(i)) setStepIndex(i)
-    else if (etape) {
-      // convertit l'étape en index une fois la mission chargée
-      if (mission) {
-        const idx = mission.steps.findIndex((s) =>
-          s.file.toLowerCase().includes(etape.toLowerCase())
-        )
-        if (idx >= 0) setStepIndex(idx)
-      }
+    else if (etape && mission) {
+      const idx = mission.steps.findIndex((s) =>
+        s.file.toLowerCase().includes(etape.toLowerCase())
+      )
+      if (idx >= 0) setStepIndex(idx)
     }
   }, [mission])
 
-  // 🌐 Charge le fichier mission principal
+  // 🌐 Charge la mission principale
   useEffect(() => {
     async function loadMission() {
       try {
-        const res = await fetch(assetUrl("/data/missions/inuite/mission.json"))
+        const res = await fetch("/data/missions/inuite/mission.json")
         if (!res.ok) throw new Error("Mission non trouvée")
         const data = await res.json()
         setMission(data)
       } catch (err) {
-        console.error("Erreur mission :", err)
+        console.error("⚠️ Erreur mission :", err)
       }
     }
     loadMission()
   }, [])
 
-  // 📜 Charge le fichier d’étape local
+  // 📜 Charge une étape
   useEffect(() => {
     if (!mission) return
     const stepFile = mission.steps[stepIndex]?.file
@@ -52,19 +48,20 @@ export default function MissionInuitePlayer() {
 
     async function loadStep() {
       try {
-        const res = await fetch(assetUrl(`/data/missions/inuite/${stepFile}`))
+        // ✅ correction du chemin relatif
+        const res = await fetch(`/data/missions/inuite/${stepFile}`)
         if (!res.ok) throw new Error(`Fichier manquant : ${stepFile}`)
         const data = await res.json()
         setStepData(data)
         setQuizAnswer(null)
         setQuizResult(null)
       } catch (err) {
-        console.error("Erreur étape :", err)
+        console.error("⚠️ Erreur étape :", err)
       }
     }
     loadStep()
 
-    // met à jour l'URL à chaque changement d'étape
+    // 🌀 mise à jour URL
     const slug = stepFile.split("/").pop().replace(".json", "")
     const url = new URL(window.location)
     url.searchParams.set("i", stepIndex)
@@ -72,37 +69,38 @@ export default function MissionInuitePlayer() {
     window.history.replaceState({}, "", url)
   }, [mission, stepIndex])
 
-  if (!mission || !stepData) return <p className="loading">🌘 Chargement du rêve...</p>
-
-  function next() {
+  // 🧭 Navigation
+  const next = () => {
     if (stepIndex + 1 < mission.steps.length) setStepIndex(stepIndex + 1)
     else setShowHublot(true)
   }
-  function prev() {
-    if (stepIndex > 0) setStepIndex(stepIndex - 1)
-  }
+  const prev = () => stepIndex > 0 && setStepIndex(stepIndex - 1)
 
-  function checkQuiz(correct) {
+  const checkQuiz = (correct) => {
     if (quizAnswer === null) return
     setQuizResult(quizAnswer === correct)
   }
 
+  if (!mission || !stepData)
+    return <p className="loading">🌘 Connexion au rêve arctique...</p>
+
+  // 🌠 Hublot final
   if (showHublot)
     return (
       <HublotResonant
         culture={mission.culture}
         step={stepData}
         onClose={() => setShowHublot(false)}
-        onComplete={(payload) =>
-          console.log("✨ Résonance créée :", payload)
-        }
+        onComplete={(payload) => console.log("✨ Résonance créée :", payload)}
       />
     )
 
   return (
     <div className="mission-player fade-in">
-      <h2 style={{ color: mission.color }}>{mission.title}</h2>
-      <h3>
+      <h2 className="mission-title" style={{ color: mission.color }}>
+        {mission.title}
+      </h2>
+      <h3 className="mission-step">
         Étape {stepData.step_number} — {stepData.spirit_name} {stepData.symbol}
       </h3>
 
@@ -122,7 +120,7 @@ export default function MissionInuitePlayer() {
                 style={{
                   width: "100%",
                   borderRadius: "12px",
-                  boxShadow: "0 0 12px rgba(127,255,212,0.2)"
+                  boxShadow: "0 0 12px rgba(127,255,212,0.25)",
                 }}
               />
               {a.caption && <p className="caption">{a.caption}</p>}
@@ -137,7 +135,7 @@ export default function MissionInuitePlayer() {
                 style={{
                   width: "100%",
                   borderRadius: "12px",
-                  boxShadow: "0 0 12px rgba(127,255,212,0.2)"
+                  boxShadow: "0 0 12px rgba(127,255,212,0.25)",
                 }}
               />
               {a.caption && <p className="caption">{a.caption}</p>}
@@ -188,6 +186,7 @@ export default function MissionInuitePlayer() {
         </div>
       ))}
 
+      {/* navigation */}
       <div className="nav-buttons">
         {stepIndex > 0 && (
           <button onClick={prev} className="btn-secondary">
@@ -197,7 +196,7 @@ export default function MissionInuitePlayer() {
         <button onClick={next} className="btn-primary">
           {stepIndex + 1 < mission.steps.length
             ? "Suivant →"
-            : "✨ Hublot final"}
+            : "✨ Ouvrir le Hublot"}
         </button>
       </div>
     </div>

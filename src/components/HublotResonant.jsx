@@ -1,171 +1,171 @@
 import { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
 import { inuitNodes, inuitLinks } from "../data/InuitNetwork"
+import { askNebius } from "../nebiusClient"
+import StarCardDream from "./StarCardDream"
 import "./HublotResonant.css"
 
 export default function HublotResonant({
   culture = "Inuite",
   step = {},
-  onComplete,
+  userId,
+  onComplete
 }) {
   const svgRef = useRef(null)
-  const [selected, setSelected] = useState([])
-  const [status, setStatus] = useState("")
+  const [selected, setSelected] = useState(null)
+  const [selectedEmoji, setSelectedEmoji] = useState(null)
+  const [showStar, setShowStar] = useState(false)
+  const [dreamText, setDreamText] = useState("")
+  const [generating, setGenerating] = useState(false)
+  const [saved, setSaved] = useState(false)
 
+  // === Réseau D3 ===
   useEffect(() => {
-    const width = 300
-    const height = 300
-    const radiusLimit = 120
-    const nodes = inuitNodes.map((n) => ({ ...n }))
-    const links = inuitLinks.map((l) => ({ ...l }))
-
+    const width = 320, height = 320
+    const nodes = inuitNodes.map(n => ({ ...n }))
+    const links = inuitLinks.map(l => ({ ...l }))
     const svg = d3.select(svgRef.current)
     svg.selectAll("*").remove()
 
     svg
       .attr("viewBox", [0, 0, width, height])
-      .style("background", "radial-gradient(circle at 50% 50%, #0a141c, #000)")
+      .style("background", "radial-gradient(circle at 50% 50%, #041018, #000)")
       .style("border-radius", "50%")
       .style("box-shadow", "0 0 24px rgba(127,255,212,0.25)")
 
-    const defs = svg.append("defs")
-    const glow = defs.append("filter").attr("id", "glow")
-    glow.append("feGaussianBlur").attr("stdDeviation", 2).attr("result", "blur")
-    const feMerge = glow.append("feMerge")
-    feMerge.append("feMergeNode").attr("in", "blur")
-    feMerge.append("feMergeNode").attr("in", "SourceGraphic")
+    const grad = svg.append("defs")
+      .append("linearGradient")
+      .attr("id", "auroraGradient")
+      .attr("x1", "0%").attr("x2", "100%")
+      .attr("y1", "0%").attr("y2", "100%")
+    grad.append("stop").attr("offset", "0%").attr("stop-color", "#7fffd4")
+    grad.append("stop").attr("offset", "100%").attr("stop-color", "#9ae7ff")
 
-    const color = d3.scaleOrdinal(d3.schemeTableau10)
-
-    const simulation = d3
-      .forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id((d) => d.id).distance(65))
+    const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(70))
       .force("charge", d3.forceManyBody().strength(-100))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide(22))
 
-    const link = svg
-      .append("g")
-      .attr("stroke", "#7fffd4")
-      .attr("stroke-opacity", 0.2)
+    const linkSel = svg.append("g")
       .selectAll("line")
       .data(links)
       .join("line")
+      .attr("stroke", "url(#auroraGradient)")
+      .attr("stroke-opacity", 0.6)
+      .attr("stroke-width", 1.6)
 
-    const nodeG = svg
-      .append("g")
+    const nodeG = svg.append("g")
       .selectAll("g.node")
       .data(nodes)
       .join("g")
       .attr("class", "node")
       .style("cursor", "pointer")
-      .on("click", (event, d) => toggleSelect(d.id))
+      .on("click", (_e, d) => {
+        setSelected(d.id)
+        setSelectedEmoji(d.emoji)
+        setSaved(false)
+        setDreamText("")
+      })
 
-    nodeG
-      .append("circle")
+    nodeG.append("circle")
       .attr("r", 20)
-      .attr("fill", (d) => color(d.group))
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.2)
-      .attr("filter", "url(#glow)")
+      .attr("fill", "transparent")
+      .attr("stroke", "#7fffd4")
 
-    nodeG
-      .append("text")
-      .text((d) => d.emoji || "✨")
+    nodeG.append("text")
+      .text(d => d.emoji || "✨")
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
-      .attr("font-size", 16)
-      .attr("y", 1)
-
-    nodeG
-      .append("text")
-      .text((d) => d.label || "")
-      .attr("text-anchor", "middle")
-      .attr("font-size", 9)
-      .attr("fill", "#cfe")
-      .attr("y", 26)
+      .attr("font-size", 20)
+      .attr("fill", "#eaffff")
 
     simulation.on("tick", () => {
-      nodeG.attr("transform", (d) => {
-        const dx = d.x - width / 2
-        const dy = d.y - height / 2
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist > radiusLimit) {
-          const ratio = radiusLimit / dist
-          d.x = width / 2 + dx * ratio
-          d.y = height / 2 + dy * ratio
-        }
-        return `translate(${d.x},${d.y})`
-      })
-      link
-        .attr("x1", (d) => d.source.x)
-        .attr("y1", (d) => d.source.y)
-        .attr("x2", (d) => d.target.x)
-        .attr("y2", (d) => d.target.y)
+      linkSel
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y)
+      nodeG.attr("transform", d => `translate(${d.x},${d.y})`)
     })
 
     return () => simulation.stop()
   }, [])
 
-  useEffect(() => {
-    const svg = d3.select(svgRef.current)
-    svg.selectAll("g.node").each(function (d) {
-      const g = d3.select(this)
-      const isSel = selected.includes(d.id)
-      g.select("circle")
-        .transition()
-        .duration(120)
-        .attr("r", isSel ? 24 : 20)
-        .attr("stroke-width", isSel ? 3 : 1.2)
-        .attr("stroke", isSel ? "#7fffd4" : "#fff")
-    })
-  }, [selected])
-
-  function toggleSelect(id) {
-    setSelected((prev) => {
-      if (prev.includes(id)) return prev.filter((s) => s !== id)
-      if (prev.length < 3) return [...prev, id]
-      return prev
-    })
-  }
-
+  // === Étape 1 : choisir une bulle ===
   function handleValidate() {
-    if (selected.length !== 3) {
-      setStatus("🪶 Choisis 3 bulles.")
-      return
-    }
-    const chosen = inuitNodes.filter((n) => selected.includes(n.id))
-    const emojis = chosen.map((n) => n.emoji || "✨")
-
-    const payload = {
-      culture,
-      spirit: step.spirit_name,
-      emojis,
-      step_number: step.step_number,
-    }
-    setStatus("🌟 Résonance créée.")
-    setTimeout(() => onComplete?.(payload), 1000)
+    if (!selectedEmoji) return alert("🌬️ Choisis une bulle avant de révéler ton étoile.")
+    if (!userId) return alert("⚠️ Connecte-toi pour sauvegarder ton étoile.")
+    setShowStar(true)
   }
 
+  // === Étape 2 : générer la graine IA ===
+  async function handleGenerateDream() {
+    setGenerating(true)
+    try {
+      const prompt = `Écris un court rêve inuit de 6 lignes, au présent, inspiré de l’emoji ${selectedEmoji} et du thème ${step.title}.
+Fais des phrases sensorielles, poétiques, simples, comme des images mentales.`
+      const text = await askNebius(prompt, {
+        model: "google/gemma-2-2b-it",
+        temperature: 0.8
+      })
+      setDreamText(text)
+    } catch (err) {
+      console.error("⚠️ Erreur Nebius :", err)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  // === Étape 3 : affichage après sauvegarde ===
+  if (showStar && selectedEmoji) {
+    return (
+      <div className="hublot-inline fade-in">
+        <StarCardDream
+          userId={userId}
+          emoji={selectedEmoji}
+          culture={culture}
+          spirit={step.spirit_name}
+          step_number={step.step_number}
+          onSaved={() => setSaved(true)}
+        />
+
+        {saved && (
+          <div className="dream-generator-zone fade-in">
+            <button
+              id="generateDreamBtn"
+              className="hublot__validate-btn pulse"
+              onClick={handleGenerateDream}
+              disabled={generating}
+            >
+              {generating ? "⏳ Graine en germination..." : "🌱 Générer la graine OnimojIA"}
+            </button>
+
+            {dreamText && (
+              <div className="dream-text fade-in">
+                <h4>🌕 Rêve germé :</h4>
+                <p style={{ whiteSpace: "pre-line" }}>{dreamText}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // === Étape initiale ===
   return (
     <div className="hublot-inline fade-in">
       <h3>🌌 Hublot résonant – {step.spirit_name}</h3>
-      <p className="subtitle">Choisis 3 bulles pour clore ton voyage intérieur.</p>
-      <svg ref={svgRef} width="300" height="300" />
-      <div className="hublot__selected">
-        {selected.map((id) => {
-          const n = inuitNodes.find((x) => x.id === id)
-          return (
-            <span key={id} className="hublot__chip">
-              {n?.emoji || "✨"}
-            </span>
-          )
-        })}
-      </div>
+      <p className="subtitle">Choisis une bulle pour révéler ton étoile.</p>
+      <svg ref={svgRef} width="320" height="320" />
+      {selectedEmoji && (
+        <div className="hublot__selected">
+          <span style={{ fontSize: "2rem" }}>{selectedEmoji}</span>
+        </div>
+      )}
       <button className="hublot__validate-btn" onClick={handleValidate}>
-        🌬️ Valider (3)
+        🌟 Révéler l’étoile
       </button>
-      {status && <p className="hublot__status">{status}</p>}
     </div>
   )
 }

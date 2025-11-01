@@ -1,85 +1,98 @@
-/* 🧭 Navigation entre étapes */
-.step-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 2rem;
-  gap: 1rem;
-}
-
-.step-btn {
-  flex: 1;
-  background: rgba(127, 255, 212, 0.15);
-  border: 1px solid rgba(127, 255, 212, 0.35);
+/* ——— CONTENEUR INTRO ——— */
+.mission-intro {
+  position: relative;
+  min-height: 100vh;
   color: #e9fffd;
-  border-radius: 50px;
-  padding: 0.7rem 1.4rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 8px rgba(127, 255, 212, 0.25);
-  backdrop-filter: blur(6px);
-}
-
-.step-btn:hover {
-  background: rgba(127, 255, 212, 0.25);
-  box-shadow: 0 0 18px rgba(127, 255, 212, 0.3);
-  transform: translateY(-2px);
-}
-
-.step-btn:active {
-  transform: scale(0.96);
-  box-shadow: 0 0 6px rgba(127, 255, 212, 0.2);
-}
-
-.step-btn.next {
-  background: linear-gradient(135deg, rgba(127, 255, 212, 0.4), rgba(106, 90, 205, 0.3));
-  color: #0c1a18;
-  font-weight: 600;
-}
-
-.step-btn.next:hover {
-  background: linear-gradient(135deg, rgba(127, 255, 212, 0.6), rgba(106, 90, 205, 0.4));
-  box-shadow: 0 0 24px rgba(127, 255, 212, 0.45);
-}
-
-.step-btn.disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  filter: grayscale(60%);
-}
-
-/* 🌙 Étape suivante (bouton centré et doux) */
-.next-step-center {
+  text-align: center;
+  padding: 2rem 1.5rem;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  margin-top: 2.5rem;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 25%, #08161c 0%, #000 70%);
 }
 
-.next-step-center button {
-  background: radial-gradient(circle at 50% 50%, rgba(127, 255, 212, 0.25), rgba(106, 90, 205, 0.25));
+/* ——— ARRIÈRE-PLAN DOUX ——— */
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(40% 30% at 30% 20%, rgba(127,255,212,0.12), transparent 70%),
+    radial-gradient(35% 28% at 70% 25%, rgba(154,231,255,0.10), transparent 70%),
+    radial-gradient(30% 25% at 50% 75%, rgba(255,212,127,0.08), transparent 70%);
+  filter: blur(24px);
+  z-index: 0;
+}
+
+/* ——— TITRE / TEXTE ——— */
+.intro-title {
+  position: relative;
+  z-index: 1;
+  font-size: 1.6rem;
   color: #7fffd4;
-  border: 1px solid rgba(127, 255, 212, 0.4);
-  border-radius: 40px;
-  padding: 0.8rem 1.8rem;
+  text-shadow: 0 0 8px rgba(127,255,212,0.25);
+  margin-bottom: 1.2rem;
+}
+
+.intro-text {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0.8rem auto;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+/* ——— BOUTON ——— */
+.btn-primary {
+  position: relative;
+  z-index: 1;
+  margin-top: 1.2rem;
+  background: linear-gradient(90deg, #0b7a6d, #11a39a);
+  color: #fff;
+  padding: 0.8rem 1.6rem;
+  border: none;
+  border-radius: 24px;
   font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-shadow: 0 0 12px rgba(127, 255, 212, 0.3);
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
+  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: 0 0 14px rgba(127,255,212,0.22);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(127,255,212,0.35);
 }
 
-.next-step-center button:hover {
-  background: radial-gradient(circle at 50% 50%, rgba(127, 255, 212, 0.35), rgba(106, 90, 205, 0.35));
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 0 28px rgba(127, 255, 212, 0.4);
+/* ——— FOOTER ——— */
+.intro-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  font-style: italic;
 }
 
-.next-step-center button:active {
-  transform: scale(0.97);
-  box-shadow: 0 0 12px rgba(127, 255, 212, 0.25);
+/* ——— EFFETS SIMPLES ——— */
+.fade-in { animation: fadeIn .8s ease both; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ——— CHARGEMENT ——— */
+.mission-loading {
+  text-align: center;
+  color: #a0fdf5;
+  margin-top: 35vh;
+}
+.loader {
+  margin: 0 auto 1rem;
+  width: 32px; height: 32px;
+  border: 3px solid rgba(127,255,212,0.22);
+  border-top-color: #7fffd4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

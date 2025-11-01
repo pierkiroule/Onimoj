@@ -1,0 +1,93 @@
+/* 🌌 Écho du Ciel Résonant */
+
+svg {
+  background: radial-gradient(circle at 50% 45%, #01090f 0%, #000 95%);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(127, 255, 212, 0.15),
+              inset 0 0 20px rgba(0, 40, 40, 0.3);
+  animation: fadeIn 1.2s ease;
+  transition: background 1.5s ease;
+}
+
+/* --- Nœuds (étoiles, mots, emojis, users) --- */
+.node circle {
+  fill: rgba(127, 255, 212, 0.12);
+  stroke: #7fffd4;
+  stroke-width: 1.2px;
+  transition: transform 0.3s ease, fill 0.5s ease, r 0.3s ease;
+  animation: nodePulse 8s ease-in-out infinite;
+}
+.node:hover circle {
+  transform: scale(1.25);
+  fill: rgba(127, 255, 212, 0.25);
+  stroke: #9efff9;
+  filter: drop-shadow(0 0 8px rgba(127,255,212,0.6));
+}
+
+/* --- Étiquettes d’étoiles --- */
+.node text {
+  font-family: "Inter", system-ui, sans-serif;
+  fill: #bff;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
+.node:hover text {
+  transform: scale(1.2);
+  fill: #eaffff;
+  text-shadow: 0 0 6px rgba(127,255,212,0.4);
+}
+
+/* --- Liens (résonances entre étoiles) --- */
+line {
+  transition: stroke-opacity 0.4s ease, stroke-width 0.4s ease;
+  animation: linkFlow 10s linear infinite;
+  filter: blur(1px);
+}
+line:hover {
+  stroke-opacity: 0.8;
+  stroke-width: 2.4;
+}
+
+/* --- Panneaux d’interface --- */
+h3 {
+  font-size: 1.2rem;
+  color: #7fffd4;
+  text-shadow: 0 0 8px rgba(127,255,212,0.4);
+  margin-bottom: 0.6rem;
+}
+
+input[type="radio"] {
+  accent-color: #7fffd4;
+}
+label {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+label:hover {
+  color: #eaffff;
+}
+
+/* --- Animations cosmiques --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nodePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(127,255,212,0.4));
+    opacity: 0.9;
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(127,255,212,0.8));
+    opacity: 1;
+  }
+}
+
+@keyframes linkFlow {
+  0% { stroke: rgba(127,255,212,0.25); }
+  50% { stroke: rgba(255,212,127,0.35); }
+  100% { stroke: rgba(127,255,212,0.25); }
+}

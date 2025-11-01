@@ -1,0 +1,66 @@
+.dreamfriend-bubble {
+  background: rgba(8, 20, 24, 0.45);
+  border: 1px solid rgba(127, 255, 212, 0.25);
+  border-radius: 20px;
+  padding: 1.2rem;
+  margin: 1rem auto 2rem;
+  max-width: 480px;
+  text-align: center;
+  color: #e9fffd;
+  box-shadow: 0 0 20px rgba(127,255,212,0.15);
+  backdrop-filter: blur(6px);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.dreamfriend-bubble.active {
+  transform: scale(1.02);
+  box-shadow: 0 0 25px rgba(127,255,212,0.25);
+}
+
+.dreamfriend-bubble h3 {
+  color: #7fffd4;
+  margin-bottom: 0.5rem;
+}
+
+.dreamfriend-sub {
+  opacity: 0.9;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.dreamfriend-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dreamfriend-avatar {
+  font-size: 2rem;
+}
+
+.dreamfriend-info p {
+  margin: 0;
+}
+
+.score {
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+.dreamfriend-chat-btn {
+  background: linear-gradient(90deg, #007f73, #00bfa5);
+  border: none;
+  border-radius: 18px;
+  padding: 0.6rem 1.2rem;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.dreamfriend-chat-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(127,255,212,0.4);
+}

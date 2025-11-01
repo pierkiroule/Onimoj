@@ -11,7 +11,7 @@ export default function Home({ onStart, onLogin, onRegister }) {
         zIndex: 1,
       }}
     >
-      {/* 🌘 LOGO CENTRÉ */}
+      {/* 🌘 LOGO */}
       <div className="home-logo fade-in">
         <div className="moon-symbol">🌘•°</div>
         <div className="brand-name">Onimoji</div>
@@ -19,7 +19,6 @@ export default function Home({ onStart, onLogin, onRegister }) {
 
       {/* 🪶 SLOGAN */}
       <h2
-        className="tagline"
         style={{
           fontSize: "1.2rem",
           fontStyle: "italic",
@@ -29,89 +28,73 @@ export default function Home({ onStart, onLogin, onRegister }) {
           textShadow: "0 0 8px rgba(180,220,255,0.4)",
         }}
       >
-        Prendre soin de son sommeil en cultivant ses rêves.  
-        Explorer les univers culturels oniriques.
+        Voyage onirique, culturel et collectif.  
+        Apprends à inspirer tes rêves.
       </h2>
 
-      {/* 🌠 INTRO */}
-      <h1 className="home-title">Bienvenue à bord de la navette Oniris 🚀</h1>
-      <p className="intro-zone" style={{ maxWidth: "600px", margin: "1rem auto" }}>
-        Une exploration de l’univers poétique, onirique et culturel,  
-        où les rêves du monde se relient en résonance.
+      {/* 🌌 INTRO SIMPLE */}
+      <p style={{ maxWidth: "600px", margin: "1rem auto" }}>
+        <strong>Onimoji</strong> t’invite à explorer les sagesses du monde à travers le rêve.  
+        Ensemble, nous allons apprendre à <b>cocréer des suggestions oniriques</b>  
+        pour prendre soin du sommeil, de l’imaginaire et du lien au vivant.
         <br /><br />
-        Chaque culture éclaire une manière d’habiter le monde et de rêver :
-        <br />
         ❄️ Les Inuits écoutent le souffle du vent.  
         <br />
-        🌵 Les Berbères dialoguent avec les étoiles du désert.  
+        🌵 Les Berbères lisent les étoiles du désert.  
         <br />
-        🌲 Les Celtes conversent avec la forêt et les rivières.  
+        🌲 Les Celtes conversent avec les forêts et les rivières.  
         <br /><br />
-        Rêver devient un acte d’écoute :  
-        un lien entre soi, les autres et le vivant.
+        Chaque culture devient une porte pour rêver autrement.
       </p>
 
       {/* 💫 POURQUOI */}
       <div className="card-glow" style={{ maxWidth: "600px", margin: "1.5rem auto" }}>
-        <h3 style={{ color: "#7fffd4" }}>Pourquoi Onimoji ?</h3>
+        <h3 style={{ color: "#7fffd4" }}>Pourquoi participer ?</h3>
         <p>
-          Nous sommes connectés à tout, sauf à nos rêves.  
-          <strong>Onimoji</strong> invite à une écologie du rêve :  
-          un espace de résonance où les symboles et les émotions deviennent des passerelles.  
-          Chaque rêve partagé fait vibrer les sagesses du monde.
+          Nous avons perdu le lien avec nos rêves.  
+          <b>Onimoji</b> propose une écologie du rêve :  
+          apprendre à écouter, partager et nourrir le monde intérieur.  
+          Rêver devient un acte de soin, de culture et de lien.
         </p>
       </div>
 
-      {/* 🌀 COMMENT */}
+      {/* 🌿 COMMENT */}
       <div className="card-glow" style={{ marginTop: "1rem", maxWidth: "600px", margin: "0 auto" }}>
-        <h3 style={{ color: "#7fffd4" }}>Comment participer ?</h3>
+        <h3 style={{ color: "#7fffd4" }}>Comment ça marche ?</h3>
         <p>
-          🌿 Choisis un horizon culturel.  
+          🌙 Choisis une culture à explorer.  
           <br />
-          💭 Découvre ses symboles et récits.  
+          💭 Découvre ses symboles et ses récits.  
           <br />
-          ✨ Cocrée chaque jour, avec notre inspir-IA, tes ressources oniriques.
+          ✨ Laisse-toi guider pour créer chaque soir ta suggestion onirique personnalisée.
         </p>
       </div>
 
       {/* ✨ BOUTONS */}
       <div
         style={{
-          marginTop: "1.6rem",
+          marginTop: "1.8rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "0.6rem",
+          gap: "0.8rem",
         }}
       >
         <button className="dream-button" onClick={onStart}>
-          Explorer Onimoji
+          🌠 Commencer le voyage
         </button>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "0.6rem",
-          }}
-        >
+        <div style={{ display: "flex", gap: "0.6rem" }}>
           <button
             className="dream-button"
-            style={{
-              background: "rgba(127,255,212,0.15)",
-              color: "#7fffd4",
-            }}
+            style={{ background: "rgba(127,255,212,0.15)", color: "#7fffd4" }}
             onClick={onLogin}
           >
             Connexion
           </button>
-
           <button
             className="dream-button"
-            style={{
-              background: "rgba(110,255,141,0.15)",
-              color: "#6eff8d",
-            }}
+            style={{ background: "rgba(110,255,141,0.15)", color: "#6eff8d" }}
             onClick={onRegister}
           >
             Inscription
@@ -120,8 +103,8 @@ export default function Home({ onStart, onLogin, onRegister }) {
       </div>
 
       {/* 🌙 FOOTER */}
-      <div className="footer" style={{ marginTop: "1.5rem", opacity: 0.85 }}>
-        <p>Des voyages culturels pour apprendre à rêver vivant.</p>
+      <div className="footer" style={{ marginTop: "2rem", opacity: 0.85 }}>
+        <p>🌌 Un voyage collectif pour réapprendre à rêver vivant.</p>
       </div>
     </div>
   )

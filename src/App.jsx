@@ -13,7 +13,8 @@ import MissionInuite from "./pages/MissionInuite"
 import MissionInuiteEditor from "./pages/MissionInuiteEditor"
 import DreamStarCreator from "./pages/DreamStarCreator"
 import Profil from "./pages/Profil"
-import EchoCreation from "./pages/EchoCreation"
+import DreamEcho from "./pages/DreamEcho"
+import DreamReso from "./pages/DreamReso"
 import TestSupabase from "./pages/TestSupabase"
 import Auth from "./pages/Auth"
 import Register from "./pages/Register"
@@ -25,35 +26,32 @@ import "./App.css"
 
 export default function App() {
   const [page, setPage] = useState("home")
-  const [supabaseStatus, setSupabaseStatus] = useState("⏳ Connexion à Supabase…")
   const [session, setSession] = useState(null)
+  const [supabaseStatus, setSupabaseStatus] = useState("⏳ Connexion à Supabase…")
   const [checkingSession, setCheckingSession] = useState(true)
 
-  // 🚀 Vérifie la connexion à Supabase
+  // 🔌 Vérifie connexion Supabase
   useEffect(() => {
-    let interval
     async function testSupabase() {
       try {
         const { error } = await supabase.from("test_table").select("*").limit(1)
         if (error) throw error
         setSupabaseStatus("✅ Supabase connecté")
-      } catch (err) {
-        console.warn("⚠️ Mode local :", err.message)
+      } catch {
         setSupabaseStatus("⚠️ Mode local (offline)")
       }
     }
     testSupabase()
-    interval = setInterval(testSupabase, 30000)
+    const interval = setInterval(testSupabase, 30000)
     return () => clearInterval(interval)
   }, [])
 
-  // 🔐 Gestion de session persistante
+  // 🔐 Session persistante
   useEffect(() => {
     async function initSession() {
       const { data } = await supabase.auth.getSession()
       if (data?.session) setSession(data.session)
       setCheckingSession(false)
-
       const { data: listener } = supabase.auth.onAuthStateChange((_event, sess) => {
         setSession(sess)
       })
@@ -62,20 +60,19 @@ export default function App() {
     initSession()
   }, [])
 
-  // 🔁 Navigation simple
-  const handleNavigation = (pageId) => setPage(pageId)
+  // 🔁 Navigation
+  const handleNavigation = (id) => setPage(id)
 
-  // 🚪 Déconnexion utilisateur
+  // 🚪 Déconnexion
   async function handleLogout() {
     await supabase.auth.signOut()
     setSession(null)
     setPage("home")
   }
 
-  // 🪄 Routing principal
+  // 🧭 Routing interne
   const renderPage = () => {
     switch (page) {
-      // 🏠 Page d'accueil
       case "home":
         return (
           <Home
@@ -85,21 +82,18 @@ export default function App() {
           />
         )
 
-      // 🔐 Connexion
       case "login":
         return <Auth onAuth={setSession} onNavigate={setPage} />
 
-      // 🆕 Inscription
       case "register":
         return <Register onAuth={setSession} onNavigate={setPage} />
 
-      // 🌍 Sélection d’horizon
       case "mission-select":
         return (
           <HorizonSelect
-            onChoose={(sel) => {
-              if (sel.culture === "Inuite") setPage("mission-inuite")
-            }}
+            onChoose={(sel) =>
+              sel.culture === "Inuite" && setPage("mission-inuite")
+            }
           />
         )
 
@@ -112,7 +106,6 @@ export default function App() {
       case "create":
         return <DreamStarCreator />
 
-      // 👤 Profil utilisateur
       case "profil":
         return (
           <Profil
@@ -123,7 +116,10 @@ export default function App() {
         )
 
       case "echo-creation":
-        return <EchoCreation />
+        return <DreamEcho userId={session?.user?.id} />
+
+      case "dreamreso":
+        return <DreamReso userId={session?.user?.id} />
 
       case "test":
         return <TestSupabase />
@@ -149,15 +145,20 @@ export default function App() {
   }
 
   // 🌙 Attente initiale
-  if (checkingSession)
+  if (checkingSession) {
     return (
       <div
         className="app-root"
-        style={{ color: "#7fffd4", textAlign: "center", marginTop: "40vh" }}
+        style={{
+          color: "#7fffd4",
+          textAlign: "center",
+          marginTop: "40vh",
+        }}
       >
         🌌 Restauration de la session...
       </div>
     )
+  }
 
   // 🌌 Rendu principal
   return (
@@ -167,9 +168,7 @@ export default function App() {
 
       <main className="main-container fade-in">{renderPage()}</main>
 
-      {session && (
-        <BottomMenu currentPage={page} onNavigate={handleNavigation} />
-      )}
+      {session && <BottomMenu currentPage={page} onNavigate={handleNavigation} />}
 
       {/* ✅ Statut Supabase */}
       <div

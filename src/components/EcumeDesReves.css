@@ -1,55 +1,115 @@
 .resotimer {
-  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 60vh;
-  width: 100%;
-  background: radial-gradient(circle at 50% 45%, #08141c, #000);
-  overflow: hidden;
-  border-radius: 16px;
+  text-align: center;
   color: #e9fffd;
   font-family: "Inter", system-ui, sans-serif;
+  padding: 1rem;
 }
 
-.resotimer__circle {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 2px solid rgba(127,255,212,0.3);
-  box-shadow: 0 0 24px rgba(127,255,212,0.12);
-  animation: wave 6s ease-in-out infinite;
-}
-
-@keyframes wave {
-  0% {
-    transform: scale(0.2);
-    opacity: 0.3;
-  }
-  40% {
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
-.resotimer__phrase {
+/* --- Timer en haut --- */
+.resotimer__topTimer {
   position: relative;
-  z-index: 2;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.resotimer__time {
+  font-size: 1.6rem;
+  font-family: "Space Mono", monospace;
+  color: #aaffee;
+  text-shadow: 0 0 15px #00ffc3, 0 0 30px #006657;
+  animation: glow 2.5s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.85; text-shadow: 0 0 15px #00ffc3, 0 0 30px #006657; }
+  50% { opacity: 1; text-shadow: 0 0 25px #7fffd4, 0 0 45px #00a982; }
+}
+
+/* --- Particules autour du timer --- */
+.particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #7fffd4;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: orbit 6s linear infinite;
+}
+
+/* 12 particules autour du timer */
+.dot:nth-child(1) { transform: rotate(0deg) translate(80px) rotate(0deg); animation-delay: 0s; }
+.dot:nth-child(2) { transform: rotate(30deg) translate(80px) rotate(0deg); animation-delay: 0.5s; }
+.dot:nth-child(3) { transform: rotate(60deg) translate(80px) rotate(0deg); animation-delay: 1s; }
+.dot:nth-child(4) { transform: rotate(90deg) translate(80px) rotate(0deg); animation-delay: 1.5s; }
+.dot:nth-child(5) { transform: rotate(120deg) translate(80px) rotate(0deg); animation-delay: 2s; }
+.dot:nth-child(6) { transform: rotate(150deg) translate(80px) rotate(0deg); animation-delay: 2.5s; }
+.dot:nth-child(7) { transform: rotate(180deg) translate(80px) rotate(0deg); animation-delay: 3s; }
+.dot:nth-child(8) { transform: rotate(210deg) translate(80px) rotate(0deg); animation-delay: 3.5s; }
+.dot:nth-child(9) { transform: rotate(240deg) translate(80px) rotate(0deg); animation-delay: 4s; }
+.dot:nth-child(10) { transform: rotate(270deg) translate(80px) rotate(0deg); animation-delay: 4.5s; }
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translate(80px) rotate(0deg); opacity: 0.9; }
+  100% { transform: rotate(360deg) translate(80px) rotate(-360deg); opacity: 0.7; }
+}
+
+/* --- Vidéo --- */
+.resotimer__videoWrap {
+  position: relative;
+  width: min(80vw, 360px);
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(127, 255, 212, 0.25);
+}
+
+.resotimer__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+  border-radius: 16px;
+}
+
+/* --- Texte central --- */
+.resotimer__phrase {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 1.3rem;
-  text-align: center;
-  width: 80%;
-  max-width: 600px;
-  line-height: 1.4;
-  color: #7fffd4;
-  text-shadow: 0 0 12px rgba(127,255,212,0.35);
+  color: #bfffe9;
+  text-shadow: 0 0 12px rgba(127, 255, 212, 0.3);
+  z-index: 3;
   animation: fade 6s ease-in-out infinite;
 }
 
 @keyframes fade {
-  0%,100% { opacity: 0; transform: translateY(8px); }
-  20%,80% { opacity: 1; transform: translateY(0); }
+  0%,100% { opacity: 0; transform: translate(-50%, -48%); }
+  20%,80% { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* --- Texte bas --- */
+.resotimer__guide {
+  max-width: 360px;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(233, 255, 253, 0.9);
 }

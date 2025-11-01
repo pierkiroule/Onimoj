@@ -7,42 +7,73 @@
   "activities": [
     {
       "type": "text",
-      "content": "<h3>Le Souffle du Monde</h3><p><b>Sila</b> n’est pas un dieu, mais une présence : le <i>souffle du monde</i>. Chez les Inuit, il circule entre le ciel et la mer, entre le visible et l’invisible. Il fait vibrer la glace, les peaux et les âmes. Quand tout semble figé, c’est Sila qui murmure encore dans la neige. Il rappelle que la vie n’est pas un objet, mais un <b>mouvement</b> — une respiration cosmique.</p><p>Dans les traditions circumpolaires, ce souffle n’appartient à personne. Il traverse les vivants, les morts, les esprits, les rêves. En rêve, il devient le vent intérieur qui oriente les voyageurs de l’âme. Écouter Sila, c’est apprendre à respirer avec le monde, à sentir la résonance entre ton souffle et celui du grand dehors.</p>"
+      "content": "<h3>Le Souffle du Monde</h3><p><b>Sila</b> est le <i>souffle du monde</i>. Il circule entre ciel et mer, visible et invisible. Il fait vibrer la glace, les peaux et les âmes. Quand tout semble figé, il murmure encore dans la neige. La vie est un <b>mouvement</b> : une respiration cosmique.</p><p>En rêve, Sila devient vent intérieur. Écouter Sila, c’est respirer avec le monde et sentir la résonance entre ton souffle et le dehors.</p><hr/><p><b>Lecture mythanalytique :</b> Sila symbolise une <i>trans-respiration</i> entre les règnes. Il unit humain, animal et atmosphère dans une <b>écologie du lien</b>. L’âme et le vent partagent une même matière subtile : <b>rêver, c’est respirer le cosmos</b>.</p>"
     },
     {
       "type": "video",
-      "url": "/data/missions/inuite/media/sila_intro.mp4",
-      "caption": "Regarde le vent danser sur la glace. Chaque souffle efface et recrée le monde."
-    },
-    {
-      "type": "text",
-      "content": "<p>Dans une lecture <b>mythanalytique</b>, Sila symbolise le principe de <i>trans-respiration</i> entre les règnes : il unit l’humain, l’animal et l’atmosphère dans une même trame vibratoire. Anthropologiquement, on pourrait dire que Sila désigne une <b>écologie du lien</b>, où l’existence s’éprouve non pas comme sujet face au monde, mais comme souffle parmi les souffles.</p><p>Dans la pensée inuit, l’âme et le vent sont une seule et même matière subtile. Quand un enfant rêve, Sila passe à travers lui et y laisse une trace : un souvenir du monde avant les formes. Ainsi, rêver, c’est <b>respirer le cosmos</b>.</p>"
+      "url": "/assets/video/sila.mp4",
+      "caption": "Le vent danse sur la glace. Chaque souffle efface et recrée le monde."
     },
     {
       "type": "ritual",
-      "title": "Rituel du souffle",
-      "content": "<p>Ferme les yeux. Inspire lentement le froid, expire la clarté. Imagine le vent glissant sur la banquise et passant à travers toi. Respire trois fois avec le monde. Laisse ton souffle s’unir au Souffle.</p>",
-      "sound": "/data/missions/inuite/media/neige_vent.mp3"
+      "title": "Rituel du Souffle",
+      "content": "<p>Ferme les yeux. Inspire le froid, expire la clarté. Imagine le vent glissant sur la banquise et à travers toi. Respire <b>3 fois</b> avec le monde.</p>",
+      "sound": "/assets/mp3/sila.mp3"
     },
     {
       "type": "quiz",
-      "question": "Que symbolise Sila dans la tradition inuit ?",
-      "options": [
-        "Un dieu du ciel et des orages",
-        "Le souffle invisible du monde",
-        "Un animal sacré du Grand Nord"
+      "title": "Énigmes du Souffle",
+      "intro": "Avant de répondre, écoute le silence. Sens la température du vent, la texture de la lumière. Ici, le savoir n’est pas dans les mots, mais dans le souffle.",
+      "questions": [
+        {
+          "text": "Le vent effleure ton visage. Que te dit-il ?",
+          "options": [
+            "Je viens d’ailleurs, étranger au monde.",
+            "Je suis partout où tu respires.",
+            "Je passe, je ne laisse rien."
+          ],
+          "correct": 1,
+          "feedback": [
+            "🌫️ Tu crois qu’il vient d’ailleurs, mais le vent ne connaît pas l’ailleurs.",
+            "🌬️ Oui. Le vent est Sila, le souffle du monde : il passe en toi comme tu passes en lui.",
+            "❄️ Même quand il passe, il laisse des traces dans la neige et dans ton cœur."
+          ]
+        },
+        {
+          "text": "Un phoque surgit du trou de glace et te regarde sans peur. Que ressens-tu ?",
+          "options": [
+            "De la surprise, car nous ne parlons pas la même langue.",
+            "Une reconnaissance muette, comme entre deux souffles.",
+            "Un besoin de comprendre ce qu’il pense."
+          ],
+          "correct": 1,
+          "feedback": [
+            "🐚 Le phoque ne parle pas ta langue, mais il te comprend par ton calme.",
+            "💫 Oui. Dans la culture inuit, l’animal est parent — le souffle circule entre les formes de vie.",
+            "🦭 Penser n’est pas comprendre. Ressentir, oui."
+          ]
+        },
+        {
+          "text": "La tempête approche. Tu es seul sur la banquise. Que fais-tu ?",
+          "options": [
+            "Je résiste, j’affronte le vent.",
+            "Je m’abaisse, j’écoute son rythme et je respire avec lui.",
+            "Je fuis avant qu’il ne me trouve."
+          ],
+          "correct": 1,
+          "feedback": [
+            "❄️ Résister, c’est oublier que le vent t’enseigne à plier.",
+            "🌪️ Oui. L’Inuit ne lutte pas contre le monde : il s’y accorde.",
+            "🌬️ Fuir, c’est quitter le souffle. Parfois, rester immobile est la vraie sagesse."
+          ]
+        }
       ],
-      "correct": 1,
-      "feedback": [
-        "❄️ Pas tout à fait… Sila n’est pas un dieu personnel, mais un souffle impersonnel.",
-        "🌬️ Exact ! Sila est le souffle invisible, le vent du monde.",
-        "🐋 Non… mais les animaux, eux aussi, respirent Sila à leur manière."
-      ]
+      "end_message": "🌕 Tu as senti comme un Inuit : le souffle t’a traversé, et tu n’as plus eu besoin de mots."
     },
     {
       "type": "hublot",
       "title": "Hublot résonant – Souffle final",
-      "text": "<p>Ferme les yeux. Sens le vent passer à travers toi. Il ne vient pas d’ailleurs — il vient du dedans du monde. Tu es respiré par la Terre, par le Ciel, par Sila. Quand tu ouvres les yeux, le monde te respire encore.</p>",
+      "text": "<p>Ferme les yeux. Le vent ne vient pas d’ailleurs : il vient du dedans du monde. Tu es respiré par la Terre, le Ciel, Sila. Quand tu ouvres les yeux, le monde te respire encore.</p>",
       "sound": "/data/missions/inuite/media/hublot_sila.mp3",
       "transition": "next_step"
     }

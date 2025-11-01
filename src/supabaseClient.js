@@ -4,14 +4,14 @@ import { createClient } from '@supabase/supabase-js'
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// 🧩 Vérification de base
-console.log('✅ Vérification Supabase :')
+// ✅ Vérification de base (non bloquante)
+console.log('🧭 Vérification Supabase :')
 console.log('🌐 URL  →', SUPABASE_URL || '❌ non définie')
-console.log('🔑 KEY  →', SUPABASE_ANON_KEY ? 'présente ✅' : '❌ absente')
+console.log('🔑 KEY  →', SUPABASE_ANON_KEY ? '✅ présente' : '❌ absente')
 
-// 🛡️ Stub minimal si variables manquantes pour éviter les crashs
+// 🛡️ Stub minimal (évite plantage hors ligne ou sans .env)
 function createSupabaseStub() {
-  const missingEnvError = new Error('Supabase non configuré: variables .env manquantes')
+  const missingEnvError = new Error('⚠️ Supabase non configuré (.env manquant)')
   const selectable = {
     limit: async () => ({ data: [], error: missingEnvError }),
     eq: () => ({ order: async () => ({ data: [], error: missingEnvError }) }),
@@ -20,11 +20,13 @@ function createSupabaseStub() {
   const updatable = {
     eq: async () => ({ data: null, error: missingEnvError }),
   }
+
   return {
     from: () => ({
       select: () => selectable,
       insert: async () => ({ data: null, error: missingEnvError }),
       update: () => updatable,
+      delete: async () => ({ error: missingEnvError }),
     }),
     auth: {
       getUser: async () => ({ data: { user: null }, error: missingEnvError }),
@@ -33,34 +35,37 @@ function createSupabaseStub() {
       signInWithPassword: async () => ({ data: null, error: missingEnvError }),
       signOut: async () => ({ error: missingEnvError }),
       onAuthStateChange: () => ({
-        data: {
-          subscription: {
-            unsubscribe: () => {},
-          },
-        },
+        data: { subscription: { unsubscribe: () => {} } },
         error: null,
       }),
     },
   }
 }
 
-// 🚀 Création du client (réel si config présente, sinon stub)
-export const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : createSupabaseStub()
+// 🚀 Client réel ou stub de secours
+export const supabase =
+  SUPABASE_URL && SUPABASE_ANON_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+        },
+        realtime: {
+          params: { eventsPerSecond: 2 },
+        },
+      })
+    : createSupabaseStub()
 
-// 🌐 Test direct de connectivité réseau Supabase
+// 🌍 Test rapide réseau (facultatif, silencieux)
 if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-  const url = `${SUPABASE_URL}/rest/v1/test_table`
-  console.log('📡 Test réseau direct :', url)
-  fetch(url, { headers: { apikey: SUPABASE_ANON_KEY } })
-    .then(async (r) => {
-      const txt = await r.text()
-      console.log(`🌍 Réponse Supabase [${r.status}] :`, txt.slice(0, 200))
-    })
-    .catch((err) => {
-      console.error('🚨 Erreur réseau directe →', err.message)
-    })
+  const testUrl = `${SUPABASE_URL}/rest/v1/test_table`
+  fetch(testUrl, { headers: { apikey: SUPABASE_ANON_KEY } })
+    .then((r) =>
+      r.text().then((t) =>
+        console.log(`📡 Supabase OK [${r.status}] – ${t.slice(0, 100)}...`)
+      )
+    )
+    .catch((err) => console.warn('⚠️ Supabase non joignable →', err.message))
 } else {
-  console.warn('⚠️ Variables manquantes : client Supabase inactif (stub).')
+  console.warn('⛔ Client Supabase en mode STUB (local ou offline).')
 }

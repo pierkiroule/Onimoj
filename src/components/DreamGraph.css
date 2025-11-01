@@ -1,0 +1,11 @@
+.dreamgraph-container {
+  width: 100%;
+  max-width: 480px;
+  height: 420px;
+  margin: 0 auto 1.5rem;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 10, 20, 0.8), rgba(0, 0, 0, 0.9));
+  border: 1px solid rgba(127, 255, 212, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(127,255,212,0.1);
+  overflow: hidden;
+}

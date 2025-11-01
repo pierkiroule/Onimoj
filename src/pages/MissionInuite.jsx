@@ -1,64 +1,47 @@
 import { useEffect, useState } from "react"
-import { assetUrl } from "../utils/assetUrl"
-import StepEngine from "../components/StepEngine"
-import "./MissionInuite.css"
+import { supabase } from "../supabaseClient"
+import InuitFlow from "../components/InuitFlow"
 
 export default function MissionInuite() {
-  const [mission, setMission] = useState(null)
-  const [steps, setSteps] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const [userId, setUserId] = useState(null)
+  const [ready, setReady] = useState(false)
 
+  // 🔐 Session
   useEffect(() => {
-    async function loadMission() {
-      try {
-        setLoading(true)
-        setError("")
-        console.log("📖 Lecture du fichier mission.json...")
-
-        const res = await fetch(assetUrl("/data/missions/inuite/mission.json"))
-        if (!res.ok) throw new Error("Mission introuvable.")
-        const missionData = await res.json()
-        console.log("✅ Mission trouvée :", missionData.title)
-
-        // Charge toutes les étapes depuis le bon dossier
-        const stepPromises = missionData.steps.map(async (s) => {
-          const filePath = `/data/missions/inuite/${s.file}`
-          const r = await fetch(assetUrl(filePath))
-          if (!r.ok) throw new Error(`Fichier manquant : ${filePath}`)
-          return await r.json()
-        })
-        const stepData = await Promise.all(stepPromises)
-
-        setMission(missionData)
-        setSteps(stepData)
-      } catch (err) {
-        console.error("⚠️ Erreur mission :", err)
-        setError("Impossible de charger la mission locale.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadMission()
+    let sub
+    (async () => {
+      const { data } = await supabase.auth.getSession()
+      setUserId(data?.session?.user?.id || null)
+      setReady(true)
+    })()
+    const listener = supabase.auth.onAuthStateChange((_e, sess) => {
+      setUserId(sess?.user?.id || null)
+    })
+    sub = listener?.data?.subscription
+    return () => sub?.unsubscribe?.()
   }, [])
 
-  if (loading)
-    return <p style={{ textAlign: "center", marginTop: "40vh" }}>🌘 Chargement du rêve…</p>
+  if (!ready) return <div style={{color:"#7fffd4",textAlign:"center",marginTop:"30vh"}}>🌌 Chargement…</div>
 
-  if (error)
-    return <p style={{ color: "#ff8080", textAlign: "center", marginTop: "40vh" }}>{error}</p>
+  // Si non connecté
+  if (!userId) {
+    return (
+      <div style={{maxWidth:720,margin:"10vh auto",padding:"1rem",color:"#e9fffd",textAlign:"center"}}>
+        <h2 style={{color:"#7fffd4",marginBottom:"0.5rem"}}>Constellation Inuite</h2>
+        <p style={{opacity:.85,marginBottom:"1rem"}}>Connecte-toi pour commencer le voyage.</p>
+        <a href="#" onClick={async (e)=>{e.preventDefault(); await supabase.auth.signInWithOAuth({provider:"google"})}}
+           style={{display:"inline-block",padding:"0.7rem 1.2rem",borderRadius:12,
+                   background:"rgba(127,255,212,.15)",border:"1px solid rgba(127,255,212,.35)",color:"#7fffd4"}}>
+          🔑 Se connecter
+        </a>
+      </div>
+    )
+  }
 
-  if (!steps.length)
-    return <p style={{ textAlign: "center", marginTop: "40vh" }}>Aucune étape trouvée.</p>
-
+  // Flux principal
   return (
-    <div className="mission-inuite fade-in">
-      <h2 style={{ textAlign: "center", color: mission.color }}>{mission.title}</h2>
-      <p style={{ textAlign: "center", opacity: 0.8, marginTop: "-0.5rem" }}>
-        {mission.description}
-      </p>
-      <StepEngine steps={steps} />
+    <div style={{minHeight:"100vh",padding:"1rem",color:"#e9fffd"}}>
+      <InuitFlow userId={userId} />
     </div>
   )
 }

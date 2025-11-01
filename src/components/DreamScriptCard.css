@@ -1,0 +1,54 @@
+.dreamscript-card {
+  background: rgba(8, 20, 24, 0.45);
+  border: 1px solid rgba(127, 255, 212, 0.25);
+  border-radius: 16px;
+  padding: 1rem;
+  margin: 0.8rem auto;
+  max-width: 460px;
+  color: #e9fffd;
+  box-shadow: 0 0 20px rgba(127,255,212,0.1);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.dreamscript-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 24px rgba(127,255,212,0.25);
+}
+
+.dreamscript-img {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.dreamscript-img img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dreamscript-content h4 {
+  margin: 0.2rem 0 0.4rem;
+  color: #7fffd4;
+}
+
+.dreamscript-text {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
+
+.dreamscript-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.score {
+  color: #a3ffe6;
+}

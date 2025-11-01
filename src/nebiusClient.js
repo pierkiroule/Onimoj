@@ -1,10 +1,10 @@
 // src/nebiusClient.js
-// ⚡ Client universel Nebius Studio Chat (complet + streaming)
+// ⚡ Client universel Nebius Studio Chat (complet + filtrage poétique inuit)
 
 const API_URL =
   import.meta.env.VITE_NEBIUS_API_URL ||
   "https://api.studio.nebius.com/v1/chat/completions"
-// Support both the correct name and the older one to avoid prod breakage
+
 const API_KEY =
   import.meta.env.VITE_NEBIUS_API_KEY || import.meta.env.VITE_NEBIUS_KEY
 
@@ -12,25 +12,23 @@ const API_KEY =
  * Fonction principale : demande à Nebius une réponse textuelle.
  * @param {string} prompt - message utilisateur
  * @param {object} options :
- *    - model : modèle Nebius (défaut : google/gemma-2-2b-it)
+ *    - model : modèle Nebius (défaut : google/gemma-2-9b-it-fast)
  *    - systemPrompt : instructions système
  *    - temperature : créativité
  *    - stream : true → active l’affichage progressif
  *    - onToken : callback(token) → reçoit chaque fragment
- * @returns {Promise<string>} - texte complet généré
+ * @returns {Promise<string>} - texte complet généré et nettoyé
  */
 export async function askNebius(prompt, options = {}) {
   const body = {
-    model: options.model || "google/gemma-2-2b-it",
+    model: options.model || "google/gemma-2-9b-it-fast",
     messages: [
-      // system must be first
       {
         role: "system",
         content:
           options.systemPrompt ||
-          "Tu es un assistant poétique et bienveillant. Réponds en français, avec des images sensorielles, un ton apaisant et concis.",
+          "Tu es un conteur du Grand Nord. Raconte des rêves courts, sensoriels et poétiques en français, inspirés de la tradition inuit. Utilise des mots simples et évite toute invention lexicale mais utilise des metaphores inuites.",
       },
-      // optional few-shot examples array: must be valid Nebius message objects
       ...(Array.isArray(options.examples) ? options.examples : []),
       {
         role: "user",
@@ -44,11 +42,10 @@ export async function askNebius(prompt, options = {}) {
 
   try {
     if (!API_KEY) {
-      console.error(
-        "⛔ Clé API Nebius absente. Définis VITE_NEBIUS_API_KEY dans tes variables d'environnement (et redéploie)."
-      )
+      console.error("⛔ Clé API Nebius absente. Définis VITE_NEBIUS_API_KEY.")
       return ""
     }
+
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
@@ -59,14 +56,12 @@ export async function askNebius(prompt, options = {}) {
       body: JSON.stringify(body),
     })
 
-    // 🚨 Si erreur HTTP
     if (!res.ok) {
       const errText = await res.text()
       console.error("❌ Erreur Nebius:", errText)
       return ""
     }
 
-    // ⚡ Mode streaming : lecture progressive du flux texte
     if (options.stream) {
       const reader = res.body.getReader()
       const decoder = new TextDecoder("utf-8")
@@ -78,19 +73,19 @@ export async function askNebius(prompt, options = {}) {
         const tokens = extractTokens(chunk)
         for (const token of tokens) {
           fullText += token
-          options.onToken?.(token) // callback à chaque fragment
+          options.onToken?.(token)
         }
       }
-      return fullText.trim()
+      return cleanDreamText(fullText.trim())
     }
 
-    // 🌊 Réponse complète (non-streamée)
     const data = await res.json()
-    return (
+    const raw =
       data.choices?.[0]?.message?.content?.[0]?.text?.trim() ||
       data.choices?.[0]?.message?.content?.trim() ||
       ""
-    )
+
+    return cleanDreamText(raw)
   } catch (err) {
     console.error("⚠️ Erreur connexion Nebius:", err)
     return ""
@@ -98,9 +93,7 @@ export async function askNebius(prompt, options = {}) {
 }
 
 /**
- * Fonction utilitaire pour extraire les tokens texte depuis le flux SSE
- * @param {string} chunk - bloc brut de données
- * @returns {string[]} - liste de tokens
+ * Extraction des tokens texte depuis le flux SSE
  */
 function extractTokens(chunk) {
   const tokens = []
@@ -110,9 +103,23 @@ function extractTokens(chunk) {
       const json = JSON.parse(line.replace("data:", "").trim())
       const text = json?.choices?.[0]?.delta?.content?.[0]?.text
       if (text) tokens.push(text)
-    } catch {
-      /* ignore parsing errors */
-    }
+    } catch {}
   }
   return tokens
+}
+
+/**
+ * 🌬️ Nettoyage poétique frugal
+ * - remplace les mots inventés ou absurdes
+ * - supprime caractères illisibles
+ * - conserve le style poétique
+ */
+function cleanDreamText(text) {
+  if (!text) return ""
+  return text
+    .replace(/\bsonlagt\b/gi, "chant de lumière")
+    .replace(/\bsolagt\b/gi, "éclat du soleil")
+    .replace(/[^\p{L}\p{M}\p{P}\p{Zs}\n]/gu, "")
+    .replace(/\s{2,}/g, " ")
+    .trim()
 }

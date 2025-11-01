@@ -1,11 +1,12 @@
-import './BottomMenu.css'
+import "./BottomMenu.css"
 
 export default function BottomMenu({ currentPage, onNavigate }) {
   const menuItems = [
-    { icon: '🏠', label: 'Accueil', id: 'home' },
-    { icon: '❄️', label: 'Mission', id: 'mission-inuite' },
-    { icon: '🪶', label: 'Échos', id: 'echo-creation' },
-    { icon: '👤', label: 'Profil', id: 'profil' },
+    { icon: "🏠", label: "Accueil", id: "home" },
+    { icon: "❄️", label: "Mission", id: "mission-inuite" },
+    { icon: "🪶", label: "DreamEcho•°", id: "echo-creation" },
+    { icon: "🌐", label: "DreamReso•°", id: "dreamreso" },
+    { icon: "👤", label: "Profil", id: "profil" },
   ]
 
   return (
@@ -19,7 +20,7 @@ export default function BottomMenu({ currentPage, onNavigate }) {
           <button
             key={item.id}
             onClick={() => onNavigate(item.id)}
-            className={`menu-item ${currentPage === item.id ? 'active' : ''}`}
+            className={`menu-item ${currentPage === item.id ? "active" : ""}`}
             aria-label={item.label}
             role="button"
             tabIndex={0}

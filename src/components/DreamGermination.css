@@ -1,0 +1,63 @@
+.dream-germination {
+  margin: 2rem auto;
+  padding: 2rem;
+  max-width: 720px;
+  color: #e9fffd;
+  background: radial-gradient(circle at 50% 30%, rgba(10,20,25,0.85), rgba(0,0,0,0.7));
+  border: 1px solid rgba(127,255,212,0.25);
+  border-radius: 20px;
+  box-shadow: 0 0 32px rgba(127,255,212,0.15);
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+
+.dream-germination h2 {
+  font-size: 1.6rem;
+  color: #7fffd4;
+  text-shadow: 0 0 12px rgba(127,255,212,0.4);
+  margin-bottom: 1rem;
+}
+
+.timer {
+  font-family: "Courier New", monospace;
+  font-size: 2rem;
+  color: #7fffd4;
+  text-shadow: 0 0 16px rgba(127,255,212,0.4);
+  margin-bottom: 1.2rem;
+}
+
+.message {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  white-space: pre-line;
+  margin-bottom: 1.8rem;
+}
+
+.wake-btn {
+  background: rgba(127,255,212,0.25);
+  color: #e9fffd;
+  border: 1px solid rgba(127,255,212,0.35);
+  border-radius: 14px;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(127,255,212,0.15);
+  transition: all 0.3s ease;
+}
+
+.wake-btn:hover {
+  background: rgba(127,255,212,0.35);
+  box-shadow: 0 0 24px rgba(127,255,212,0.35);
+  transform: scale(1.03);
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -9,12 +9,12 @@ import Notifications from "./components/Notifications"
 // 📄 Pages
 import Home from "./pages/Home"
 import HorizonSelect from "./pages/HorizonSelect"
-import MissionInuite from "./pages/MissionInuite"
+import OnimojiJourney from "./pages/OnimojiJourney" // ✅ remplace MissionInuite
 import MissionInuiteEditor from "./pages/MissionInuiteEditor"
 import DreamStarCreator from "./pages/DreamStarCreator"
 import Profil from "./pages/Profil"
 import DreamEcho from "./pages/DreamEcho"
-import DreamReso from "./pages/DreamReso"
+import EchoReso from "./pages/EchoReso"              // ✅ nouveau nom
 import TestSupabase from "./pages/TestSupabase"
 import Auth from "./pages/Auth"
 import Register from "./pages/Register"
@@ -60,17 +60,14 @@ export default function App() {
     initSession()
   }, [])
 
-  // 🔁 Navigation
   const handleNavigation = (id) => setPage(id)
 
-  // 🚪 Déconnexion
   async function handleLogout() {
     await supabase.auth.signOut()
     setSession(null)
     setPage("home")
   }
 
-  // 🧭 Routing interne
   const renderPage = () => {
     switch (page) {
       case "home":
@@ -92,13 +89,13 @@ export default function App() {
         return (
           <HorizonSelect
             onChoose={(sel) =>
-              sel.culture === "Inuite" && setPage("mission-inuite")
+              sel.culture === "Inuite" && setPage("onimoji-journey")
             }
           />
         )
 
-      case "mission-inuite":
-        return <MissionInuite />
+      case "onimoji-journey":
+        return <OnimojiJourney userId={session?.user?.id} />
 
       case "mission-editor":
         return <MissionInuiteEditor />
@@ -118,8 +115,9 @@ export default function App() {
       case "echo-creation":
         return <DreamEcho userId={session?.user?.id} />
 
-      case "dreamreso":
-        return <DreamReso userId={session?.user?.id} />
+      // 🌌 Nouveau EchoReso intégré ici
+      case "echoreso":
+        return <EchoReso userId={session?.user?.id} />
 
       case "test":
         return <TestSupabase />
@@ -144,7 +142,6 @@ export default function App() {
     }
   }
 
-  // 🌙 Attente initiale
   if (checkingSession) {
     return (
       <div
@@ -160,7 +157,6 @@ export default function App() {
     )
   }
 
-  // 🌌 Rendu principal
   return (
     <div className="app-root">
       <StarField />
@@ -170,7 +166,6 @@ export default function App() {
 
       {session && <BottomMenu currentPage={page} onNavigate={handleNavigation} />}
 
-      {/* ✅ Statut Supabase */}
       <div
         style={{
           position: "fixed",

@@ -3,18 +3,14 @@ import "./BottomMenu.css"
 export default function BottomMenu({ currentPage, onNavigate }) {
   const menuItems = [
     { icon: "🏠", label: "Accueil", id: "home" },
-    { icon: "❄️", label: "Mission", id: "mission-inuite" },
-    { icon: "🪶", label: "DreamEcho•°", id: "echo-creation" },
-    { icon: "🌐", label: "DreamReso•°", id: "dreamreso" },
+    { icon: "🌙", label: "Voyage", id: "onimoji-journey" }, // ✅ remplace mission-inuite
+    { icon: "💤", label: "Rêvothèque", id: "echo-creation" }, // ✅ renommé depuis DreamEcho
+    { icon: "🌐", label: "ÉchoReso•°", id: "echoreso" }, // ✅ corrige ici
     { icon: "👤", label: "Profil", id: "profil" },
   ]
 
   return (
-    <nav
-      className="bottom-menu"
-      role="navigation"
-      aria-label="Navigation principale"
-    >
+    <nav className="bottom-menu" role="navigation" aria-label="Navigation principale">
       <div className="menu-container">
         {menuItems.map((item) => (
           <button

@@ -1,171 +1,332 @@
-import { useEffect, useRef, useState } from "react"
-import * as d3 from "d3"
-import { inuitNodes, inuitLinks } from "../data/InuitNetwork"
-import { askNebius } from "../nebiusClient"
-import StarCardDream from "./StarCardDream"
-import "./HublotResonant.css"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { inuitWordBanksByIndex } from "../data/inuitWordBanks"
 
+/**
+ * Hublot Résonant 2.0 — Dreamcatcher
+ * - Bubbles = tags candidats (15 par défaut) qui flottent et rebondissent
+ * - Tap = "pop" → ajoute le mot aux 5 branches de l'Onimoji
+ * - Reroll = relance un tirage (sans perdre les tags déjà captés)
+ * - Quand 5 tags → on affiche l'étoile + bouton Continuer (parent sauve)
+ */
 export default function HublotResonant({
-  culture = "Inuite",
-  step = {},
-  userId,
-  onComplete
+  step = { step_number: 1, spirit_name: "Sila", symbol: "🌬️" },
+  candidateCount = 15,
+  onComplete, // (tags[]) => void
 }) {
-  const svgRef = useRef(null)
-  const [selected, setSelected] = useState(null)
-  const [selectedEmoji, setSelectedEmoji] = useState(null)
-  const [showStar, setShowStar] = useState(false)
-  const [dreamText, setDreamText] = useState("")
-  const [generating, setGenerating] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const size = 320
+  const radius = size / 2
+  const hullR = radius - 8
 
-  // === Réseau D3 ===
+  // ===== BANK =====
+  const bank = useMemo(() => {
+    const list = (inuitWordBanksByIndex?.[step.step_number] || []).map(o => o.fr)
+    // dédoublonner proprement
+    return Array.from(new Set(list))
+  }, [step.step_number])
+
+  // ===== STATE =====
+  const [captured, setCaptured] = useState([]) // 0..5
+  const [bubbles, setBubbles] = useState([])   // objets animés
+  const [complete, setComplete] = useState(false)
+  const rafRef = useRef(null)
+  const containerRef = useRef(null)
+
+  // ===== INIT BUBBLES =====
+  function makeBubbles(seedList) {
+    const picks = [...seedList]
+      .sort(() => 0.5 - Math.random())
+      .filter(t => !captured.includes(t))
+      .slice(0, candidateCount)
+
+    const objs = picks.map((label, i) => ({
+      id: `${label}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+      label,
+      // position initiale aléatoire dans le disque (éviter le centre)
+      x: radius + (Math.random() * 2 - 1) * (hullR - 24),
+      y: radius + (Math.random() * 2 - 1) * (hullR - 24),
+      vx: (Math.random() * 1.2 + 0.3) * (Math.random() < 0.5 ? -1 : 1),
+      vy: (Math.random() * 1.2 + 0.3) * (Math.random() < 0.5 ? -1 : 1),
+      r: 18,
+    }))
+    return objs
+  }
+
+  // première population
   useEffect(() => {
-    const width = 320, height = 320
-    const nodes = inuitNodes.map(n => ({ ...n }))
-    const links = inuitLinks.map(l => ({ ...l }))
-    const svg = d3.select(svgRef.current)
-    svg.selectAll("*").remove()
+    setBubbles(makeBubbles(bank))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bank])
 
-    svg
-      .attr("viewBox", [0, 0, width, height])
-      .style("background", "radial-gradient(circle at 50% 50%, #041018, #000)")
-      .style("border-radius", "50%")
-      .style("box-shadow", "0 0 24px rgba(127,255,212,0.25)")
-
-    const grad = svg.append("defs")
-      .append("linearGradient")
-      .attr("id", "auroraGradient")
-      .attr("x1", "0%").attr("x2", "100%")
-      .attr("y1", "0%").attr("y2", "100%")
-    grad.append("stop").attr("offset", "0%").attr("stop-color", "#7fffd4")
-    grad.append("stop").attr("offset", "100%").attr("stop-color", "#9ae7ff")
-
-    const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id(d => d.id).distance(70))
-      .force("charge", d3.forceManyBody().strength(-100))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-
-    const linkSel = svg.append("g")
-      .selectAll("line")
-      .data(links)
-      .join("line")
-      .attr("stroke", "url(#auroraGradient)")
-      .attr("stroke-opacity", 0.6)
-      .attr("stroke-width", 1.6)
-
-    const nodeG = svg.append("g")
-      .selectAll("g.node")
-      .data(nodes)
-      .join("g")
-      .attr("class", "node")
-      .style("cursor", "pointer")
-      .on("click", (_e, d) => {
-        setSelected(d.id)
-        setSelectedEmoji(d.emoji)
-        setSaved(false)
-        setDreamText("")
-      })
-
-    nodeG.append("circle")
-      .attr("r", 20)
-      .attr("fill", "transparent")
-      .attr("stroke", "#7fffd4")
-
-    nodeG.append("text")
-      .text(d => d.emoji || "✨")
-      .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "central")
-      .attr("font-size", 20)
-      .attr("fill", "#eaffff")
-
-    simulation.on("tick", () => {
-      linkSel
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y)
-      nodeG.attr("transform", d => `translate(${d.x},${d.y})`)
-    })
-
-    return () => simulation.stop()
-  }, [])
-
-  // === Étape 1 : choisir une bulle ===
-  function handleValidate() {
-    if (!selectedEmoji) return alert("🌬️ Choisis une bulle avant de révéler ton étoile.")
-    if (!userId) return alert("⚠️ Connecte-toi pour sauvegarder ton étoile.")
-    setShowStar(true)
+  // ===== POP (capture) =====
+  function popBubble(id, label) {
+    if (complete) return
+    if (captured.includes(label)) return
+    const next = [...captured, label].slice(0, 5)
+    setCaptured(next)
+    setBubbles(bubbles.filter(b => b.id !== id))
+    if (next.length === 5) setComplete(true)
   }
 
-  // === Étape 2 : générer la graine IA ===
-  async function handleGenerateDream() {
-    setGenerating(true)
-    try {
-      const prompt = `Écris un court rêve inuit de 6 lignes, au présent, inspiré de l’emoji ${selectedEmoji} et du thème ${step.title}.
-Fais des phrases sensorielles, poétiques, simples, comme des images mentales.`
-      const text = await askNebius(prompt, {
-        model: "google/gemma-2-2b-it",
-        temperature: 0.8
-      })
-      setDreamText(text)
-    } catch (err) {
-      console.error("⚠️ Erreur Nebius :", err)
-    } finally {
-      setGenerating(false)
+  // ===== REROLL =====
+  function reroll() {
+    setBubbles(makeBubbles(bank))
+  }
+
+  // ===== ANIMATION =====
+  useEffect(() => {
+    const center = { x: radius, y: radius }
+    const emojiR = 20 // rayon "collision" autour de l'emoji central
+
+    function stepAnim() {
+      setBubbles(prev =>
+        prev.map(b => {
+          let { x, y, vx, vy, r } = b
+
+          // déplacement
+          x += vx
+          y += vy
+
+          // rebond bord circulaire (hublot)
+          const dx = x - center.x
+          const dy = y - center.y
+          const dist = Math.hypot(dx, dy)
+          const maxDist = hullR - r
+          if (dist > maxDist) {
+            // normale vers le centre
+            const nx = dx / dist
+            const ny = dy / dist
+            // repousse légèrement et inverse vitesse sur la normale
+            x = center.x + nx * maxDist
+            y = center.y + ny * maxDist
+            const dot = vx * nx + vy * ny
+            vx -= 2 * dot * nx
+            vy -= 2 * dot * ny
+          }
+
+          // rebond sur l'emoji central
+          const d2 = Math.hypot(x - center.x, y - center.y)
+          if (d2 < emojiR + r + 4) {
+            const nx = (x - center.x) / d2
+            const ny = (y - center.y) / d2
+            x = center.x + (emojiR + r + 4) * nx
+            y = center.y + (emojiR + r + 4) * ny
+            const dot = vx * nx + vy * ny
+            vx -= 2 * dot * nx
+            vy -= 2 * dot * ny
+          }
+
+          // micro-variations pour vie
+          vx += (Math.random() - 0.5) * 0.02
+          vy += (Math.random() - 0.5) * 0.02
+
+          // limiter la vitesse
+          const sp = Math.hypot(vx, vy)
+          const maxV = 1.1
+          if (sp > maxV) {
+            vx = (vx / sp) * maxV
+            vy = (vy / sp) * maxV
+          }
+
+          return { ...b, x, y, vx, vy }
+        })
+      )
+      rafRef.current = requestAnimationFrame(stepAnim)
     }
-  }
 
-  // === Étape 3 : affichage après sauvegarde ===
-  if (showStar && selectedEmoji) {
+    rafRef.current = requestAnimationFrame(stepAnim)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [hullR, radius])
+
+  // ===== STAR PREVIEW (SVG 5 branches) =====
+  const StarPreview = ({ emoji, tags }) => {
+    const c = 160, R = 118, r = 54
+    const pts = Array.from({ length: 10 }, (_, i) => {
+      const a = (-90 + i * 36) * (Math.PI / 180)
+      const rad = i % 2 === 0 ? R : r
+      return [c + rad * Math.cos(a), c + rad * Math.sin(a)]
+    })
+    const d = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]},${p[1]}`).join(" ") + " Z"
+
     return (
-      <div className="hublot-inline fade-in">
-        <StarCardDream
-          userId={userId}
-          emoji={selectedEmoji}
-          culture={culture}
-          spirit={step.spirit_name}
-          step_number={step.step_number}
-          onSaved={() => setSaved(true)}
-        />
-
-        {saved && (
-          <div className="dream-generator-zone fade-in">
-            <button
-              id="generateDreamBtn"
-              className="hublot__validate-btn pulse"
-              onClick={handleGenerateDream}
-              disabled={generating}
+      <svg viewBox="0 0 320 320" width={size} height={size} style={{ display: "block" }}>
+        <defs>
+          <radialGradient id="g" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(127,255,212,0.35)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.25)" />
+          </radialGradient>
+        </defs>
+        <circle cx={c} cy={c} r={hullR} fill="url(#g)" stroke="rgba(127,255,212,.35)" />
+        <path d={d} fill="none" stroke="#7fffd4" strokeWidth="1.8" />
+        <text x={c} y={c} textAnchor="middle" dominantBaseline="central" fontSize="40">
+          {step.symbol || "✨"}
+        </text>
+        {tags.map((t, i) => {
+          const angle = (-90 + i * 72) * (Math.PI / 180)
+          const x = c + Math.cos(angle) * (R + 14)
+          const y = c + Math.sin(angle) * (R + 14)
+          return (
+            <text
+              key={t}
+              x={x}
+              y={y}
+              textAnchor="middle"
+              fontSize="13"
+              fill="#e9fffd"
+              style={{ textShadow: "0 0 6px rgba(0,0,0,.6)", fontWeight: 500 }}
             >
-              {generating ? "⏳ Graine en germination..." : "🌱 Générer la graine OnimojIA"}
-            </button>
-
-            {dreamText && (
-              <div className="dream-text fade-in">
-                <h4>🌕 Rêve germé :</h4>
-                <p style={{ whiteSpace: "pre-line" }}>{dreamText}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              {t}
+            </text>
+          )
+        })}
+      </svg>
     )
   }
 
-  // === Étape initiale ===
+  // ===== RENDER =====
   return (
-    <div className="hublot-inline fade-in">
-      <h3>🌌 Hublot résonant – {step.spirit_name}</h3>
-      <p className="subtitle">Choisis une bulle pour révéler ton étoile.</p>
-      <svg ref={svgRef} width="320" height="320" />
-      {selectedEmoji && (
-        <div className="hublot__selected">
-          <span style={{ fontSize: "2rem" }}>{selectedEmoji}</span>
+    <div style={{ padding: "1rem" }}>
+      <div style={{ color: "#9ae7ff", marginBottom: ".5rem", fontWeight: 600 }}>
+        🌌 Bravo•° Dans ton dreamcatcher émerge l'Onimoji du jour  — {step.spirit_name}
+      </div>
+
+      {/* Hublot (mode capture) */}
+      {!complete && (
+        <div
+          ref={containerRef}
+          style={{
+            position: "relative",
+            width: size,
+            height: size,
+            margin: "0 auto",
+            borderRadius: "50%",
+            background: "radial-gradient(60% 60% at 50% 50%, #05121a 0%, #000 100%)",
+            boxShadow: "0 0 18px rgba(127,255,212,0.35), inset 0 0 40px rgba(0,0,0,.6)",
+            overflow: "hidden",
+          }}
+        >
+          {/* emoji central */}
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              fontSize: "42px",
+              filter: "drop-shadow(0 0 6px rgba(127,255,212,.35))",
+              userSelect: "none",
+              pointerEvents: "none",
+            }}
+          >
+            {step.symbol || "✨"}
+          </div>
+
+          {/* bulles */}
+          {bubbles.map(b => (
+            <button
+              key={b.id}
+              onClick={() => popBubble(b.id, b.label)}
+              style={{
+                position: "absolute",
+                left: b.x - 9999, // évite clignotements durant animation diff
+                top: b.y - 9999,
+                transform: `translate(${9999 - b.r}px, ${9999 - b.r}px)`,
+                minWidth: 0,
+                border: "1px solid rgba(127,255,212,.55)",
+                borderRadius: "999px",
+                background: "rgba(127,255,212,.10)",
+                color: "#e9fffd",
+                padding: ".28rem .6rem",
+                fontSize: ".85rem",
+                lineHeight: 1.1,
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+                boxShadow: "0 0 8px rgba(0,0,0,.35)",
+              }}
+            >
+              {b.label}
+            </button>
+          ))}
         </div>
       )}
-      <button className="hublot__validate-btn" onClick={handleValidate}>
-        🌟 Révéler l’étoile
-      </button>
+
+      {/* Captures en cours */}
+      {!complete && (
+        <div style={{ marginTop: ".8rem", color: "#e9fffd" }}>
+          <div style={{ opacity: .8, fontSize: ".9rem", marginBottom: ".35rem" }}>
+            Tags captés : {captured.length}/5
+          </div>
+          <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", justifyContent: "center" }}>
+            {captured.map(t => (
+              <span
+                key={t}
+                style={{
+                  padding: ".25rem .6rem",
+                  borderRadius: "999px",
+                  background: "rgba(127,255,212,.12)",
+                  border: "1px solid rgba(127,255,212,.45)",
+                  fontSize: ".85rem",
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <div style={{ marginTop: ".9rem", display: "flex", gap: ".6rem", justifyContent: "center" }}>
+            <button
+              onClick={reroll}
+              style={{
+                padding: ".55rem .9rem",
+                borderRadius: "10px",
+                border: "1px solid rgba(127,255,212,.5)",
+                background: "rgba(127,255,212,.08)",
+                color: "#e9fffd",
+                cursor: "pointer",
+              }}
+            >
+              🎲 Relancer les bulles
+            </button>
+            <button
+              disabled={captured.length < 5}
+              onClick={() => setComplete(true)}
+              style={{
+                padding: ".55rem .9rem",
+                borderRadius: "10px",
+                border: "1px solid rgba(255,255,255,.15)",
+                background: captured.length < 5 ? "rgba(255,255,255,.08)" : "rgba(110,255,141,.15)",
+                color: captured.length < 5 ? "#b7c9c6" : "#6eff8d",
+                cursor: captured.length < 5 ? "not-allowed" : "pointer",
+              }}
+            >
+              🌟 Tisser l’étoile
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Étoile finale + suite */}
+      {complete && (
+        <div style={{ marginTop: ".6rem", textAlign: "center" }}>
+          <StarPreview emoji={step.symbol || "✨"} tags={captured} />
+          <p style={{ color: "#7fffd4", marginTop: ".6rem" }}>
+            ✨ Le Dreamcatcher est rempli.
+          </p>
+          <button
+            onClick={() => onComplete && onComplete(captured)}
+            style={{
+              marginTop: ".6rem",
+              padding: ".65rem 1rem",
+              borderRadius: "12px",
+              border: "1px solid rgba(127,255,212,.55)",
+              background: "rgba(127,255,212,.12)",
+              color: "#e9fffd",
+              cursor: "pointer",
+            }}
+          >
+            ✅ Continuer
+          </button>
+        </div>
+      )}
     </div>
   )
 }

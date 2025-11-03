@@ -1,70 +1,102 @@
+/* 🌌 PAGE HOME */
 .home {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 85vh;
+  min-height: 100vh;
   width: 100%;
-  padding: 1.5rem;
+  padding: 2rem 1.2rem;
   box-sizing: border-box;
   text-align: center;
+  background: radial-gradient(circle at 50% 30%, rgba(8,18,26,0.95), rgba(0,0,0,0.85));
+  color: #e9ecff;
+}
+
+/* 🌙 LOGO ET NOM */
+.home-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.moon-symbol {
+  font-size: 3rem;
+  color: #bfefff;
+  text-shadow: 0 0 14px rgba(127,255,212,0.4);
+}
+
+.brand-name {
+  font-size: 1.6rem;
+  color: #a9baff;
+  text-shadow: 0 0 10px rgba(150,200,255,0.3);
+  letter-spacing: 1px;
+  margin-top: 0.4rem;
 }
 
 /* 🌙 TAGLINE */
 .tagline {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1.2rem;
+  line-height: 1.7;
   color: #e9ecff;
-  text-shadow: 0 0 8px rgba(120,150,255,0.3);
-  margin-top: 4.5rem;
-  margin-bottom: 2rem;
-  animation: fadeIn 1.6s ease;
+  text-shadow: 0 0 6px rgba(120,150,255,0.25);
+  margin: 1rem auto 2rem;
+  max-width: 540px;
 }
 
 @media (max-width: 768px) {
   .tagline {
     font-size: 1rem;
-    margin-top: 3rem;
+    margin-top: 0.8rem;
+    max-width: 90%;
   }
 }
 
-/* 🧠 BLOCS ARGUMENT & NARRATIVE */
+/* 🧠 BLOCS NARRATIFS */
 .card-glow {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.05);
   border-radius: 14px;
-  padding: 1.2rem 1.6rem;
-  margin: 1.2rem auto;
-  max-width: 420px;
-  text-align: left;
+  padding: 1.4rem 1.8rem;
+  margin: 1rem auto;
+  max-width: 460px;
+  text-align: center;
   color: #e0e4ff;
   backdrop-filter: blur(8px);
-  box-shadow: 0 0 25px rgba(140,170,255,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 20px rgba(140,170,255,0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card-glow:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 40px rgba(150,180,255,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px rgba(150,180,255,0.2);
 }
 
 .card-glow h2 {
-  text-align: center;
   color: #a9baff;
-  text-shadow: 0 0 10px #7fffd420;
   font-size: 1.2rem;
   margin-bottom: 0.8rem;
+  text-shadow: 0 0 8px rgba(127,255,212,0.2);
 }
 
 .card-glow p {
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 0.96rem;
+  line-height: 1.6;
   margin-bottom: 0.8rem;
 }
 
-/* 🚀 BOUTON CENTRAL */
+/* 🚀 BOUTONS CENTRÉS */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1.8rem;
+}
+
 .dream-button {
   display: block;
-  margin: 1.6rem auto;
+  margin: 0.6rem auto;
   background: linear-gradient(90deg, #6a5acd, #7fffd4);
   border: none;
   border-radius: 2rem;
@@ -73,34 +105,39 @@
   font-size: 1rem;
   color: #0b0b1a;
   cursor: pointer;
-  transition: all 0.35s ease;
-  box-shadow: 0 0 12px #7fffd4a0;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(127,255,212,0.5);
+  min-width: 230px;
 }
 
 .dream-button:hover {
-  transform: scale(1.07);
-  box-shadow: 0 0 22px #7fffd4, 0 0 40px #6a5acd;
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(127,255,212,0.8);
 }
 
-/* 🌙 MISSION LIST */
-.mission-list {
-  display: block;
-  margin-top: 0.5rem;
-  color: #7fffd4;
-  font-weight: 500;
+.dream-sub-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
 }
 
-/* ✨ FOOTER */
+/* ✨ FOOTER CENTRÉ */
 .footer {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   opacity: 0.6;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   text-align: center;
   color: #aabaff;
+  line-height: 1.5;
 }
 
-/* ✨ ANIMATIONS */
+/* 🌌 ANIMATION D’APPARITION DOUCE */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }

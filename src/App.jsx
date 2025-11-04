@@ -9,18 +9,21 @@ import Notifications from "./components/Notifications"
 // 📄 Pages
 import Home from "./pages/Home"
 import HorizonSelect from "./pages/HorizonSelect"
-import OnimojiJourney from "./pages/OnimojiJourney" // ✅ remplace MissionInuite
+import OnimojiJourney from "./pages/OnimojiJourney"
 import MissionInuiteEditor from "./pages/MissionInuiteEditor"
 import DreamStarCreator from "./pages/DreamStarCreator"
 import Profil from "./pages/Profil"
 import DreamEcho from "./pages/DreamEcho"
-import EchoReso from "./pages/EchoReso"              // ✅ nouveau nom
-import TestSupabase from "./pages/TestSupabase"
-import Auth from "./pages/Auth"
-import Register from "./pages/Register"
+import EchoReso from "./pages/EchoReso"
 import LaboLogin from "./pages/LaboLogin"
 import Labo from "./pages/Labo"
 import InuiteAdmin from "./pages/InuiteAdmin"
+import Auth from "./pages/Auth"
+import Register from "./pages/Register"
+import TestSupabase from "./pages/TestSupabase"
+
+// 🌌 Nouveau composant
+import CalendrierOnirique from "./components/CalendrierOnirique"
 
 import "./App.css"
 
@@ -68,6 +71,7 @@ export default function App() {
     setPage("home")
   }
 
+  // 🧭 Routage des pages
   const renderPage = () => {
     switch (page) {
       case "home":
@@ -115,12 +119,11 @@ export default function App() {
       case "echo-creation":
         return <DreamEcho userId={session?.user?.id} />
 
-      // 🌌 Nouveau EchoReso intégré ici
       case "echoreso":
         return <EchoReso userId={session?.user?.id} />
 
-      case "test":
-        return <TestSupabase />
+      case "calendrier":
+        return <CalendrierOnirique />
 
       case "labo-login":
         return <LaboLogin onNavigate={setPage} />
@@ -130,6 +133,9 @@ export default function App() {
 
       case "admin-inuite":
         return <InuiteAdmin onNavigate={setPage} session={session} />
+
+      case "test":
+        return <TestSupabase />
 
       default:
         return (
@@ -142,6 +148,7 @@ export default function App() {
     }
   }
 
+  // 🌙 État de session
   if (checkingSession) {
     return (
       <div

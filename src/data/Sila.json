@@ -1,0 +1,26 @@
+{
+  "step_number": 1,
+  "spirit_name": "Sila",
+  "symbol": "🌬️",
+  "title": "Le Souffle du Monde",
+  "text": "Sila n’est pas un simple vent : c’est la respiration secrète du monde. Il glisse entre les pierres, frôle la glace, caresse la peau des vagues et s’invite jusque dans les songes des vivants. Invisible mais partout présent, il relie ce qui respire et ce qui dort : le souffle des bêtes, des mers, des hommes et des aurores. Lorsque les humains cessent d’écouter, Sila se retire ; alors les arbres ne murmurent plus, les flots perdent leur rythme, et le monde tout entier retient sa respiration. Mais dès qu’un être reprend conscience de son souffle, le monde recommence à chanter. Sila nous enseigne que respirer, c’est participer à la vie du cosmos, et que rêver, c’est prolonger ce souffle dans la nuit. Dans le sommeil, le souffle devient un lien réparateur entre le corps et l’esprit.",
+  "ritual": "Ferme les yeux. Inspire lentement par le nez, comme si tu buvais le ciel. Sens l’air descendre dans ton ventre et t’élargir. Souffle doucement par la bouche, en laissant partir tout ce qui pèse. Répète jusqu’à ce que ton corps devienne léger. Endors-toi au rythme de ton souffle.",
+  "meaning": "Sila rappelle que chaque respiration t’unit au monde. En respirant consciemment avant le sommeil, tu entres dans un rêve plus paisible, relié à la grande respiration du vivant.",
+  "quiz": [
+    {
+      "question": "Que symbolise Sila pour les Inuits ?",
+      "options": ["La respiration universelle", "Un esprit des glaces", "La colère du vent"],
+      "correct": 0
+    },
+    {
+      "question": "Selon le texte, que se passe-t-il quand on oublie Sila ?",
+      "options": ["Le monde retient sa respiration", "Les tempêtes se lèvent", "Le froid disparaît"],
+      "correct": 0
+    },
+    {
+      "question": "Comment Sila aide-t-il au sommeil ?",
+      "options": ["En apaisant le souffle et le rêve", "En rendant l’esprit plus agité", "En provoquant la fatigue du corps"],
+      "correct": 0
+    }
+  ]
+}

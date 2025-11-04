@@ -1,0 +1,34 @@
+{
+  "step_number": 9,
+  "spirit_name": "Aniu",
+  "symbol": "❄️",
+  "title": "La Mémoire de la Neige",
+  "text": "Aniu, esprit de la neige, écrit les histoires du temps sur le monde. Chaque flocon porte une forme unique, comme chaque rêve porte un sens secret. Quand elle fond, elle nous enseigne à laisser aller sans peur. La neige recouvre tout, puis disparaît : ainsi va le sommeil, qui efface doucement les traces du jour. Rêver avec Aniu, c’est apprendre à transformer la mémoire en silence apaisé.",
+  "ritual": "Avant de dormir, imagine qu’un flocon se pose sur ton front. Il fond lentement, glissant jusqu’à ton cœur. À chaque goutte, laisse partir une pensée inutile. Sens la légèreté qui s’installe.",
+  "meaning": "Aniu enseigne la beauté du passage : accepter de laisser fondre ce qui pèse. Cette dissolution des tensions prépare un sommeil pur et réparateur.",
+  "quiz": [
+    {
+      "question": "Que symbolise Aniu ?",
+      "options": ["La neige qui enseigne le lâcher-prise", "Le froid destructeur", "La tempête du souvenir"],
+      "correct": 0
+    },
+    {
+      "question": "Comment Aniu aide-t-elle à mieux dormir ?",
+      "options": [
+        "En effaçant les traces mentales de la journée",
+        "En réveillant les souvenirs douloureux",
+        "En refroidissant le corps"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que signifie le flocon du rituel ?",
+      "options": [
+        "Une pensée qui se dissout pour laisser place au calme",
+        "Un symbole de vigilance",
+        "Un appel au mouvement"
+      ],
+      "correct": 0
+    }
+  ]
+}

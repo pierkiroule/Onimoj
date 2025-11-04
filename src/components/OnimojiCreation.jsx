@@ -1,3 +1,4 @@
+// src/components/OnimojiCreation.jsx
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import { askNebius } from "../nebiusClient"
@@ -10,11 +11,10 @@ export default function OnimojiCreation({ userId, spirit, emoji, tags, onDone })
   const [saved, setSaved] = useState(false)
   const [aiCount, setAiCount] = useState(0)
   const [aiLoading, setAiLoading] = useState(false)
-  const [aiText, setAiText] = useState("")
 
-  // 🌬️ Fragments courts et suggestifs
+  // 🌬️ Génération de fragments uniques
   useEffect(() => {
-    const exemples = [
+    const base = [
       "Souffle dans la glace",
       "Mémoire du vent",
       "Silence du nord",
@@ -24,24 +24,34 @@ export default function OnimojiCreation({ userId, spirit, emoji, tags, onDone })
       "Trace dans la neige",
       "Ombre du souffle",
       "Écho sous la glace",
-      "Respiration de la banquise"
+      "Respiration de la banquise",
+      "Caresse du givre",
+      "Appel du silence",
+      "Souffle des étoiles",
+      "Murmure de la glace",
+      "Lueur des aurores"
     ]
-    setFragments(exemples.sort(() => 0.5 - Math.random()).slice(0, 3))
+    const unique = [...new Set(base)]
+    setFragments(unique.sort(() => 0.5 - Math.random()).slice(0, 3))
   }, [spirit])
 
-  // 💾 Sauvegarde
+  // 💾 Sauvegarde complète
   async function handleSave() {
     if (!text.trim()) return alert("Écris ou valide ton fragment avant de continuer.")
+    if (!selectedFrag) return alert("Choisis un titre pour ton rêve.")
     setLoading(true)
     try {
       const { error } = await supabase.from("revotheque_reves").insert({
         user_id: userId,
         titre: `${emoji} ${spirit} – Première contribution`,
+        titre_user: selectedFrag,
         texte: text.trim(),
         tags,
         emoji,
         culture: "Inuite",
-        spirit
+        spirit,
+        ai_influence: aiCount,
+        date_reve: new Date().toISOString().split("T")[0]
       })
       if (error) throw error
       setSaved(true)
@@ -53,7 +63,7 @@ export default function OnimojiCreation({ userId, spirit, emoji, tags, onDone })
     }
   }
 
-  // 🌬️ Inspiration IA — utilise fragment + tags + esprit
+  // 🌬️ Inspiration IA — ajoutée directement dans le texte principal
   async function handleAIInspire() {
     if (!selectedFrag) return alert("Choisis d’abord un fragment inspirant.")
     if (aiCount >= 3) return alert("🌬️ L’esprit se repose maintenant…")
@@ -63,9 +73,8 @@ export default function OnimojiCreation({ userId, spirit, emoji, tags, onDone })
       const prompt = `
 Tu es un poète inuit médiumnique.
 L’esprit "${spirit}" (${emoji}) te souffle un rêve à co-créer : "${selectedFrag}".
-Compose une amorce poétique en 5 lignes.
-Chaque ligne doit faire résonner un ou plusieurs de ces mots-clés : ${joinedTags}.
-Langage sensoriel, onirique et évocateur : vent, glace, souffle, silence, eau, lumière, brume...
+Compose une amorce poétique en 5 lignes, chaque ligne doit faire résonner ces mots-clés : ${joinedTags}.
+Langage sensoriel et onirique : vent, glace, souffle, silence, eau, lumière, brume...
 Le ton doit être chamanique et incarné, sans explication ni morale.
 Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
 `
@@ -74,9 +83,9 @@ Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
         temperature: 0.9,
       })
 
-      const formatted = `L’esprit ${spirit} te souffle un rêve à co-créer : « ${selectedFrag} »\n\n${result.trim()}`
-      setAiText(formatted)
-      setText(formatted)
+      const formatted = `💫 Souffle de l’esprit ${spirit} :\n${result.trim()}`
+      // fusion dans le champ texte
+      setText(prev => (prev ? prev + "\n\n" + formatted : formatted))
       setAiCount(aiCount + 1)
     } catch (err) {
       console.error("⚠️ Erreur inspiration IA :", err)
@@ -91,6 +100,9 @@ Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
     return (
       <div style={{ textAlign: "center", marginTop: "1rem", color: "#7fffd4" }}>
         🌟 Ton Onimoji est né.<br />
+        <div style={{ opacity: 0.8, fontSize: ".9rem", marginTop: ".3rem" }}>
+          {emoji} {selectedFrag} — enregistré le {new Date().toLocaleDateString()}
+        </div>
         <button
           onClick={onDone}
           style={{
@@ -124,14 +136,14 @@ Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
         🌀 Première contribution – {spirit}
       </h3>
 
-      <p style={{ fontSize: ".9rem", opacity: 0.8, marginBottom: ".8rem" }}>
+      <p style={{ fontSize: ".9rem", opacity: 0.85, marginBottom: ".8rem" }}>
         Choisis un titre qui t’appelle — un souffle, un écho, une image.  
         L’IA t’inspirera ensuite un <strong>début de rêve</strong> lié à l’esprit {emoji} {spirit}.  
         Mais <strong>tu es invité à le réécrire, le transformer, l’enrichir</strong> :  
         ajoute ton propre rythme, ta mémoire, tes sensations.
       </p>
 
-      {/* 🌬️ Choix des fragments */}
+      {/* 🌬️ Choix du fragment */}
       <div
         style={{
           display: "flex",
@@ -146,8 +158,7 @@ Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
             key={i}
             onClick={() => {
               setSelectedFrag(f)
-              setText(`"${f}" — `)
-              setAiText("")
+              setText(`« ${f} »\n`)
             }}
             style={{
               background:
@@ -172,11 +183,11 @@ Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
         ))}
       </div>
 
-      {/* 🌕 Texte utilisateur */}
+      {/* 📝 Champ texte principal */}
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        rows={7}
+        rows={8}
         placeholder="Laisse l’esprit t’inspirer, puis ajoute ton souffle..."
         style={{
           width: "100%",
@@ -187,29 +198,9 @@ Fais sentir les sensations : voir, ressentir, entendre, toucher, respirer.
           color: "#e9fffd",
           fontFamily: "inherit",
           resize: "none",
+          lineHeight: "1.5rem",
         }}
       />
-
-      {/* 🌟 Inspiration IA en jaune lumineux */}
-      {aiText && (
-        <div
-          style={{
-            marginTop: "1rem",
-            padding: "0.8rem",
-            borderRadius: "10px",
-            background: "rgba(255,255,150,0.08)",
-            border: "1px solid rgba(255,230,128,0.3)",
-            color: "#ffe680",
-            whiteSpace: "pre-wrap",
-            fontStyle: "italic",
-            boxShadow: "0 0 6px rgba(255,230,128,0.2)",
-          }}
-        >
-          💫 <strong>Souffle de l’esprit</strong> :
-          <br />
-          {aiText}
-        </div>
-      )}
 
       {/* 🔘 Boutons */}
       <div

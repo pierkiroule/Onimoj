@@ -14,14 +14,12 @@ export default function Home({ onStart, onLogin, onRegister }) {
 
       {/* ✨ SLOGAN */}
       <div className="tagline">
-        Cueille le rêve  
-        <br />
-        pour réveiller le jour.
+        Prendre soin des gardiens du sommeil !
       </div>
 
       {/* 🌙 PREMIER BLOC — Sens */}
       <div className="card-glow">
-        <h2>Et si le rêve redevenait vital ?</h2>
+        <h2>Cueille le rêve !</h2>
         <p>
           Assez d’applis qui notent ton sommeil.  
           <br />
@@ -31,7 +29,7 @@ export default function Home({ onStart, onLogin, onRegister }) {
         <p>
           <b>Onimoji</b> t’invite à écouter la nuit  
           comme un souffle du monde.  
-          Rêver, c’est déjà prendre soin.
+          Rêver, c’est déjà prendre soin de ses gardiens du sommeil.
         </p>
       </div>
 
@@ -55,21 +53,21 @@ export default function Home({ onStart, onLogin, onRegister }) {
       <div className="card-glow">
         <h2>Une aventure à partager</h2>
         <p>
-          🌙 Choisis ton esprit-guide.  
+          🌙 Choisis ton gardien du jour.  
           <br />
           💭 Crée ton rêve du soir.  
           <br />
           ✨ Découvre ceux du collectif.
         </p>
         <p>
-          Ensemble, nous tissons une écologie du rêve :  
+          Ensemble, nous tissons une écologie protectrice et regénérative du rêve :  
           lente, libre, résonante.
         </p>
       </div>
 
       {/* 🚀 ACTIONS */}
       <button className="dream-button" onClick={onStart}>
-        🌠 Commencer le voyage
+        🌠 Partez à la rencontre des gardiens Onimojis
       </button>
 
       <div style={{ display: "flex", gap: "0.6rem" }}>
@@ -100,7 +98,7 @@ export default function Home({ onStart, onLogin, onRegister }) {
       {/* 🌌 FOOTER */}
       <div className="footer">
         <p>
-          🌘 Onimoji — apprendre à rêver pour mieux veiller le monde.
+          🌘“Le rêve est la respiration de l’âme.”— Gaston Bachelard .
         </p>
       </div>
     </div>

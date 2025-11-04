@@ -1,0 +1,38 @@
+{
+  "step_number": 5,
+  "spirit_name": "Nuliajuk",
+  "symbol": "🧜‍♀️",
+  "title": "La Femme des Mers",
+  "text": "Nuliajuk vit entre deux mondes : celui des eaux profondes et celui des humains. Elle retient les poissons lorsque l’ingratitude s’installe, mais elle les relâche dès qu’un merci sincère traverse le cœur. Ses cheveux flottent dans les courants des rêves. Parfois, ils s’emmêlent dans nos pensées. Alors le sommeil devient lourd, chargé de ce que nous n’avons pas reconnu. La gratitude, comme un peigne invisible, démêle les nœuds de la nuit et rend aux rêves leur fluidité.",
+  "ritual": "Avant de dormir, prends un moment pour remercier silencieusement trois choses de ta journée : une rencontre, un souffle, une couleur. Sens comme ton cœur s’ouvre. Dis doucement : « Merci pour ce jour, que la nuit m’apaise. »",
+  "meaning": "Nuliajuk enseigne la gratitude comme une écologie du cœur. En reconnaissant ce qui nous nourrit, le sommeil devient un espace de paix où les rêves circulent librement.",
+  "quiz": [
+    {
+      "question": "Que fait Nuliajuk lorsque nous oublions la gratitude ?",
+      "options": [
+        "Elle retient les poissons et les rêves",
+        "Elle fait naître des tempêtes",
+        "Elle quitte la mer pour la terre"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Pourquoi la gratitude favorise-t-elle le sommeil ?",
+      "options": [
+        "Parce qu’elle apaise le cœur et libère les pensées",
+        "Parce qu’elle fatigue le corps",
+        "Parce qu’elle attire le vent marin"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que symbolisent les cheveux de Nuliajuk ?",
+      "options": [
+        "Les pensées et émotions à démêler avant le repos",
+        "Les vagues des tempêtes arctiques",
+        "Les liens familiaux entre les pêcheurs"
+      ],
+      "correct": 0
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "step_number": 2,
+  "spirit_name": "Sedna",
+  "symbol": "🌊",
+  "title": "La Mère des Profondeurs",
+  "text": "Sous les glaces bleues, Sedna garde les mémoires du monde aquatique. Elle règne sur les baleines, les phoques et les songes submergés. Quand les humains oublient de remercier la mer, Sedna ferme les eaux et retient les poissons : c’est sa manière de rappeler la gratitude. Elle n’est pas vengeance mais appel. Son royaume est celui des émotions profondes : quand la colère ou la tristesse s’accumulent, elles troublent la mer intérieure. Apaiser Sedna, c’est apaiser ses propres eaux. Le sommeil a besoin de cette mer calme où les rêves remontent à la surface sans heurts.",
+  "ritual": "Avant de t’endormir, imagine une mer calme. Pose une main sur ton ventre et une autre sur ton cœur. Inspire comme une vague qui monte. Expire comme une vague qui redescend. Dis intérieurement : « Je rends à la mer ce qui m’alourdit. » Laisse-toi bercer.",
+  "meaning": "Sedna enseigne que prendre soin de ses émotions, c’est nettoyer la mer du rêve. L’apaisement intérieur prépare un sommeil régénérant, comme une marée douce qui purifie le cœur.",
+  "quiz": [
+    {
+      "question": "Que fait Sedna lorsque les humains oublient la gratitude ?",
+      "options": ["Elle retient les poissons", "Elle déclenche des tempêtes", "Elle disparaît sous la glace"],
+      "correct": 0
+    },
+    {
+      "question": "Pourquoi Sedna est-elle liée au sommeil ?",
+      "options": [
+        "Parce que le calme de la mer reflète la paix intérieure",
+        "Parce qu’elle contrôle les rêves des baleines",
+        "Parce qu’elle empêche les tempêtes de nuit"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que symbolise le geste de peigner les cheveux de Sedna ?",
+      "options": [
+        "Libérer les émotions retenues",
+        "Se couper du monde",
+        "Attirer la pluie"
+      ],
+      "correct": 0
+    }
+  ]
+}

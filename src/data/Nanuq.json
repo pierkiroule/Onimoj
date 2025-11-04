@@ -1,0 +1,34 @@
+{
+  "step_number": 10,
+  "spirit_name": "Nanuq",
+  "symbol": "🐻‍❄️",
+  "title": "L’Ours des Glaces",
+  "text": "Nanuq, maître du Nord, avance lentement dans le froid et la clarté. Il ne combat pas le monde : il l’habite avec patience. Sous sa force, une douceur veille. Nanuq nous enseigne à trouver la solidité tranquille, celle qui permet de s’endormir sans peur. Quand tout semble instable, son calme devient un abri. Dans le rêve, il veille comme une montagne blanche, gardienne du repos profond.",
+  "ritual": "Allonge-toi et sens le poids de ton corps contre le lit. Inspire lentement : dis-toi « Je suis stable comme la glace ». Expire : « Je suis paisible comme la neige ». Répète jusqu’à sentir ton corps s’enfoncer dans la terre froide du sommeil.",
+  "meaning": "Nanuq enseigne la patience confiante : s’endormir, c’est faire confiance à la terre qui nous porte. Le sommeil devient un abri intérieur, solide et tendre à la fois.",
+  "quiz": [
+    {
+      "question": "Quelle qualité Nanuq incarne-t-il ?",
+      "options": ["La patience tranquille", "La vitesse", "La colère protectrice"],
+      "correct": 0
+    },
+    {
+      "question": "Comment son rituel favorise-t-il le sommeil ?",
+      "options": [
+        "En renforçant la sensation d’ancrage et de sécurité",
+        "En stimulant le froid intérieur",
+        "En créant de la tension musculaire"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que symbolise Nanuq pendant les rêves ?",
+      "options": [
+        "Le gardien calme du repos profond",
+        "Le chasseur nocturne",
+        "Le guide des tempêtes"
+      ],
+      "correct": 0
+    }
+  ]
+}

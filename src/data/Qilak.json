@@ -1,0 +1,34 @@
+{
+  "step_number": 3,
+  "spirit_name": "Qilak",
+  "symbol": "🌌",
+  "title": "Le Ciel aux Mille Voix",
+  "text": "Qilak est le vaste manteau du ciel, parsemé de murmures et d’étoiles. Chaque prière, chaque souffle monte jusqu’à lui. Dans le silence nocturne, Qilak écoute les battements du monde. Le ciel n’est pas au-dessus : il nous enveloppe. Rêver sous Qilak, c’est se souvenir que nous sommes entendus. Quand l’esprit se tend, les étoiles se voilent. Quand il s’apaise, elles brillent à nouveau. Apprendre à écouter Qilak, c’est apprendre à écouter le silence en soi avant le sommeil.",
+  "ritual": "Regarde le ciel, ou imagine-le si tu es déjà dans la nuit. Choisis une étoile. Confie-lui une pensée, une peur ou un souhait. Puis respire profondément jusqu’à sentir cette étoile se fondre dans ton souffle. Endors-toi avec ce point de lumière au fond du cœur.",
+  "meaning": "Qilak enseigne l’écoute du silence. Le ciel apaise les pensées dispersées et prépare l’esprit à rêver avec confiance. L’attention silencieuse est une porte du sommeil.",
+  "quiz": [
+    {
+      "question": "Que symbolise Qilak selon le texte ?",
+      "options": ["Le ciel à l’écoute du monde", "La lumière de la glace", "Le souffle du vent"],
+      "correct": 0
+    },
+    {
+      "question": "Comment Qilak aide-t-il à s’endormir ?",
+      "options": [
+        "En apaisant les pensées et en ouvrant le silence intérieur",
+        "En accélérant le rythme du cœur",
+        "En apportant la clarté du jour"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que représente l’étoile du rituel de Qilak ?",
+      "options": [
+        "Un point de paix intérieure",
+        "Une divinité de la mer",
+        "Un feu destructeur"
+      ],
+      "correct": 0
+    }
+  ]
+}

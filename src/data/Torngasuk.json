@@ -1,0 +1,34 @@
+{
+  "step_number": 4,
+  "spirit_name": "Torngasuk",
+  "symbol": "🔥",
+  "title": "Le Feu des Ancêtres",
+  "text": "Torngasuk veille dans la lueur du feu sacré. Sa flamme ne détruit pas ; elle éclaire et réchauffe. Chaque crépitement rappelle la présence des anciens. Dans la nuit, il protège ceux qui veillent et rassure ceux qui dorment. Quand la fatigue devient trop lourde, Torngasuk ranime la petite braise du cœur : cette chaleur intérieure qui soutient la vie. Rêver près du feu, c’est apprendre à transformer ses inquiétudes en lumière douce, comme les flammes qui dansent sans brûler.",
+  "ritual": "Avant de t’endormir, imagine une flamme paisible au centre de ta poitrine. Observe-la grandir légèrement à chaque inspiration, et se stabiliser à chaque expiration. Sens sa chaleur s’étendre dans ton corps. Laisse-la t’envelopper d’un calme tiède.",
+  "meaning": "Torngasuk enseigne que la chaleur bienveillante guérit la fatigue et éclaire le sommeil. En allumant la flamme intérieure avant la nuit, on prépare un rêve clair et réconfortant.",
+  "quiz": [
+    {
+      "question": "Que représente le feu de Torngasuk ?",
+      "options": ["La lumière de la transformation", "Une punition des ancêtres", "Le feu destructeur de la colère"],
+      "correct": 0
+    },
+    {
+      "question": "Comment ce feu soutient-il le sommeil ?",
+      "options": [
+        "Il réchauffe et apaise les émotions avant la nuit",
+        "Il réveille l’énergie pour rester éveillé",
+        "Il consume les rêves agités"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Quel est le symbole du rituel ?",
+      "options": [
+        "La flamme du cœur qui s’apaise au rythme de la respiration",
+        "Le feu du jour qui détruit la nuit",
+        "Une lumière extérieure à contempler"
+      ],
+      "correct": 0
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "step_number": 12,
+  "spirit_name": "Turnngaq",
+  "symbol": "🌀",
+  "title": "L’Esprit du Souvenir",
+  "text": "Turnngaq veille sur la mémoire des êtres et des lieux. Il relie les vivants et les absents, les rêves d’hier et ceux de demain. Quand nous dormons, il murmure des histoires d’ancêtres et de tendresse oubliée. Se souvenir, pour lui, ce n’est pas retenir : c’est reconnaître la continuité du souffle. Ceux qui écoutent Turnngaq se réveillent le cœur plein d’une paix ancienne.",
+  "ritual": "Avant le sommeil, pense à un souvenir doux, une présence aimée. Respire en évoquant ce lien : inspire la chaleur du souvenir, expire en l’offrant au monde. Sens la gratitude se déposer dans ta poitrine.",
+  "meaning": "Turnngaq enseigne la continuité entre mémoire et repos. Se souvenir avec douceur apaise le cœur et favorise un rêve relié à la lignée du vivant.",
+  "quiz": [
+    {
+      "question": "Que protège Turnngaq ?",
+      "options": ["La mémoire du monde et des ancêtres", "Le vent du Nord", "Les secrets de la mer"],
+      "correct": 0
+    },
+    {
+      "question": "Comment son rituel agit-il sur le sommeil ?",
+      "options": [
+        "Il relie le rêve à la gratitude et à la mémoire apaisée",
+        "Il réveille les souvenirs douloureux",
+        "Il coupe les liens affectifs"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Quel message principal porte Turnngaq ?",
+      "options": [
+        "Se souvenir, c’est respirer avec le monde",
+        "Oublier, c’est se protéger du passé",
+        "Dormir, c’est échapper au réel"
+      ],
+      "correct": 0
+    }
+  ]
+}

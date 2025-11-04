@@ -1,0 +1,34 @@
+{
+  "step_number": 8,
+  "spirit_name": "Amaruq",
+  "symbol": "🐺",
+  "title": "Le Loup des Solitudes",
+  "text": "Amaruq marche seul sous la lune, mais jamais séparé du monde. Son cri n’est pas appel, mais offrande. Il apprend à ceux qui doutent d’eux-mêmes que la solitude n’est pas un vide, mais un espace pour s’entendre respirer. Dans le sommeil, Amaruq protège la part sauvage et libre de l’âme. Ses pas silencieux traversent la neige du rêve pour y déposer confiance et courage.",
+  "ritual": "Ferme les yeux et écoute ton souffle comme un léger grondement. Inspire profondément, puis expire en murmurant un son grave et doux. Laisse ce son vibrer dans ta poitrine. Sens la paix de ta propre présence.",
+  "meaning": "Amaruq enseigne la fidélité à soi-même. Trouver le silence intérieur avant de dormir, c’est retrouver la force tranquille du loup qui veille sans crainte.",
+  "quiz": [
+    {
+      "question": "Que symbolise la marche d’Amaruq ?",
+      "options": ["La solitude féconde et confiante", "L’isolement douloureux", "La peur de la nuit"],
+      "correct": 0
+    },
+    {
+      "question": "Comment le rituel aide-t-il au sommeil ?",
+      "options": [
+        "Il installe une vibration apaisante dans le corps",
+        "Il stimule l’adrénaline pour rester éveillé",
+        "Il fait oublier la respiration"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Pourquoi Amaruq est-il un gardien du rêve ?",
+      "options": [
+        "Parce qu’il veille dans le silence intérieur",
+        "Parce qu’il chasse les rêves intrusifs",
+        "Parce qu’il guide les loups endormis"
+      ],
+      "correct": 0
+    }
+  ]
+}

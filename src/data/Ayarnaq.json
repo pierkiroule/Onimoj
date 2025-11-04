@@ -1,0 +1,34 @@
+{
+  "step_number": 11,
+  "spirit_name": "Ayarnaq",
+  "symbol": "🌒",
+  "title": "L’Ombre qui Guérit",
+  "text": "Ayarnaq traverse la nuit sans peur. Ses blessures sont des portes et ses cicatrices, des chemins. Il nous enseigne que l’obscurité n’est pas ennemie du rêve : elle est son berceau. En accueillant ce qui nous effraie, on découvre la lumière cachée dans l’ombre. Le sommeil devient alors une guérison silencieuse où les émotions se métamorphosent en clarté.",
+  "ritual": "Avant de dormir, pense à une difficulté récente. Pose-la dans la paume de ta main imaginaire. Souffle doucement dessus jusqu’à la voir s’adoucir. Laisse-la se transformer en une petite lueur. Endors-toi avec cette lumière au creux de toi.",
+  "meaning": "Ayarnaq enseigne la guérison par l’acceptation. Reconnaître l’ombre en soi libère le rêve et apaise le cœur avant la nuit.",
+  "quiz": [
+    {
+      "question": "Que représente Ayarnaq ?",
+      "options": ["L’ombre transformatrice", "La peur du noir", "L’oubli du passé"],
+      "correct": 0
+    },
+    {
+      "question": "Que fait le rituel proposé ?",
+      "options": [
+        "Il transforme une difficulté en lumière apaisante",
+        "Il efface la mémoire de la journée",
+        "Il attire la fatigue du corps"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Quel lien existe entre l’ombre et le rêve ?",
+      "options": [
+        "Le rêve transforme l’ombre en clarté intérieure",
+        "L’ombre empêche de rêver",
+        "Le rêve renforce les peurs"
+      ],
+      "correct": 0
+    }
+  ]
+}

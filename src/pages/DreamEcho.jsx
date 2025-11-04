@@ -1,293 +1,394 @@
-// src/pages/DreamEcho.jsx
 import { useEffect, useState } from "react"
 import { supabase } from "../supabaseClient"
+import { askNebiusImage } from "../nebiusClient"
 
-// === 🌟 Sous-composant : Mini étoile à 5 branches ===
-function MiniStar({ emoji = "✨", tags = [] }) {
-  const c = 80, R = 55, r = 25
-  const pts = []
-  for (let i = 0; i < 10; i++) {
-    const a = (-90 + i * 36) * (Math.PI / 180)
-    const rad = i % 2 === 0 ? R : r
-    pts.push([c + rad * Math.cos(a), c + rad * Math.sin(a)])
-  }
-  const d = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]},${p[1]}`).join(" ") + " Z"
-
-  return (
-    <svg viewBox="0 0 160 160" width="120" height="120" style={{ flexShrink: 0 }}>
-      <defs>
-        <radialGradient id="grad-star" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(127,255,212,0.4)" />
-          <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
-        </radialGradient>
-      </defs>
-      <path
-        d={d}
-        fill="url(#grad-star)"
-        stroke="#7fffd4"
-        strokeWidth="1.2"
-        style={{ filter: "drop-shadow(0 0 6px rgba(127,255,212,0.4))" }}
-      />
-      <text x="80" y="88" textAnchor="middle" fontSize="28" dominantBaseline="middle">
-        {emoji}
-      </text>
-      {tags.slice(0, 5).map((t, i) => {
-        const a = (-90 + i * 72) * (Math.PI / 180)
-        const x = 80 + Math.cos(a) * 65
-        const y = 80 + Math.sin(a) * 65
-        return (
-          <text
-            key={i}
-            x={x}
-            y={y}
-            textAnchor="middle"
-            fontSize="10"
-            fill="#e9fffd"
-            style={{ textShadow: "0 0 4px rgba(0,0,0,0.7)" }}
-          >
-            {t}
-          </text>
-        )
-      })}
-    </svg>
-  )
-}
-
-// === 🌌 Page principale DreamEcho ===
 export default function DreamEcho({ userId }) {
-  const [stars, setStars] = useState([])
-  const [selected, setSelected] = useState(null)
-  const [contribs, setContribs] = useState([])
-  const [newText, setNewText] = useState("")
-  const [editing, setEditing] = useState(null)
-  const [status, setStatus] = useState("")
+  const [myDreams, setMyDreams] = useState([])
+  const [gifts, setGifts] = useState([])
+  const [activeChat, setActiveChat] = useState(null)
+  const [messages, setMessages] = useState([])
+  const [newMsg, setNewMsg] = useState("")
+  const [previewImg, setPreviewImg] = useState(null)
+  const [infoMsg, setInfoMsg] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  // === Charger la liste personnelle ===
+  // === CHARGEMENT INITIAL ===
   useEffect(() => {
-    if (userId) loadStars()
-  }, [userId])
+    loadMyDreams()
+    loadGifts()
+  }, [])
 
-  async function loadStars() {
+  async function loadMyDreams() {
     const { data, error } = await supabase
       .from("revotheque_reves")
       .select("*")
       .eq("user_id", userId)
-      .order("date", { ascending: false })
-    if (error) return console.error(error)
-    setStars(data || [])
+      .order("date_reve", { ascending: false })
+    if (!error) setMyDreams(data || [])
   }
 
-  // === Charger les contributions ===
-  async function openStar(star) {
-    setSelected(star)
+  async function loadGifts() {
+    const now = new Date().toISOString()
     const { data, error } = await supabase
-      .from("dream_contributions")
+      .from("revo_chats")
       .select("*")
-      .eq("dream_star_id", star.id)
-      .order("created_at", { ascending: true })
-    if (!error) setContribs(data || [])
+      .eq("to_user", userId)
+      .gt("expires_at", now)
+      .order("created_at", { ascending: false })
+    if (!error) setGifts(data || [])
   }
 
-  // === Ajouter ou modifier une contribution ===
-  async function saveContribution() {
-    if (!newText.trim()) return
-    if (editing) {
+  // === GÉNÉRER & OFFRIR UN RÊVE ===
+  async function offerDream(d) {
+    if (d.envol || d.image_url) {
+      alert("🌬️ Ce rêve s’est déjà envolé vers un autre monde.")
+      return
+    }
+
+    const ok = confirm(`🎁 Souhaites-tu vraiment offrir le rêve "${d.titre}" ?`)
+    if (!ok) return
+
+    setLoading(true)
+    setInfoMsg("✨ Génération de la résonance onirique en cours...")
+
+    // 🔮 Génération d'image Nebius
+    const prompt = `${d.emoji || "🌬️"} ${d.titre}. ${d.texte?.slice(0, 200)}. 
+    Style onirique, lumineux, inuit, brume, vent, glace, rêve projectif.`
+    const imageDataUrl = await askNebiusImage(prompt)
+
+    setLoading(false)
+
+    if (!imageDataUrl) {
+      alert("⚠️ Échec de la génération de l’image Nebius.")
+      setInfoMsg("")
+      return
+    }
+
+    // 🌠 Affiche l’image générée dans la modale
+    setPreviewImg({ dataUrl: imageDataUrl, dream: d })
+    setInfoMsg("")
+  }
+
+  // === FERMETURE DE LA MODALE (ENREGISTREMENT + DON) ===
+  async function closePreview(save = true) {
+    if (save && previewImg?.dream) {
+      const d = previewImg.dream
+
+      // 💾 Sauvegarde l’image et marque comme envolé
       await supabase
-        .from("dream_contributions")
-        .update({ text_fragment: newText })
-        .eq("id", editing)
-      setEditing(null)
-    } else {
-      await supabase.from("dream_contributions").insert({
-        dream_star_id: selected.id,
-        contributor_id: userId,
-        text_fragment: newText,
-      })
+        .from("revotheque_reves")
+        .update({ image_url: previewImg.dataUrl, envol: true })
+        .eq("id", d.id)
+
+      // 🎁 Don automatique à un autre utilisateur
+      const { data: users } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .neq("user_id", userId)
+      if (users?.length) {
+        const randomUser = users[Math.floor(Math.random() * users.length)]
+        const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000)
+
+        const { data: chat } = await supabase
+          .from("revo_chats")
+          .insert({
+            from_user: userId,
+            to_user: randomUser.user_id,
+            reve_id: d.id,
+            expires_at: expiresAt,
+          })
+          .select()
+          .single()
+
+        await supabase.from("revo_chat_messages").insert({
+          chat_id: chat.id,
+          sender: userId,
+          content: `💫 Je t’offre mon rêve : "${d.titre}"\n\n${d.texte}`,
+        })
+      }
+
+      setInfoMsg("🌌 Image enregistrée dans ta galerie Kado•° et rêve offert au vent.")
+      loadMyDreams()
     }
-    setNewText("")
-    openStar(selected)
+    setPreviewImg(null)
   }
 
-  // === Supprimer contribution ===
-  async function deleteContribution(id) {
-    if (!confirm("Supprimer cette contribution ?")) return
-    await supabase.from("dream_contributions").delete().eq("id", id)
-    openStar(selected)
+  // === CHAT ===
+  async function openChat(chat) {
+    setActiveChat(chat)
+    const { data } = await supabase
+      .from("revo_chat_messages")
+      .select("*")
+      .eq("chat_id", chat.id)
+      .order("created_at", { ascending: true })
+    setMessages(data || [])
   }
 
-  // === Métamorphose finale ===
-  async function metamorphose() {
-    if (!confirm("✨ Offrir ce rêve au ciel collectif ? (irréversible)")) return
-    const fullText = [selected.texte, ...contribs.map(c => c.text_fragment)].join(" ")
-    setStatus("🌀 Génération poétique en cours...")
-    try {
-      // Appels fictifs IA (à relier plus tard)
-      const aiText = `Texte poétique généré à partir de ${selected.spirit} et des tags ${selected.tags.join(", ")}`
-      const aiImage = "https://placehold.co/600x400/0a0a0a/7fffd4?text=Etoile+Eternelle"
-
-      await supabase.from("dream_scripts_shared").insert({
-        user_a: userId,
-        title: selected.titre,
-        text_generated: aiText,
-        image_url: aiImage,
-        culture: selected.culture,
-        tags: selected.tags,
-        emoji: selected.emoji,
-        resonance_score: 1,
-      })
-
-      await supabase.from("revotheque_reves").delete().eq("id", selected.id)
-      setSelected(null)
-      loadStars()
-      setStatus("🌌 Ton rêve est devenu Étoile Éternelle !")
-    } catch (err) {
-      console.error(err)
-      setStatus("⚠️ Erreur lors de la métamorphose.")
+  async function sendMessage() {
+    if (!newMsg.trim() || !activeChat) return
+    const { error } = await supabase.from("revo_chat_messages").insert({
+      chat_id: activeChat.id,
+      sender: userId,
+      content: newMsg.trim(),
+    })
+    if (!error) {
+      setMessages([
+        ...messages,
+        { chat_id: activeChat.id, sender: userId, content: newMsg.trim() },
+      ])
+      setNewMsg("")
     }
   }
 
-  // === Style global inline ===
-  const pageStyle = {
-    color: "#e9fffd",
-    padding: "1rem",
-    fontFamily: "system-ui, sans-serif",
-    textAlign: "center",
-  }
+  // === RENDU ===
+  return (
+    <div style={{ padding: "1rem", color: "#e9fffd" }}>
+      <h2 style={{ textAlign: "center", color: "#7fffd4" }}>🌌 DonOnirique</h2>
 
-  const cardStyle = {
-    background: "rgba(0,0,0,0.5)",
-    border: "1px solid rgba(127,255,212,0.2)",
-    borderRadius: "14px",
-    padding: "1rem",
-    margin: "1rem auto",
-    maxWidth: "420px",
-    boxShadow: "0 0 12px rgba(127,255,212,0.15)",
-  }
+      {loading && (
+        <p style={{ textAlign: "center", opacity: 0.7 }}>{infoMsg}</p>
+      )}
 
-  const btnStyle = {
-    background: "linear-gradient(135deg,#7fffd4,#b9fff2)",
-    border: "none",
-    borderRadius: "10px",
-    padding: "0.6rem 1.2rem",
-    margin: "0.3rem",
-    cursor: "pointer",
-    color: "#001a14",
-    fontWeight: "600",
-  }
+      {/* 🌕 Mes rêves */}
+      <h3 style={{ marginTop: "1rem", color: "#7fffd4" }}>🌕 Mes Rêves</h3>
 
-  const textareaStyle = {
-    width: "100%",
-    borderRadius: "8px",
-    padding: ".6rem",
-    border: "1px solid rgba(127,255,212,0.4)",
-    background: "rgba(0,0,0,0.4)",
-    color: "#e9fffd",
-    marginTop: ".6rem",
-  }
+      {myDreams.length === 0 && (
+        <p style={{ opacity: 0.6 }}>Aucun rêve pour l’instant.</p>
+      )}
 
-  // === Liste principale ===
-  if (!selected)
-    return (
-      <div style={pageStyle}>
-        <h2>🌙 Rêvothèque personnelle</h2>
-        <p>Explore, ajuste et transmue tes Onimojis avant leur offrande.</p>
-        {stars.map((s) => (
-          <div key={s.id} style={cardStyle}>
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem", justifyContent: "center" }}>
-              <MiniStar emoji={s.emoji} tags={s.tags || []} />
-              <div style={{ textAlign: "left" }}>
-                <h3 style={{ margin: "0", color: "#7fffd4" }}>{s.titre}</h3>
-                <p style={{ opacity: 0.8, margin: 0 }}>
-                  {s.culture} • {s.spirit} • étape {s.step_number}
-                </p>
-                <small>{new Date(s.date).toLocaleString()}</small>
+      <div style={gridContainer}>
+        {myDreams.map((d) => (
+          <div key={d.id} style={cardStyle}>
+            <h4>{d.emoji} {d.titre}</h4>
+
+            {d.image_url ? (
+              <img
+                src={d.image_url}
+                alt="Résonance"
+                style={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  marginBottom: ".4rem",
+                  boxShadow: "0 0 10px rgba(127,255,212,.3)",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  height: "160px",
+                  borderRadius: "8px",
+                  background: "rgba(255,255,255,0.05)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#7fffd4",
+                  fontSize: ".8rem",
+                  opacity: 0.6,
+                }}
+              >
+                Aucune image générée
               </div>
+            )}
+
+            <p style={{ fontSize: ".9rem", opacity: 0.8 }}>
+              {d.texte?.slice(0, 100)}...
+            </p>
+
+            {!d.envol && !d.image_url && (
+              <button onClick={() => offerDream(d)} style={btnPrimary}>
+                🎁 Offrir à un inconnu
+              </button>
+            )}
+
+            {(d.envol || d.image_url) && (
+              <span style={{ fontSize: ".8rem", opacity: 0.6 }}>
+                🌬️ Déjà offert
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* 💫 KadoOniriques reçus */}
+      <h3 style={{ marginTop: "2rem", color: "#7fffd4" }}>💫 KadoOniriques reçus</h3>
+
+      {gifts.length === 0 && (
+        <p style={{ opacity: 0.6 }}>Aucun rêve reçu pour le moment.</p>
+      )}
+
+      {gifts.map((g) => (
+        <div key={g.id} style={cardStyle}>
+          <p style={{ opacity: 0.9 }}>
+            🎁 Rêve offert par {g.from_user.slice(0, 6)}
+          </p>
+          <button onClick={() => openChat(g)} style={btnSecondary}>
+            💭 Ouvrir le chat onirique
+          </button>
+        </div>
+      ))}
+
+      {/* 💬 Chat éphémère */}
+      {activeChat && (
+        <div style={chatOverlay}>
+          <div style={chatBox}>
+            <h3 style={{ color: "#7fffd4" }}>💭 Échange onirique</h3>
+            <div style={chatMessages}>
+              {messages.map((m, i) => (
+                <div
+                  key={i}
+                  style={{
+                    textAlign: m.sender === userId ? "right" : "left",
+                    margin: ".4rem 0",
+                    opacity: 0.9,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-block",
+                      padding: ".4rem .6rem",
+                      borderRadius: "12px",
+                      background:
+                        m.sender === userId
+                          ? "rgba(127,255,212,.2)"
+                          : "rgba(255,255,255,.08)",
+                    }}
+                  >
+                    {m.content}
+                  </span>
+                </div>
+              ))}
             </div>
-            <button style={btnStyle} onClick={() => openStar(s)}>
-              🌕 Ouvrir
+            <textarea
+              value={newMsg}
+              onChange={(e) => setNewMsg(e.target.value)}
+              rows={2}
+              placeholder="Écris ton souffle..."
+              style={textArea}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button onClick={() => setActiveChat(null)} style={btnSecondary}>
+                ✨ Fermer
+              </button>
+              <button onClick={sendMessage} style={btnPrimary}>
+                ➤ Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🌠 Modale image générée */}
+      {previewImg && (
+        <div style={previewOverlay}>
+          <div style={previewBox}>
+            <h3 style={{ color: "#7fffd4" }}>🌬️ Résonance générée</h3>
+            <img
+              src={previewImg.dataUrl}
+              alt="Image onirique"
+              style={{ width: "100%", borderRadius: "12px", margin: "1rem 0" }}
+            />
+            <button onClick={() => closePreview(true)} style={btnPrimary}>
+              ✨ Enregistrer & offrir
             </button>
           </div>
-        ))}
-        <p style={{ opacity: 0.7, marginTop: "1rem" }}>{status}</p>
-      </div>
-    )
+        </div>
+      )}
 
-  // === Détail Onimoji ===
-  return (
-    <div style={pageStyle}>
-      <button
-        onClick={() => setSelected(null)}
-        style={{ ...btnStyle, background: "rgba(127,255,212,0.15)", color: "#7fffd4" }}
-      >
-        ← Retour
-      </button>
-
-      <div style={{ margin: "1rem auto", maxWidth: "480px" }}>
-        <MiniStar emoji={selected.emoji} tags={selected.tags || []} />
-        <h2 style={{ marginTop: "0.5rem" }}>{selected.titre}</h2>
-        <p style={{ opacity: 0.8 }}>
-          {selected.spirit} • étape {selected.step_number} • {selected.culture}
-        </p>
-      </div>
-
-      <div style={cardStyle}>
-        <h3>💬 Contributions</h3>
-        {contribs.length === 0 && <p>Aucune contribution encore.</p>}
-        {contribs.map((c) => (
-          <div
-            key={c.id}
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              margin: ".4rem 0",
-              padding: ".5rem",
-              borderRadius: "8px",
-              textAlign: "left",
-            }}
-          >
-            <p style={{ margin: 0 }}>{c.text_fragment}</p>
-            <div style={{ textAlign: "right", marginTop: ".2rem" }}>
-              <button
-                onClick={() => {
-                  setEditing(c.id)
-                  setNewText(c.text_fragment)
-                }}
-                style={{ ...btnStyle, padding: ".2rem .6rem", fontSize: ".8rem" }}
-              >
-                ✏️
-              </button>
-              <button
-                onClick={() => deleteContribution(c.id)}
-                style={{
-                  ...btnStyle,
-                  padding: ".2rem .6rem",
-                  fontSize: ".8rem",
-                  background: "rgba(255,100,100,0.3)",
-                  color: "#fff",
-                }}
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
-        ))}
-
-        <textarea
-          style={textareaStyle}
-          rows={3}
-          placeholder="Ajoute ou modifie un fragment onirique..."
-          value={newText}
-          onChange={(e) => setNewText(e.target.value)}
-        />
-        <button style={btnStyle} onClick={saveContribution}>
-          {editing ? "💾 Enregistrer la modification" : "➕ Ajouter une contribution"}
-        </button>
-      </div>
-
-      <button style={{ ...btnStyle, marginTop: "1rem" }} onClick={metamorphose}>
-        🌌 Offrir au ciel collectif
-      </button>
-
-      <p style={{ opacity: 0.8, marginTop: "0.6rem" }}>{status}</p>
+      {infoMsg && (
+        <p style={{ marginTop: "1rem", color: "#7fffd4", textAlign: "center" }}>{infoMsg}</p>
+      )}
     </div>
   )
+}
+
+/* === Styles === */
+const gridContainer = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "0.8rem",
+  marginTop: "1rem",
+}
+const cardStyle = {
+  background: "rgba(0,25,35,.5)",
+  border: "1px solid rgba(127,255,212,.3)",
+  borderRadius: "10px",
+  padding: "0.8rem",
+  textAlign: "center",
+}
+const btnPrimary = {
+  border: "none",
+  borderRadius: "8px",
+  padding: ".4rem .8rem",
+  background: "linear-gradient(90deg, #7fffd4, #6a5acd)",
+  color: "#111",
+  fontWeight: "bold",
+  cursor: "pointer",
+  marginTop: ".4rem",
+}
+const btnSecondary = {
+  border: "1px solid rgba(127,255,212,.4)",
+  borderRadius: "8px",
+  padding: ".3rem .8rem",
+  background: "rgba(127,255,212,.1)",
+  color: "#7fffd4",
+  cursor: "pointer",
+  marginTop: ".4rem",
+}
+const chatOverlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: "rgba(0,0,0,0.6)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "1rem",
+  zIndex: 999,
+}
+const chatBox = {
+  background: "rgba(0,20,25,.95)",
+  borderRadius: "12px",
+  padding: "1rem",
+  maxWidth: "420px",
+  width: "100%",
+  color: "#e9fffd",
+}
+const chatMessages = {
+  maxHeight: "280px",
+  overflowY: "auto",
+  marginBottom: ".6rem",
+  padding: ".3rem",
+  background: "rgba(0,0,0,.2)",
+  borderRadius: "8px",
+}
+const textArea = {
+  width: "100%",
+  borderRadius: "10px",
+  padding: ".5rem",
+  border: "1px solid rgba(127,255,212,.3)",
+  background: "rgba(0,30,30,.6)",
+  color: "#e9fffd",
+  resize: "none",
+  marginBottom: ".6rem",
+}
+const previewOverlay = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,0.85)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 9999,
+  animation: "fadeIn 0.5s ease",
+}
+const previewBox = {
+  background: "rgba(10,20,25,0.95)",
+  padding: "1rem",
+  borderRadius: "12px",
+  width: "90%",
+  maxWidth: "420px",
+  textAlign: "center",
+  boxShadow: "0 0 20px rgba(127,255,212,.3)",
 }

@@ -1,19 +1,47 @@
-// src/components/InuitCircle.jsx
+import { useEffect, useState } from "react"
 import { inuitSteps } from "../data/inuitSteps"
 
 export default function InuitCircle({
-  awakenedSteps = [],         // [1,3,...] étapes déjà complétées
-  selectedSpirit = null,      // esprit sélectionné (objet from inuitSteps) ou null
-  onSelect,                   // (spirit) => void
-  onSpiritCall                // () => void  (tirage aléatoire géré par le parent ou ici)
+  awakenedSteps = [],
+  selectedSpirit = null,
+  onSelect,
+  onSpiritCall
 }) {
+  const [particles, setParticles] = useState([])
+
+  // Particules flottantes bleutées
+  useEffect(() => {
+    const newParticles = Array.from({ length: 25 }).map((_, i) => ({
+      id: i,
+      x: Math.random() * 280,
+      y: Math.random() * 280,
+      size: 2 + Math.random() * 3,
+      duration: 4000 + Math.random() * 3000,
+      direction: Math.random() > 0.5 ? 1 : -1
+    }))
+    setParticles(newParticles)
+  }, [])
+
+  // Animation manuelle
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setParticles(p =>
+        p.map(pt => {
+          let y = pt.y + pt.direction * 0.3
+          if (y < 0 || y > 280) pt.direction *= -1
+          return { ...pt, y }
+        })
+      )
+    }, 50)
+    return () => clearInterval(interval)
+  }, [])
+
   const radius = 120
 
   function renderNode(spirit, i) {
     const angle = (i / inuitSteps.length) * 2 * Math.PI
     const x = 140 + radius * Math.cos(angle)
     const y = 140 + radius * Math.sin(angle)
-
     const awakened = awakenedSteps.includes(spirit.step_number)
     const active = selectedSpirit?.step_number === spirit.step_number
 
@@ -30,27 +58,26 @@ export default function InuitCircle({
           width: "42px",
           height: "42px",
           borderRadius: "50%",
-          border: active ? "2px solid #7fffd4" : "1px solid rgba(127,255,212,0.4)",
+          border: active ? "2px solid #66ccff" : "1px solid rgba(100,180,255,0.3)",
           background: active
-            ? "radial-gradient(circle at 50% 50%, rgba(127,255,212,0.25), rgba(0,0,0,0.2))"
+            ? "radial-gradient(circle at 50% 50%, rgba(100,180,255,0.3), rgba(0,0,40,0.3))"
             : "transparent",
-          color: "#e9fffd",
+          color: "#cfeeff",
           cursor: "pointer",
           fontSize: "1.4rem",
-          lineHeight: "42px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          opacity: awakened ? 1 : active ? 0.9 : 0.2, // 👈 endormis à 0.2
+          opacity: awakened ? 1 : active ? 0.8 : 0.25,
           boxShadow: active
-            ? "0 0 10px rgba(127,255,212,0.6)"
+            ? "0 0 14px rgba(100,180,255,0.6)"
             : awakened
-            ? "0 0 4px rgba(127,255,212,0.3)"
+            ? "0 0 6px rgba(100,180,255,0.3)"
             : "none",
-          transition: "all .25s ease"
+          transition: "all .3s ease"
         }}
       >
-        <span aria-hidden="true">{spirit.symbol}</span>
+        {spirit.symbol}
       </button>
     )
   }
@@ -63,14 +90,33 @@ export default function InuitCircle({
         margin: "0 auto",
         position: "relative",
         borderRadius: "50%",
-        background: "radial-gradient(circle at 50% 50%, #06151b, #000)",
-        boxShadow: "0 0 16px rgba(127,255,212,0.25)",
+        background: "radial-gradient(circle at 50% 50%, #0b1c40, #000010)",
+        boxShadow: "0 0 18px rgba(100,180,255,0.4)",
+        overflow: "hidden"
       }}
     >
-      {/* Nœuds */}
+      {/* Particules */}
+      {particles.map(p => (
+        <span
+          key={p.id}
+          style={{
+            position: "absolute",
+            left: `${p.x}px`,
+            top: `${p.y}px`,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            borderRadius: "50%",
+            background: "rgba(150,200,255,0.7)",
+            boxShadow: "0 0 6px rgba(150,200,255,0.8)",
+            opacity: 0.8
+          }}
+        />
+      ))}
+
+      {/* Nœuds des gardiens */}
       {inuitSteps.map(renderNode)}
 
-      {/* Bouton central : SpiritCall = tirer un esprit */}
+      {/* Bouton central */}
       <button
         onClick={onSpiritCall}
         style={{
@@ -82,17 +128,31 @@ export default function InuitCircle({
           height: 120,
           borderRadius: "50%",
           border: "none",
-          background: "radial-gradient(circle at 50% 50%, #7fffd4, #2a6060)",
-          color: "#003333",
-          boxShadow: "0 0 18px rgba(127,255,212,0.45), inset 0 0 10px rgba(0,0,0,0.35)",
+          background: "radial-gradient(circle at 50% 50%, #5aaaff, #002b80)",
+          color: "#e9f4ff",
+          boxShadow:
+            "0 0 22px rgba(100,180,255,0.6), inset 0 0 10px rgba(0,0,40,0.5)",
           cursor: "pointer",
           fontWeight: 700,
-          fontSize: ".92rem"
+          fontSize: ".9rem",
+          transition: "transform .4s ease, box-shadow .4s ease"
         }}
-        title="Tirer un esprit au hasard"
+        title="Sélectionner un gardien au hasard"
+        onMouseEnter={e => {
+          e.currentTarget.style.transform =
+            "translate(-50%, -50%) scale(1.1)"
+          e.currentTarget.style.boxShadow =
+            "0 0 28px rgba(150,200,255,0.9), inset 0 0 10px rgba(0,0,40,0.6)"
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform =
+            "translate(-50%, -50%) scale(1)"
+          e.currentTarget.style.boxShadow =
+            "0 0 22px rgba(100,180,255,0.6), inset 0 0 10px rgba(0,0,40,0.5)"
+        }}
       >
-        🌙 SpiritCall
-        <div style={{ fontSize: ".75rem", opacity: .9 }}>RÊVeille un esprit</div>
+        🌌
+        <div style={{ fontSize: ".75rem", opacity: 0.9 }}>Mon gardien</div>
       </button>
     </div>
   )

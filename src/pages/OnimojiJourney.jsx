@@ -36,14 +36,14 @@ export default function OnimojiJourney({ userId }) {
     console.log("💡 Mission Inuite réinitialisée (local uniquement)")
   }
 
-  // 🌙 ÉTAPE 1 — Sélection d’un esprit
+  // 🌙 ÉTAPE 1 — Sélection d’un gardien
   if (step === 1) {
     return (
       <div
         className="onimoji-step fade-in"
         style={{ textAlign: "center", color: "#e9fffd" }}
       >
-        <h2 style={{ color: "#7fffd4" }}>🌙 Cercle des 12 Esprits</h2>
+        <h2 style={{ color: "#7fffd4" }}>🌙 Cercle des 12 gardiens de la culture Inuite</h2>
 
         <InuitCircle
           awakenedSteps={awakened}
@@ -122,56 +122,57 @@ export default function OnimojiJourney({ userId }) {
               </div>
             )}
 
-            {/* ❓ Quiz */}
-            {selectedSpirit.quiz && (
-              <div
-                style={{
-                  marginTop: "0.5rem",
-                  textAlign: "left",
-                  background: "rgba(127,255,212,0.05)",
-                  borderRadius: "8px",
-                  padding: "0.8rem",
-                  maxWidth: "320px",
-                  marginInline: "auto",
-                }}
-              >
-                <p
-                  style={{
-                    fontWeight: "bold",
-                    color: "#7fffd4",
-                    marginBottom: "0.4rem",
-                  }}
-                >
-                  ❓ {selectedSpirit.quiz.question}
-                </p>
-                {selectedSpirit.quiz.options.map((opt, i) => (
-                  <button
-                    key={i}
-                    onClick={() =>
-                      setQuizPassed(
-                        i === selectedSpirit.quiz.correct
-                          ? (alert("✅ Bonne réponse !"), true)
-                          : (alert("❌ Essaie encore..."), false)
-                      )
-                    }
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      marginBottom: "0.4rem",
-                      background: "rgba(127,255,212,0.1)",
-                      border: "1px solid #7fffd4",
-                      borderRadius: "6px",
-                      padding: "0.4rem",
-                      color: "#e9fffd",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
+{/* ❓ Quiz (plusieurs questions) */}
+{Array.isArray(selectedSpirit.quiz) && (
+  <div
+    style={{
+      marginTop: "0.5rem",
+      textAlign: "left",
+      background: "rgba(127,255,212,0.05)",
+      borderRadius: "8px",
+      padding: "0.8rem",
+      maxWidth: "320px",
+      marginInline: "auto",
+    }}
+  >
+    <h4 style={{ color: "#7fffd4", marginBottom: "0.6rem" }}>❓ Quiz</h4>
+
+    {selectedSpirit.quiz.map((q, qi) => (
+      <div key={qi} style={{ marginBottom: "1rem" }}>
+        <p style={{ fontWeight: "bold", color: "#aefcf5", marginBottom: "0.3rem" }}>
+          {qi + 1}. {q.question}
+        </p>
+
+        {q.options.map((opt, i) => (
+          <button
+            key={i}
+            onClick={() =>
+              setQuizPassed(
+                i === q.correct
+                  ? (alert("✅ Bonne réponse !"), true)
+                  : (alert("❌ Essaie encore..."), false)
+              )
+            }
+            style={{
+              display: "block",
+              width: "100%",
+              marginBottom: "0.4rem",
+              background: "rgba(127,255,212,0.1)",
+              border: "1px solid #7fffd4",
+              borderRadius: "6px",
+              padding: "0.4rem",
+              color: "#e9fffd",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    ))}
+  </div>
+)}
 
             {/* 🔘 Continuer seulement si quiz réussi */}
             <button

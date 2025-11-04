@@ -1,0 +1,34 @@
+{
+  "step_number": 7,
+  "spirit_name": "Qajaq",
+  "symbol": "🛶",
+  "title": "L’Équilibre sur l’Eau",
+  "text": "Qajaq, le kayak, glisse entre la surface et la profondeur. Il garde son équilibre non par la rigidité, mais par l’écoute des vagues. Il nous rappelle que le sommeil vient lorsque nous cessons de lutter. Flotter, c’est faire confiance à l’eau. Ceux qui acceptent le mouvement de la vie dorment comme Qajaq avance : stables au cœur du flux. Dans le rêve, cette fluidité devient voyage, passage sans effort d’un monde à l’autre.",
+  "ritual": "Assieds-toi ou allonge-toi et imagine ton corps comme un kayak sur une eau calme. À chaque inspiration, sens-toi soulevé par une petite vague. À chaque expiration, redescends lentement. Laisse ce balancement t’endormir.",
+  "meaning": "Qajaq enseigne l’équilibre vivant : trouver la stabilité dans le mouvement. Se laisser porter favorise un sommeil fluide et des rêves sans tension.",
+  "quiz": [
+    {
+      "question": "Comment Qajaq trouve-t-il l’équilibre ?",
+      "options": ["En suivant le mouvement de l’eau", "En restant immobile et rigide", "En luttant contre les vagues"],
+      "correct": 0
+    },
+    {
+      "question": "Que symbolise Qajaq pour le sommeil ?",
+      "options": [
+        "La confiance et la détente qui précèdent le rêve",
+        "Le contrôle des pensées avant de dormir",
+        "Le mouvement incessant de l’insomnie"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que fait le rituel proposé ?",
+      "options": [
+        "Il berce le corps et l’esprit comme une embarcation",
+        "Il accélère le souffle pour réchauffer",
+        "Il coupe le lien avec les émotions"
+      ],
+      "correct": 0
+    }
+  ]
+}

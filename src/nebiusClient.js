@@ -1,25 +1,25 @@
 // src/nebiusClient.js
-// ⚡ Client universel Nebius Studio Chat (complet + filtrage poétique inuit)
+// ⚡ Client universel Nebius Studio : texte + image onirique
+// Compatible mobile / cache local / prompts poétiques inuit
 
-const API_URL =
+const API_CHAT_URL =
   import.meta.env.VITE_NEBIUS_API_URL ||
   "https://api.studio.nebius.com/v1/chat/completions"
+
+const API_IMAGE_URL = "https://api.studio.nebius.com/v1/images/generations"
 
 const API_KEY =
   import.meta.env.VITE_NEBIUS_API_KEY || import.meta.env.VITE_NEBIUS_KEY
 
 /**
- * Fonction principale : demande à Nebius une réponse textuelle.
- * @param {string} prompt - message utilisateur
- * @param {object} options :
- *    - model : modèle Nebius (défaut : google/gemma-2-9b-it-fast)
- *    - systemPrompt : instructions système
- *    - temperature : créativité
- *    - stream : true → active l’affichage progressif
- *    - onToken : callback(token) → reçoit chaque fragment
- * @returns {Promise<string>} - texte complet généré et nettoyé
+ * 🧠 Fonction principale : génération textuelle poétique
  */
 export async function askNebius(prompt, options = {}) {
+  if (!API_KEY) {
+    console.error("⛔ Clé API Nebius absente. Définis VITE_NEBIUS_API_KEY.")
+    return ""
+  }
+
   const body = {
     model: options.model || "google/gemma-2-9b-it-fast",
     messages: [
@@ -27,13 +27,10 @@ export async function askNebius(prompt, options = {}) {
         role: "system",
         content:
           options.systemPrompt ||
-          "Tu es un conteur du Grand Nord. Raconte des rêves courts, sensoriels et poétiques en français, inspirés de la tradition inuit. Utilise des mots simples et évite toute invention lexicale mais utilise des metaphores inuites.",
+          "Tu es un conteur du Grand Nord. Raconte des rêves courts, sensoriels et poétiques en français, inspirés de la tradition inuit. Utilise des mots simples, des images naturelles et évite les inventions lexicales.",
       },
       ...(Array.isArray(options.examples) ? options.examples : []),
-      {
-        role: "user",
-        content: [{ type: "text", text: prompt }],
-      },
+      { role: "user", content: [{ type: "text", text: prompt }] },
     ],
     temperature: options.temperature ?? 0.8,
     stream: options.stream ?? false,
@@ -41,12 +38,7 @@ export async function askNebius(prompt, options = {}) {
   }
 
   try {
-    if (!API_KEY) {
-      console.error("⛔ Clé API Nebius absente. Définis VITE_NEBIUS_API_KEY.")
-      return ""
-    }
-
-    const res = await fetch(API_URL, {
+    const res = await fetch(API_CHAT_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${API_KEY}`,
@@ -62,6 +54,7 @@ export async function askNebius(prompt, options = {}) {
       return ""
     }
 
+    // 🌀 Mode streaming
     if (options.stream) {
       const reader = res.body.getReader()
       const decoder = new TextDecoder("utf-8")
@@ -79,12 +72,12 @@ export async function askNebius(prompt, options = {}) {
       return cleanDreamText(fullText.trim())
     }
 
+    // ✨ Réponse simple
     const data = await res.json()
     const raw =
       data.choices?.[0]?.message?.content?.[0]?.text?.trim() ||
       data.choices?.[0]?.message?.content?.trim() ||
       ""
-
     return cleanDreamText(raw)
   } catch (err) {
     console.error("⚠️ Erreur connexion Nebius:", err)
@@ -93,7 +86,7 @@ export async function askNebius(prompt, options = {}) {
 }
 
 /**
- * Extraction des tokens texte depuis le flux SSE
+ * 🔤 Extraction des tokens texte depuis le flux SSE
  */
 function extractTokens(chunk) {
   const tokens = []
@@ -110,9 +103,6 @@ function extractTokens(chunk) {
 
 /**
  * 🌬️ Nettoyage poétique frugal
- * - remplace les mots inventés ou absurdes
- * - supprime caractères illisibles
- * - conserve le style poétique
  */
 function cleanDreamText(text) {
   if (!text) return ""
@@ -122,4 +112,70 @@ function cleanDreamText(text) {
     .replace(/[^\p{L}\p{M}\p{P}\p{Zs}\n]/gu, "")
     .replace(/\s{2,}/g, " ")
     .trim()
+}
+
+/**
+ * 🖼️ Génération d'image onirique (mobile + cache local)
+ */
+export async function askNebiusImage(prompt) {
+  if (!API_KEY) {
+    console.error("❌ Clé Nebius manquante : VITE_NEBIUS_API_KEY")
+    alert("⚠️ Clé Nebius absente : ajoute-la dans ton fichier .env")
+    return null
+  }
+
+  // 🌙 Vérifie si l'image existe déjà dans le cache
+  const cacheKey = `nebius_${btoa(unescape(encodeURIComponent(prompt))).slice(0, 100)}`
+  const cached = localStorage.getItem(cacheKey)
+  if (cached) {
+    console.log("🌀 Image chargée depuis le cache Nebius")
+    return cached
+  }
+
+  try {
+    console.log("✨ Appel Nebius pour :", prompt)
+
+    const response = await fetch(API_IMAGE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "black-forest-labs/flux-schnell",
+        prompt,
+        size: "512x512",
+      }),
+    })
+
+    if (!response.ok) throw new Error(`Erreur Nebius: ${response.statusText}`)
+
+    const result = await response.json()
+    console.log("🧠 Réponse Nebius brute :", result)
+
+    const base64 = result.data?.[0]?.b64_json
+    const url = result.data?.[0]?.url
+
+    // 🧩 Cas 1 : base64
+    if (base64) {
+      const dataUrl = `data:image/png;base64,${base64}`
+      localStorage.setItem(cacheKey, dataUrl)
+      console.log("🌌 Image (base64) générée et mise en cache.")
+      return dataUrl
+    }
+
+    // 🧩 Cas 2 : URL distante
+    if (url) {
+      localStorage.setItem(cacheKey, url)
+      console.log("🌌 Image (URL) générée et mise en cache.")
+      return url
+    }
+
+    // 🚫 Cas d'erreur
+    throw new Error("Réponse Nebius vide (ni b64_json ni url).")
+  } catch (err) {
+    console.error("⚠️ Erreur Nebius Studio:", err)
+    return null
+  }
 }

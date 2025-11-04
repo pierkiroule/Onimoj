@@ -72,7 +72,7 @@ export default function HorizonSelect({ onChoose }) {
           position: "relative",
         }}
       >
-        Chaque horizon ouvre un voyage de 12 défis-doux vers un monde onirique.
+        Chaque horizon ouvre à la rencontre de 12 gardiens des mondes oniriques.
       </p>
 
       <div

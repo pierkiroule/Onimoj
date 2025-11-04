@@ -1,18 +1,23 @@
 // 🌬️ Banque bilingue cohérente — 12 esprits du Grand Nord
 export const inuitWordBanksBySlug = {
   sila: [
-    { fr: "Souffle", iu: "Sila" },
-    { fr: "Vent", iu: "Anuri" },
-    { fr: "Ciel", iu: "Qilak" },
-    { fr: "Silence", iu: "Sila" },
-    { fr: "Équilibre", iu: "Silatuniq" },
-    { fr: "Brume", iu: "Aput" },
-    { fr: "Horizon", iu: "Avinngaq" },
-    { fr: "Respiration", iu: "Anirniq" },
-    { fr: "Conscience", iu: "Qaujimajuk" },
-    { fr: "Paix", iu: "Saimarik" }
-  ],
-
+  { fr: "Souffle", iu: "Sila" },
+  { fr: "Vent", iu: "Anuri" },
+  { fr: "Ciel", iu: "Qilak" },
+  { fr: "Silence", iu: "Sila" },
+  { fr: "Équilibre", iu: "Silatuniq" },
+  { fr: "Brume", iu: "Aput" },
+  { fr: "Horizon", iu: "Avinngaq" },
+  { fr: "Respiration", iu: "Anirniq" },
+  { fr: "Conscience", iu: "Qaujimajuk" },
+  { fr: "Paix", iu: "Saimarik" },
+  // 🌬️ 5 nouveaux mots
+  { fr: "Vibration", iu: "Anuraaq" },
+  { fr: "Légèreté", iu: "Aniu" },
+  { fr: "Présence", iu: "Qaujisarniq" },
+  { fr: "Inspiration", iu: "Anirniq" },
+  { fr: "Union", iu: "Suli" }
+],
   sedna: [
     { fr: "Mer", iu: "Imaq" },
     { fr: "Profondeur", iu: "Imarsuaq" },

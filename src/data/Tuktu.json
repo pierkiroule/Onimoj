@@ -1,0 +1,34 @@
+{
+  "step_number": 6,
+  "spirit_name": "Tuktu",
+  "symbol": "🦌",
+  "title": "Le Caribou Nomade",
+  "text": "Tuktu marche avec la neige et connaît le repos autant que la marche. Il avance lentement, sans forcer, suivant le rythme de la Terre. Dans le rêve, il nous apprend à voyager sans fuir : chaque étape du chemin devient une respiration. La régularité du pas de Tuktu est semblable au battement du cœur : stable, paisible, régénérant. Ceux qui dorment avec ce rythme s’endorment plus vite et rêvent plus clair, car leur souffle et leur esprit marchent ensemble.",
+  "ritual": "Allonge-toi. Imagine que tu marches dans une neige légère. Chaque inspiration correspond à un pas en avant, chaque expiration à un pas de repos. Continue jusqu’à sentir ton souffle se fondre dans le silence blanc.",
+  "meaning": "Tuktu enseigne la marche intérieure : avancer doucement vers le repos, sans tension. L’équilibre du mouvement et du calme favorise un sommeil profond et réparateur.",
+  "quiz": [
+    {
+      "question": "Que symbolise la marche de Tuktu ?",
+      "options": ["Le rythme naturel du corps et du rêve", "La fuite devant la fatigue", "Une course contre le temps"],
+      "correct": 0
+    },
+    {
+      "question": "Quel lien relie Tuktu au sommeil ?",
+      "options": [
+        "La lenteur et la régularité qui apaisent l’esprit",
+        "La course rapide qui épuise le corps",
+        "Le bruit du vent qui empêche de dormir"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Que fait l’exercice du rituel ?",
+      "options": [
+        "Il synchronise le souffle et le mouvement intérieur",
+        "Il accélère la respiration",
+        "Il réveille les tensions musculaires"
+      ],
+      "correct": 0
+    }
+  ]
+}

@@ -87,6 +87,12 @@ export default function App() {
     setPage("home")
   }
 
+  function disableDreamLock() {
+    localStorage.removeItem("lastDreamTime")
+    localStorage.removeItem("dreamLock")
+    setDreamLock(false)
+  }
+
   // 🧭 Routage principal
   const renderPage = () => {
     switch (page) {
@@ -123,6 +129,7 @@ export default function App() {
           <Profil
             user={session?.user}
             onLogout={handleLogout}
+            onDisableTimer={disableDreamLock}
             onNavigate={setPage}
           />
         )

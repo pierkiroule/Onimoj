@@ -17,6 +17,7 @@
     "@tiptap/extension-youtube": "^3.8.0",
     "@tiptap/react": "^3.8.0",
     "@tiptap/starter-kit": "^3.8.0",
+    "core-js": "^3.46.0",
     "d3": "^7.9.0",
     "d3-force": "^3.0.0",
     "d3-path": "^3.1.0",

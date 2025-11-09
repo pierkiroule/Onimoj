@@ -155,7 +155,7 @@ Pas de liste, pas d’injonction. Une seule strophe fluide.
             {selectedSpirit.spirit_name === "Sila" && (
               <div style={{ marginTop: "1rem" }}>
                 <video
-                  src="/assets/video/Sil.mp4"
+                  src="/video/Sil.mp4"
                   autoPlay
                   muted
                   loop

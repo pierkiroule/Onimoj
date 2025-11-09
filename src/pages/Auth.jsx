@@ -1,130 +1,198 @@
-import { useState } from 'react'
-import { supabase } from '../supabaseClient'
-import '../App.css'
+import { useState } from "react"
+import { supabase } from "../supabaseClient"
+import "../App.css"
+import "./Home.css"
 
 export default function Auth({ onAuth }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [mode, setMode] = useState('signin') // signin | signup | reset
-  const [status, setStatus] = useState('')
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [mode, setMode] = useState("signin") // signin | signup | reset
+  const [status, setStatus] = useState("")
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setStatus('⏳ Connexion au cosmos...')
+    setLoading(true)
+    setStatus("⏳ Connexion au champ des rêves...")
 
     try {
       let result
 
-      if (mode === 'signup') {
+      if (mode === "signup") {
         result = await supabase.auth.signUp({ email, password })
-      } else if (mode === 'signin') {
+        if (result.error) throw result.error
+
+        // ✨ Crée un profil onirique
+        const user = result.data.user
+        if (user) {
+          const emojis = ["🌙", "🪶", "❄️", "🔥", "🌿", "💧", "🪞"]
+          const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
+          await supabase.from("profiles").insert({
+            user_id: user.id,
+            email,
+            username: email.split("@")[0],
+            emoji: randomEmoji,
+            culture: "Inuite",
+          })
+        }
+
+        setStatus("✅ Compte créé ! Vérifie ton e-mail pour activer ton voyage.")
+      } else if (mode === "signin") {
         result = await supabase.auth.signInWithPassword({ email, password })
-      } else if (mode === 'reset') {
+        if (result.error) throw result.error
+        setStatus("🌕 Connecté au Réso•° des rêves.")
+        onAuth(result.data.session)
+      } else if (mode === "reset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email)
         if (error) throw error
-        setStatus('📩 Lien de réinitialisation envoyé à ton adresse e-mail.')
+        setStatus("📩 Lien de réinitialisation envoyé à ton adresse onirique.")
         return
       }
-
-      if (result.error) throw result.error
-
-      // ✅ Connexion réussie
-      setStatus('✅ Connecté au champ de rêves !')
-      onAuth(result.data.session)
-
     } catch (err) {
-      setStatus('❌ ' + err.message)
+      setStatus("❌ " + err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // 🌙 Titre dynamique
   const titles = {
-    signin: '🌙 Connecte-toi à ton espace onirique',
-    signup: '✨ Crée ton compte onirique',
-    reset: '🔑 Réinitialise ton mot de passe',
+    signin: "🌙 Connecte-toi à ton espace onirique",
+    signup: "✨ Crée ton compte de rêveur",
+    reset: "🔑 Réinitialise ton mot de passe",
   }
 
   return (
-    <div className="fade-in" style={{ textAlign: 'center', color: '#eee', padding: '1.5rem' }}>
-      <h3>{titles[mode]}</h3>
+    <div
+      className="fade-in"
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+        background: "radial-gradient(circle at 50% 30%, rgba(8,18,26,0.95), rgba(0,0,0,0.9))",
+        color: "#e9fffd",
+        padding: "1.5rem",
+      }}
+    >
+      <div
+        style={{
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(8px)",
+          borderRadius: "16px",
+          padding: "2rem",
+          boxShadow: "0 0 20px rgba(140,170,255,0.15)",
+          width: "90%",
+          maxWidth: "400px",
+        }}
+      >
+        <h2 style={{ color: "#7fffd4", marginBottom: "0.5rem" }}>{titles[mode]}</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
-        <input
-          type="email"
-          placeholder="Email onirique..."
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{
-            padding: '0.6rem',
-            margin: '0.3rem',
-            borderRadius: '8px',
-            width: '80%',
-            border: 'none',
-          }}
-        />
-
-        {mode !== 'reset' && (
+        <form onSubmit={handleSubmit}>
           <input
-            type="password"
-            placeholder="Mot de passe secret..."
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="email"
+            placeholder="Adresse onirique..."
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
-            style={{
-              padding: '0.6rem',
-              margin: '0.3rem',
-              borderRadius: '8px',
-              width: '80%',
-              border: 'none',
-            }}
+            style={inputStyle}
           />
-        )}
 
-        <button
-          type="submit"
-          className="dream-button"
-          style={{
-            marginTop: '0.8rem',
-            background: '#6eff8d',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0.6rem 1.2rem',
-          }}
-        >
-          {mode === 'signup'
-            ? 'Créer un compte'
-            : mode === 'signin'
-            ? 'Connexion'
-            : 'Envoyer le lien'}
-        </button>
-      </form>
+          {mode !== "reset" && (
+            <input
+              type="password"
+              placeholder="Mot de passe secret..."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={inputStyle}
+            />
+          )}
 
-      {/* 🔁 Changement de mode */}
-      <div style={{ marginTop: '1rem', opacity: 0.8 }}>
-        {mode === 'signup' && (
-          <p onClick={() => setMode('signin')} style={{ cursor: 'pointer' }}>
-            🌀 Déjà inscrit ? Connecte-toi
-          </p>
-        )}
-        {mode === 'signin' && (
-          <>
-            <p onClick={() => setMode('signup')} style={{ cursor: 'pointer' }}>
-              🌱 Nouveau voyageur ? Crée ton compte
+          <button
+            type="submit"
+            disabled={loading}
+            className="dream-button"
+            style={{
+              background: loading ? "rgba(127,255,212,0.4)" : "linear-gradient(90deg,#7fffd4,#6a5acd)",
+              border: "none",
+              borderRadius: "10px",
+              padding: "0.7rem 1.5rem",
+              fontWeight: "bold",
+              color: "#0b0b1a",
+              cursor: "pointer",
+              marginTop: "1rem",
+              boxShadow: "0 0 12px rgba(127,255,212,0.4)",
+            }}
+          >
+            {loading
+              ? "…"
+              : mode === "signup"
+              ? "Créer le compte"
+              : mode === "signin"
+              ? "Connexion"
+              : "Envoyer le lien"}
+          </button>
+        </form>
+
+        <div style={{ marginTop: "1rem", opacity: 0.8 }}>
+          {mode === "signup" && (
+            <p onClick={() => setMode("signin")} style={linkStyle}>
+              🌀 Déjà membre du Réso•° ? Connecte-toi
             </p>
-            <p onClick={() => setMode('reset')} style={{ cursor: 'pointer', fontSize: '0.9rem', opacity: 0.6 }}>
-              🔑 Mot de passe oublié ?
+          )}
+          {mode === "signin" && (
+            <>
+              <p onClick={() => setMode("signup")} style={linkStyle}>
+                🌱 Nouveau rêveur ? Crée ton compte
+              </p>
+              <p onClick={() => setMode("reset")} style={{ ...linkStyle, fontSize: ".9rem", opacity: 0.6 }}>
+                🔑 Mot de passe oublié ?
+              </p>
+            </>
+          )}
+          {mode === "reset" && (
+            <p onClick={() => setMode("signin")} style={linkStyle}>
+              🌙 Retour à la connexion
             </p>
-          </>
-        )}
-        {mode === 'reset' && (
-          <p onClick={() => setMode('signin')} style={{ cursor: 'pointer' }}>
-            🌙 Retour à la connexion
+          )}
+        </div>
+
+        {status && (
+          <p
+            style={{
+              fontSize: "0.9rem",
+              marginTop: "0.8rem",
+              opacity: 0.8,
+              color: status.startsWith("❌") ? "#ff6b6b" : "#aefcf5",
+              minHeight: "1.2rem",
+            }}
+          >
+            {status}
           </p>
         )}
       </div>
-
-      <p style={{ fontSize: '0.9rem', marginTop: '0.8rem', opacity: 0.7 }}>{status}</p>
     </div>
   )
+}
+
+/* === Styles === */
+const inputStyle = {
+  padding: "0.6rem",
+  margin: "0.4rem auto",
+  borderRadius: "8px",
+  width: "85%",
+  border: "1px solid rgba(127,255,212,0.4)",
+  background: "rgba(0,25,35,0.6)",
+  color: "#e9fffd",
+  outline: "none",
+  fontSize: "1rem",
+  transition: "0.3s",
+}
+
+const linkStyle = {
+  cursor: "pointer",
+  color: "#7fffd4",
+  transition: "0.2s",
 }

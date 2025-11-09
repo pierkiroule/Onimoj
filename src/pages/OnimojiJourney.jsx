@@ -1,5 +1,4 @@
-// src/pages/OnimojiJourney.jsx
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { inuitSteps } from "../data/inuitSteps"
 import InuitCircle from "../components/InuitCircle"
 import HublotResonant from "../components/HublotResonant"
@@ -13,7 +12,6 @@ export default function OnimojiJourney({ userId }) {
   const [selectedSpirit, setSelectedSpirit] = useState(null)
   const [awakened, setAwakened] = useState([])
   const [quizPassed, setQuizPassed] = useState(false)
-
   const [tags, setTags] = useState([])
   const [title, setTitle] = useState("")
   const [text, setText] = useState("")
@@ -21,21 +19,46 @@ export default function OnimojiJourney({ userId }) {
   const [genLoading, setGenLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
 
+  // 🌙 Timer 12h
+  const [remaining, setRemaining] = useState(0)
+  const DELAY = 12 * 60 * 60 * 1000
+
+  useEffect(() => {
+    const last = parseInt(localStorage.getItem("lastDreamTime") || "0")
+    const diff = DELAY - (Date.now() - last)
+    if (diff > 0) setRemaining(diff)
+  }, [])
+
+  useEffect(() => {
+    if (!remaining) return
+    const t = setInterval(() => setRemaining(r => (r > 1000 ? r - 1000 : 0)), 1000)
+    return () => clearInterval(t)
+  }, [remaining])
+
+  function format(ms) {
+    const s = Math.floor(ms / 1000)
+    const h = String(Math.floor(s / 3600)).padStart(2, "0")
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0")
+    const sec = String(s % 60).padStart(2, "0")
+    return `${h}:${m}:${sec}`
+  }
+
   const isDev =
     import.meta.env.MODE === "development" ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
+    ["localhost", "127.0.0.1"].includes(window.location.hostname)
 
+  // === Sélection du gardien ===
   function handleSpiritCall() {
-    const all = inuitSteps.map((s) => s.step_number)
-    const remaining = all.filter((n) => !awakened.includes(n))
-    const pool = remaining.length ? remaining : all
+    const all = inuitSteps.map(s => s.step_number)
+    const remainingSteps = all.filter(n => !awakened.includes(n))
+    const pool = remainingSteps.length ? remainingSteps : all
     const pickNum = pool[Math.floor(Math.random() * pool.length)]
-    const pick = inuitSteps.find((s) => s.step_number === pickNum)
+    const pick = inuitSteps.find(s => s.step_number === pickNum)
     setSelectedSpirit(pick)
     setQuizPassed(false)
   }
 
+  // === Réinitialisation ===
   function handleResetMission() {
     if (!confirm("Réinitialiser toute la mission Inuite ?")) return
     setAwakened([])
@@ -48,6 +71,7 @@ export default function OnimojiJourney({ userId }) {
     setStep(1)
   }
 
+  // === Génération texte IA ===
   async function generateText() {
     if (!selectedSpirit) return
     setGenLoading(true)
@@ -70,66 +94,104 @@ Pas de liste, pas d’injonction. Une seule strophe fluide.
     }
   }
 
+  // === Génération image IA ===
   async function generateImage() {
     if (!selectedSpirit) return
     setGenLoading(true)
     try {
-      const cue = tags?.length ? tags.join(", ") : "aurora, ice, inuit,  landscape, dream, awa"
-      const imgPrompt = `${selectedSpirit.spirit_name}, inuit proective abstract dream atmosphere, ${cue}, soft light, aurora borealis, ethereal`
+      const cue = tags?.length ? tags.join(", ") : "aurora, ice, inuit, dream, landscape"
+      const imgPrompt = `${selectedSpirit.spirit_name}, inuit dream guardian, ${cue}, aurora borealis, ethereal`
       const url = await askNebiusImage(imgPrompt)
       setImageUrl(url || "")
     } catch {
-      alert("⚠️ Échec génération de l’image.")
+      alert("⚠️ Échec génération image.")
     } finally {
       setGenLoading(false)
     }
   }
 
+  // === Sauvegarde Supabase + blocage 12h ===
   async function handleSave() {
-  if (!userId) return alert("Connecte-toi d’abord pour sauvegarder 🌙")
-  if (!selectedSpirit) return
-  if (!title.trim()) return alert("Ajoute un titre à ton rêve.")
-  if (!text.trim()) return alert("Génère ou écris un texte avant de sauvegarder.")
+    if (!userId) return alert("Connecte-toi d’abord 🌙")
+    if (!selectedSpirit) return
+    if (!title.trim()) return alert("Ajoute un titre à ton rêve.")
+    if (!text.trim()) return alert("Génère ou écris un texte avant de sauvegarder.")
 
-  setSaveLoading(true)
-  try {
-    const guardianUuid = selectedSpirit.guardian_id || selectedSpirit.id || "715dcb42-7a69-4b46-ac7f-95feb051754f"
+    setSaveLoading(true)
+    try {
+      const guardianUuid =
+        selectedSpirit.guardian_id || selectedSpirit.id || "715dcb42-7a69-4b46-ac7f-95feb051754f"
 
-    const { data, error } = await supabase.from("dreams").insert([
-      {
-        user_id: userId,
-        guardian_id: guardianUuid,
-        titre: title.trim(),
-        contenu: text.trim(),
-        tags,
-        image_url: imageUrl || null,
-        visible: false, // 🔒 privé par défaut
-        vitality: 1,
-        source_guardians: [guardianUuid],
-      },
-    ]).select()
+      const { error } = await supabase.from("dreams").insert([
+        {
+          user_id: userId,
+          guardian_id: guardianUuid,
+          titre: title.trim(),
+          contenu: text.trim(),
+          tags,
+          image_url: imageUrl || null,
+          visible: false,
+          vitality: 1,
+          source_guardians: [guardianUuid],
+        },
+      ])
+      if (error) throw error
 
-    if (error) throw error
-    if (data?.length) alert("💾 Rêve sauvegardé dans ta Rêvothèque (privé).")
+      // 🌕 Blocage local
+      const now = Date.now()
+      localStorage.setItem("lastDreamTime", now.toString())
+      setRemaining(DELAY)
 
-    setAwakened(prev => [...new Set([...prev, selectedSpirit.step_number])])
-    setSelectedSpirit(null)
-    setTags([])
-    setTitle("")
-    setText("")
-    setImageUrl("")
-    setQuizPassed(false)
-    setStep(1)
-  } catch (e) {
-    console.error("Erreur sauvegarde rêve :", e)
-    alert("❌ Sauvegarde impossible.")
-  } finally {
-    setSaveLoading(false)
+      alert("💾 Rêve sauvegardé ! Reviens dans 12 h pour ton prochain gardien 🌕")
+      setAwakened(prev => [...new Set([...prev, selectedSpirit.step_number])])
+      setSelectedSpirit(null)
+      setTags([])
+      setTitle("")
+      setText("")
+      setImageUrl("")
+      setQuizPassed(false)
+      setStep(1)
+    } catch (e) {
+      console.error("Erreur sauvegarde rêve :", e)
+      alert("❌ Sauvegarde impossible.")
+    } finally {
+      setSaveLoading(false)
+    }
   }
-}
 
   // ————— ÉTAPE 1 : CERCLE DES GARDIENS —————
   if (step === 1) {
+    if (remaining > 0) {
+      const progress = ((DELAY - remaining) / DELAY) * 100
+      return (
+        <div className="fade-in" style={{ textAlign: "center", color: "#e9fffd", padding: "2rem" }}>
+          <h2 style={{ color: "#7fffd4" }}>🌕 Le rêve dort encore…</h2>
+          <p>Le prochain gardien te contactera dans :</p>
+          <h3 style={{ color: "#aefcf5" }}>{format(remaining)}</h3>
+          <div
+            style={{
+              width: "80%",
+              height: "12px",
+              borderRadius: "8px",
+              background: "rgba(255,255,255,0.1)",
+              margin: "1rem auto",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${progress}%`,
+                background: "linear-gradient(90deg,#7fffd4,#6a5acd)",
+                transition: "width 1s linear",
+              }}
+            />
+          </div>
+          <p style={{ fontSize: ".9rem", opacity: 0.7 }}>Respire. Le rêve infuse encore…</p>
+        </div>
+      )
+    }
+
     return (
       <div className="onimoji-step fade-in" style={{ textAlign: "center", color: "#e9fffd" }}>
         <h2 style={{ color: "#7fffd4" }}>🌙 Cercle des Gardiens — Culture Inuite</h2>
@@ -148,31 +210,6 @@ Pas de liste, pas d’injonction. Une seule strophe fluide.
           <div style={{ marginTop: "1rem", padding: "0 1rem" }}>
             <h3>{selectedSpirit.symbol} {selectedSpirit.spirit_name}</h3>
             <p style={{ opacity: 0.8 }}>{selectedSpirit.title}</p>
-            {selectedSpirit.text && (
-              <p style={{ opacity: 0.7 }}>{selectedSpirit.text}</p>
-            )}
-
-            {selectedSpirit.spirit_name === "Sila" && (
-              <div style={{ marginTop: "1rem" }}>
-                <video
-                  src="/video/Sil.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  style={{
-                    width: "100%",
-                    maxWidth: "360px",
-                    borderRadius: "12px",
-                    boxShadow: "0 0 20px rgba(127,255,212,0.3)",
-                    marginTop: "0.6rem",
-                  }}
-                />
-                <p style={{ fontSize: "0.9rem", color: "#aefcf5", fontStyle: "italic" }}>
-                  🌬️ Respire avec Sila — le souffle du monde.
-                </p>
-              </div>
-            )}
 
             {/* Quiz */}
             {Array.isArray(selectedSpirit.quiz) && (
@@ -348,7 +385,7 @@ Pas de liste, pas d’injonction. Une seule strophe fluide.
   return null
 }
 
-/* ——— Styles de base ——— */
+/* === Styles === */
 const btnPrimary = {
   background: "linear-gradient(90deg,#7fffd4,#6a5acd)",
   border: "none",

@@ -1,4 +1,6 @@
+// src/pages/echoreso/Index.jsx
 import EchoResoFlow from "./EchoResoFlow"
+import BookOfWisdom from "./BookOfWisdom"
 
 export default function Index({ userId }) {
   return (
@@ -29,9 +31,10 @@ export default function Index({ userId }) {
           marginBottom: "1.2rem",
         }}
       >
-        Réso•°<b>Les rêves des uns deviennent les ressources des autres.</b>
+        <b>Réso•°</b> — Les rêves des uns deviennent les ressources des autres.
       </p>
 
+      {/* === Graphe onirique interactif === */}
       <div
         style={{
           border: "1px solid rgba(127,255,212,0.2)",
@@ -39,11 +42,46 @@ export default function Index({ userId }) {
           background: "rgba(0,25,35,0.25)",
           padding: "0",
           overflow: "hidden",
-          height: "90vh",
+          height: "72vh",
           boxShadow: "inset 0 0 20px rgba(127,255,212,0.1)",
         }}
       >
         <EchoResoFlow userId={userId} />
+      </div>
+
+      {/* === Livre des Sagesses Oniriques === */}
+      <div
+        style={{
+          marginTop: "2rem",
+          padding: "1.2rem",
+          border: "1px solid rgba(255,230,150,0.2)",
+          borderRadius: "12px",
+          background: "linear-gradient(180deg, rgba(30,25,10,0.4), rgba(10,8,2,0.8))",
+          boxShadow: "0 0 25px rgba(255,230,150,0.15)",
+        }}
+      >
+        <h3
+          style={{
+            color: "#ffe38e",
+            marginBottom: "0.5rem",
+            textShadow: "0 0 12px rgba(255,230,150,0.4)",
+          }}
+        >
+          📖 Livre des Sagesses Oniriques
+        </h3>
+
+        <p
+          style={{
+            fontSize: ".85rem",
+            opacity: 0.85,
+            marginBottom: "1rem",
+          }}
+        >
+          Ici reposent les rêves du Réso•° métamorphosés en sagesses collectives.  
+          Une seule révélation IA par rêve, pour le bien commun du Réso.
+        </p>
+
+        <BookOfWisdom userId={userId} />
       </div>
     </div>
   )

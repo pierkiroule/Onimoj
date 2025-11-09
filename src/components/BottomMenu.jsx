@@ -3,7 +3,7 @@ import "./BottomMenu.css"
 export default function BottomMenu({ currentPage, onNavigate }) {
   const menuItems = [
     { icon: "🏠", label: "Accueil", id: "home" },
-    { icon: "🌙", label: "RÊV", id: "onimoji-journey" }, // création / exploration personnelle
+    { icon: "🌙", label: "RÊVduJour", id: "onimoji-journey" }, // création / exploration personnelle
     { icon: "💤", label: "Rêvothèque", id: "revotheque" }, // bibliothèque personnelle
     { icon: "🌐", label: "Reso•°", id: "echoreso" }, // réseau collectif
     { icon: "👤", label: "Profil", id: "profil" }, // profil utilisateur

@@ -1,15 +1,81 @@
-// src/pages/Home.jsx
 import "../App.css"
 import "./Home.css"
+import { useEffect, useState } from "react"
 import { supabase } from "../supabaseClient"
 
 export default function Home({ onStart, onLogin, onRegister }) {
-  async function handleFullSeed() {
-    const confirmSeed = confirm("🌌 Peuple toute ta base de démonstration ?")
-    if (!confirmSeed) return
+  const [remaining, setRemaining] = useState(0)
+  const DELAY = 12 * 60 * 60 * 1000 // 12h
 
+  const isDev =
+    import.meta.env.MODE === "development" ||
+    ["localhost", "127.0.0.1"].includes(window.location.hostname)
+
+  // 🕰️ Vérifie le dernier rêve généré
+  useEffect(() => {
+    checkCooldown()
+  }, [])
+
+  async function checkCooldown() {
     try {
-      // 1️⃣ Profil démo
+      // 🔧 Mode dév : sablier désactivé → on sort direct
+      if (isDev && localStorage.getItem("devCooldownOff") === "true") {
+        setRemaining(0)
+        return
+      }
+
+      // Local cache
+      const localTime = localStorage.getItem("lastDreamTime")
+      let last = localTime ? parseInt(localTime) : 0
+
+      // Tentative réseau (sauf si offline)
+      try {
+        const { data } = await supabase
+          .from("dreams")
+          .select("created_at")
+          .order("created_at", { ascending: false })
+          .limit(1)
+        if (data?.[0]) {
+          const supaTime = new Date(data[0].created_at).getTime()
+          if (supaTime > last) {
+            last = supaTime
+            localStorage.setItem("lastDreamTime", last.toString())
+          }
+        }
+      } catch {
+        console.warn("🌙 Mode local : Supabase non joignable.")
+      }
+
+      const now = Date.now()
+      const diff = DELAY - (now - last)
+      if (diff > 0) setRemaining(diff)
+      else setRemaining(0)
+    } catch (e) {
+      console.error("Erreur cooldown :", e)
+    }
+  }
+
+  useEffect(() => {
+    if (!remaining) return
+    const timer = setInterval(() => {
+      setRemaining((t) => (t > 1000 ? t - 1000 : 0))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [remaining])
+
+  function format(ms) {
+    const s = Math.floor(ms / 1000)
+    const h = String(Math.floor(s / 3600)).padStart(2, "0")
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0")
+    const sec = String(s % 60).padStart(2, "0")
+    return `${h}:${m}:${sec}`
+  }
+
+  // 🌱 Base de démonstration
+  async function handleFullSeed() {
+    const confirmSeed = confirm("🌌 Peupler ta base de démonstration ?")
+    if (!confirmSeed) return
+    try {
       const { data: existingProfile } = await supabase
         .from("profiles")
         .select("user_id")
@@ -28,7 +94,6 @@ export default function Home({ onStart, onLogin, onRegister }) {
         })
       }
 
-      // 2️⃣ Gardiens fondateurs
       const guardians = [
         { emoji: "🌬️", name: "Sila", element: "Air", description: "Souffle du Nord et messager des vents." },
         { emoji: "🔥", name: "Tuktu", element: "Feu", description: "Flamme des aurores boréales." },
@@ -48,7 +113,6 @@ export default function Home({ onStart, onLogin, onRegister }) {
         })
       }
 
-      // 3️⃣ Rêves initiaux liés aux gardiens
       const dreams = [
         {
           titre: "Souffle du matin",
@@ -82,18 +146,6 @@ export default function Home({ onStart, onLogin, onRegister }) {
         })
       }
 
-      // 4️⃣ Résonances entre rêves
-      const { data: allDreams } = await supabase.from("dreams").select("id").limit(10)
-      if (allDreams?.length > 1) {
-        for (let i = 0; i < allDreams.length - 1; i++) {
-          await supabase.from("resonance_links").insert({
-            source_dream_id: allDreams[i].id,
-            target_dream_id: allDreams[i + 1].id,
-            strength: Math.random(),
-          })
-        }
-      }
-
       alert("🌟 Base peuplée avec succès : gardiens + rêves + résonances !")
     } catch (err) {
       console.error("⚠️ Erreur seed:", err)
@@ -105,47 +157,72 @@ export default function Home({ onStart, onLogin, onRegister }) {
     <div className="home fade-in">
       <div className="home-logo fade-in" style={{ marginBottom: "1rem" }}>
         <div className="moon-symbol" style={{ fontSize: "2.4rem" }}>🌘•°</div>
-        <div className="brand-name" style={{ fontSize: "1.6rem", color: "#bfefff" }}>
-          Onimoji
+        <div className="brand-name" style={{ fontSize: "1.6rem", color: "#bfefff" }}>Onimoji</div>
+      </div>
+
+      <div className="tagline">
+        Embarquez dans une quête onirique pour découvrir la richesse culturelle
+        des rêves de vos gardiens du sommeil.
+      </div>
+
+      {remaining > 0 ? (
+        <div style={borealBox}>
+          <div style={{ fontSize: "0.9rem", color: "#aefcf5" }}>
+            🌙 Ton prochain voyage onirique sera disponible dans :
+          </div>
+          <div
+            style={{
+              color: "#7fffd4",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              marginTop: "0.3rem",
+            }}
+          >
+            {format(remaining)}
+          </div>
+          <div className="boreal-hourglass" />
+          <p style={{ fontSize: ".8rem", opacity: 0.8 }}>
+            Laisse ton rêve s’intégrer avant d’en semer un nouveau.
+          </p>
+
+          {/* 🔧 Bouton DEV pour désactiver le sablier */}
+          {isDev && (
+            <button
+              onClick={() => {
+                localStorage.setItem("devCooldownOff", "true")
+                localStorage.removeItem("lastDreamTime")
+                localStorage.removeItem("dreamLock")
+                alert("🧪 Mode dév : sablier désactivé.")
+                window.location.reload()
+              }}
+              style={{
+                marginTop: "0.8rem",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(127,255,212,0.4)",
+                borderRadius: "10px",
+                padding: ".4rem 1rem",
+                color: "#7fffd4",
+                fontSize: ".85rem",
+                cursor: "pointer",
+              }}
+            >
+              🧪 Désactiver le sablier (mode dév)
+            </button>
+          )}
         </div>
-      </div>
-
-      <div className="tagline">Prendre soin des gardiens du sommeil.</div>
-
-      <div className="card-glow">
-        <h2>Cueille le rêve.</h2>
-        <p>
-          <b>Onimoji</b> est une aventure poétique où chaque rêve devient un geste de soin.
-        </p>
-      </div>
-
-      <div className="card-glow">
-        <h2>Les voyages Onimoji</h2>
-        <p>
-          ❄️ <b>Inuit</b> — souffle de Sila et sagesse des glaces.<br />
-          🌲 <b>Celtique</b> — entre arbres et songes.<br />
-          🌵 <b>Berbère</b> — étoiles du désert et vents de mémoire.
-        </p>
-      </div>
-
-      <button className="dream-button" onClick={onStart}>
-        🌠 Entrer dans la Constellation des Rêves
-      </button>
+      ) : (
+        <button className="dream-button" onClick={onStart}>
+          🌠 Rejoindre la Constellation des Rêves
+        </button>
+      )}
 
       <div style={{ display: "flex", gap: "0.6rem" }}>
-        <button
-          className="dream-button"
-          style={{ background: "rgba(127,255,212,0.15)", color: "#7fffd4" }}
-          onClick={onLogin}
-        >
-          Connexion
-        </button>
         <button
           className="dream-button"
           style={{ background: "rgba(110,255,141,0.15)", color: "#6eff8d" }}
           onClick={onRegister}
         >
-          Inscription
+          🌙 RÊVeille l'Écho•° du rêve qui sommeille en toi !
         </button>
       </div>
 
@@ -162,13 +239,57 @@ export default function Home({ onStart, onLogin, onRegister }) {
             fontSize: ".9rem",
           }}
         >
-          🧩 Peupler ma base (démo complète)
+          🧩 Découvrir les quêtes oniriques
         </button>
       </div>
 
       <div className="footer" style={{ marginTop: "2rem" }}>
         <p>🌘 “Le rêve est la respiration de l’âme.” — <i>Bachelard</i></p>
+        <p>Partagez vos rêves, cultivez votre sommeil.</p>
       </div>
+
+      <style>
+        {`
+        .boreal-hourglass {
+          margin: 1rem auto;
+          width: 50px;
+          height: 70px;
+          position: relative;
+          border: 2px solid rgba(127,255,212,0.5);
+          border-radius: 12px;
+          box-shadow: 0 0 10px rgba(127,255,212,0.3);
+          overflow: hidden;
+        }
+        .boreal-hourglass::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #7fffd4;
+          box-shadow: 0 0 8px #7fffd4;
+          animation: borealBubble 1.8s ease-in-out infinite;
+        }
+        @keyframes borealBubble {
+          0% { transform: translate(-50%, 40px) scale(0.6); opacity: 0; }
+          40% { opacity: 1; }
+          100% { transform: translate(-50%, -40px) scale(1.2); opacity: 0; }
+        }
+      `}
+      </style>
     </div>
   )
+}
+
+const borealBox = {
+  background: "rgba(0,30,40,0.6)",
+  border: "1px solid rgba(127,255,212,0.3)",
+  borderRadius: "12px",
+  padding: "1rem",
+  margin: "1rem auto",
+  maxWidth: "360px",
+  textAlign: "center",
+  boxShadow: "0 0 15px rgba(127,255,212,0.25)",
 }

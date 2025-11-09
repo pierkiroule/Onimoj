@@ -20,26 +20,32 @@ export default function Profil({ user, onLogout }) {
   useEffect(() => {
     const timer = setInterval(() => {
       setAnimLine((prev) => (prev < poeticLines.length ? prev + 1 : prev))
-    }, 1500)
+    }, 1800)
     return () => clearInterval(timer)
   }, [])
 
   const poeticLines = [
     "🌬️ Le vent du Nord t’invite à voyager.",
     "❄️ Chaque rêve trace une onde nouvelle.",
-    "🌕 L’eau du monde te reflète en douceur."
+    "🌕 L’eau du monde te reflète en douceur.",
+    "💫 Les sagesses murmurent sous la glace."
   ]
 
-  // --- Statistiques ---
+  // --- Statistiques personnelles ---
   async function fetchStats(userId) {
     try {
-      const [{ count: dreamsCount }, { count: echoesCount }] = await Promise.all([
+      const [{ count: dreamsCount }, { count: echoesCount }, { data: dreams }] = await Promise.all([
         supabase.from("dreams").select("*", { count: "exact", head: true }).eq("user_id", userId),
         supabase.from("dream_echoes").select("*", { count: "exact", head: true }).eq("user_id", userId),
+        supabase.from("dreams").select("guardian_id").eq("user_id", userId),
       ])
+
+      const uniqueGuardians = [...new Set((dreams || []).map((d) => d.guardian_id))].length
+
       setStats({
         rêves: dreamsCount || 0,
         échos: echoesCount || 0,
+        gardiens: uniqueGuardians,
         vitalité: Math.min(10, (dreamsCount + echoesCount) / 2),
         résonances: Math.max(1, Math.round(Math.random() * 5 + dreamsCount / 2)),
       })
@@ -81,7 +87,7 @@ export default function Profil({ user, onLogout }) {
     if (total > 50) return "🌕 Maître des Rêves"
     if (total > 20) return "🌠 Gardien des Échos"
     if (total > 5) return "✨ Voyageur Onirique"
-    return "🌑 Rêveur naissant"
+    return "🌑 Rêveur Naissant"
   }
 
   const dimensions = stats
@@ -103,92 +109,103 @@ export default function Profil({ user, onLogout }) {
   return (
     <div className="fade-in" style={{ padding: "1rem", color: "#e9fffd", textAlign: "center" }}>
       <h2>👤 Profil Réso•°</h2>
-      <h3 style={{ color: "#ffd46b", marginTop: "-.5rem" }}>
-        {titreOnirique(stats)}
-      </h3>
+      <h3 style={{ color: "#ffd46b", marginTop: "-.5rem" }}>{titreOnirique(stats)}</h3>
       <p style={{ opacity: 0.8, fontSize: ".9rem" }}>
         {user?.email || `ID : ${user?.id?.slice(0, 8)}...`}
       </p>
 
-      {/* 🌬️ message poétique */}
+      {/* 🌬️ message poétique progressif */}
       <div style={introBox}>
         <h3 style={{ color: "#7fffd4" }}>Tes ondes vivantes</h3>
         {poeticLines.slice(0, animLine).map((line, i) => (
-          <p key={i} style={{ opacity: 0.9, fontSize: ".95rem" }}>{line}</p>
+          <p key={i} style={{ opacity: 0.9, fontSize: ".95rem", animation: "fadeIn 1s ease forwards" }}>
+            {line}
+          </p>
         ))}
       </div>
 
-      {/* 🌊 Cercles stats */}
+      {/* 🌊 Statistiques en bulles */}
       {stats ? (
         <div style={bubbleContainer}>
           {dimensions.map((d, i) => (
-            <div key={i} style={{ ...bubble(d), animationDelay: `${i * 0.7}s` }}>
+            <div key={i} style={{ ...bubble(d), animationDelay: `${i * 0.6}s` }}>
               <div style={bubbleLabel}>
                 <p style={{ fontWeight: "bold", color: "#7fffd4" }}>{d.label}</p>
                 <p style={{ fontSize: "1.1rem", margin: 0 }}>{d.value}</p>
               </div>
             </div>
           ))}
-          <style>
-            {`
-              @keyframes bubblePulse {
-                0% { transform: scale(1); opacity: 0.7; }
-                50% { transform: scale(1.15); opacity: 1; }
-                100% { transform: scale(1); opacity: 0.7; }
-              }
-            `}
-          </style>
         </div>
       ) : (
         <p style={{ opacity: 0.7 }}>Chargement des bulles...</p>
       )}
 
+      {/* 🌕 Cercle boréal des 12 gardiens */}
+      {stats?.gardiens >= 0 && (
+        <div style={circleBox}>
+          <h3 style={{ color: "#7fffd4", marginBottom: ".6rem" }}>🌌 Cercle des 12 Gardiens</h3>
+          <div style={circleOuter}>
+            <svg width="160" height="160" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="aura" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#7fffd4" />
+                  <stop offset="100%" stopColor="#6a5acd" />
+                </linearGradient>
+              </defs>
+
+              {/* cercle fond */}
+              <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.1)" strokeWidth="6" fill="none" />
+
+              {/* progression */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                stroke="url(#aura)"
+                strokeWidth="6"
+                strokeLinecap="round"
+                fill="none"
+                strokeDasharray={`${(stats.gardiens / 12) * 314},314`}
+                style={{ transition: "stroke-dasharray 1.5s ease" }}
+                transform="rotate(-90 60 60)"
+              />
+
+              {/* lune centrale */}
+              <circle cx="60" cy="60" r="12" fill="#7fffd4" opacity="0.8">
+                <animate attributeName="r" values="12;14;12" dur="3s" repeatCount="indefinite" />
+              </circle>
+
+              <text x="60" y="65" textAnchor="middle" fill="#001820" fontSize="12" fontWeight="bold">
+                {stats.gardiens}/12
+              </text>
+            </svg>
+            <p style={{ fontSize: ".9rem", color: "#aefcf5", marginTop: ".4rem" }}>
+              {stats.gardiens === 12
+                ? "🌕 Cercle complet — Sagesse éveillée"
+                : `Éveillés : ${stats.gardiens} sur 12`}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 🏅 Badges oniriques */}
       {badges.length > 0 && (
-        <div style={{ marginTop: "1rem" }}>
+        <div style={{ marginTop: "1.2rem" }}>
           <h3 style={{ color: "#ffd46b" }}>🏅 Tes Sagesses révélées</h3>
-          <div style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "1rem",
-            marginTop: ".6rem"
-          }}>
-            {badges.map(b => (
-              <div key={b.id} style={{
-                width: 90,
-                height: 90,
-                borderRadius: "50%",
-                background: "radial-gradient(circle at 30% 30%, #ffe38e, #553)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                color: "#111",
-                fontWeight: "bold",
-                boxShadow: "0 0 10px rgba(255,230,150,0.6)",
-                animation: "floatBadge 6s ease-in-out infinite",
-              }}>
+          <div style={badgeContainer}>
+            {badges.map((b) => (
+              <div key={b.id} className="badge-mini">
                 <span style={{ fontSize: "1.3rem" }}>🌕</span>
                 <small style={{ fontSize: ".7rem", textAlign: "center" }}>
                   {b.guardian_name?.slice(0, 10) || "Sagesse"}
                 </small>
               </div>
             ))}
-            <style>
-              {`
-                @keyframes floatBadge {
-                  0% { transform: translateY(0); }
-                  50% { transform: translateY(-6px); }
-                  100% { transform: translateY(0); }
-                }
-              `}
-            </style>
           </div>
         </div>
       )}
 
-      {/* 💠 Cercle “offrir un voyage” */}
+      {/* 💠 Voyage onirique */}
       <div style={payZone}>
         <div className="pulse" style={payCircle}>
           <p style={{ fontSize: "1.1rem", margin: 0 }}>
@@ -202,21 +219,16 @@ export default function Profil({ user, onLogout }) {
             <p style={{ fontSize: ".8rem", marginTop: ".4rem", color: "#aefcf5" }}>{status}</p>
           )}
         </div>
-        <style>
-          {`
-            @keyframes pulseWave {
-              0% { transform: scale(1); opacity: 0.8; }
-              50% { transform: scale(1.1); opacity: 1; }
-              100% { transform: scale(1); opacity: 0.8; }
-            }
-            .pulse {
-              animation: pulseWave 5s ease-in-out infinite;
-            }
-          `}
-        </style>
       </div>
 
       <button onClick={onLogout} style={btnLogout}>🚪 Se déconnecter</button>
+
+      <style>{`
+        @keyframes softGlow {
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(127,255,212,0.4)); }
+          50% { filter: drop-shadow(0 0 16px rgba(127,255,212,0.7)); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -239,7 +251,7 @@ const bubbleContainer = {
   alignItems: "center",
   gap: "1.2rem",
   marginTop: "1.5rem",
-  marginBottom: "2rem",
+  marginBottom: "1.5rem",
 }
 
 function bubble(d) {
@@ -256,16 +268,28 @@ function bubble(d) {
   }
 }
 
-const bubbleLabel = {
-  textAlign: "center",
-  color: "#e9fffd",
-}
+const bubbleLabel = { textAlign: "center", color: "#e9fffd" }
 
-const payZone = {
+const circleBox = { textAlign: "center", marginTop: "1rem", marginBottom: "1rem" }
+
+const circleOuter = {
   display: "flex",
   justifyContent: "center",
-  marginTop: "1rem",
+  alignItems: "center",
+  flexDirection: "column",
+  animation: "softGlow 4s ease-in-out infinite",
 }
+
+const badgeContainer = {
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "1rem",
+  marginTop: ".6rem",
+}
+
+const payZone = { display: "flex", justifyContent: "center", marginTop: "1rem" }
 
 const payCircle = {
   width: 200,

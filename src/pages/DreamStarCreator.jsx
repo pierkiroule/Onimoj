@@ -29,6 +29,7 @@ export default function DreamStarCreator({ step = 1 }) {
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
   const [spirit, setSpirit] = useState(null)
+  const [echoMax, setEchoMax] = useState(6) // 🌱 nouveau : limite de ricochets
 
   useEffect(() => {
     async function loadUser() {
@@ -58,12 +59,12 @@ export default function DreamStarCreator({ step = 1 }) {
           texts: filledTexts,
           culture: 'Inuite',
           stage: filledEmojis.length,
+          echo_max: echoMax, // 🌙 nouveau champ Ricochet
         },
       ])
 
       if (error) throw error
 
-      // 🌬️ Fait émerger l'esprit associé à l’étape
       const spiritData = getInuitSpirit(step)
       setSpirit(spiritData)
 
@@ -71,6 +72,7 @@ export default function DreamStarCreator({ step = 1 }) {
       setTitle('')
       setEmojis(['', '', '', '', ''])
       setTexts(['', '', '', '', ''])
+      setEchoMax(6)
     } catch (err) {
       console.error(err)
       setStatus('❌ Erreur lors de la création : ' + err.message)
@@ -106,6 +108,32 @@ export default function DreamStarCreator({ step = 1 }) {
           textAlign: 'center',
         }}
       />
+
+      {/* 🪶 Champ Ricochets */}
+      <div style={{ marginTop: '1rem' }}>
+        <h4>💫 Nombre de ricochets avant métamorphose</h4>
+        <input
+          type="number"
+          min="3"
+          max="9"
+          value={echoMax}
+          onChange={(e) => setEchoMax(parseInt(e.target.value))}
+          style={{
+            width: '4rem',
+            marginTop: '.3rem',
+            padding: '.4rem',
+            borderRadius: '6px',
+            background: '#111',
+            color: '#fff',
+            border: '1px solid #666',
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}
+        />
+        <p style={{ opacity: 0.6, fontSize: '.85rem' }}>
+          (le nombre d’échos nécessaires avant que ton rêve devienne sagesse)
+        </p>
+      </div>
 
       <div style={{ marginTop: '1rem' }}>
         <h4>✨ Émojis symboliques (jusqu’à 5)</h4>

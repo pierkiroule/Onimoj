@@ -1,138 +1,179 @@
-/* 🌌 Hublot résonant — réseau poétique et immersif */
+// src/components/HublotResonant.jsx
+import { useEffect, useMemo, useRef, useState } from "react"
+import { inuitWordBanksByIndex } from "../data/inuitWordBanks"
+import "./HublotResonant.css"
 
-.hublot-inline {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #eaffff;
-  font-family: "Inter", system-ui, sans-serif;
-  text-align: center;
-  padding: 1rem;
-  animation: fadeIn 1.2s ease-in;
-}
+export default function HublotResonant({
+  step = { step_number: 1, spirit_name: "Sila", symbol: "🌬️" },
+  candidateCount = 15,
+  onComplete,
+}) {
+  const [nodes, setNodes] = useState([])
+  const [selected, setSelected] = useState([])
+  const [complete, setComplete] = useState(false)
+  const [echoMax, setEchoMax] = useState(6)
+  const rafRef = useRef(null)
 
-/* --- Titre & sous-titre --- */
-.hublot-inline h3 {
-  font-size: 1.3rem;
-  color: #7fffd4;
-  text-shadow: 0 0 10px rgba(127, 255, 212, 0.5);
-  margin-bottom: 0.2rem;
-}
-.hublot-inline .subtitle {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 0.6rem;
-}
+  const radius = 140
+  const size = 2 * radius + 40
+  const center = { x: size / 2, y: size / 2 }
 
-/* --- SVG --- */
-svg {
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, #031016, #000);
-  box-shadow: 0 0 22px rgba(127, 255, 212, 0.15),
-              inset 0 0 30px rgba(0, 60, 60, 0.2);
-  animation: auroraFlow 25s linear infinite;
-}
+  const bank = useMemo(() => {
+    const list = (inuitWordBanksByIndex?.[step.step_number] || []).map(o => o.fr)
+    return Array.from(new Set(list))
+  }, [step.step_number])
 
-/* --- Halo respirant sur chaque bulle --- */
-.node circle {
-  animation: pulseHalo 6s ease-in-out infinite;
-  transition: transform 0.3s ease, r 0.3s ease, fill 0.5s ease;
-  fill: rgba(0, 40, 50, 0.85);
-  stroke: rgba(127,255,212,0.3);
-  stroke-width: 1.4px;
-}
-.node:hover circle {
-  transform: scale(1.1);
-  stroke: rgba(127,255,212,0.8);
-  fill: rgba(20, 80, 90, 0.9);
-  filter: drop-shadow(0 0 10px rgba(127,255,212,0.8));
-}
+  useEffect(() => {
+    const init = bank
+      .sort(() => 0.5 - Math.random())
+      .slice(0, candidateCount)
+      .map((label, i) => ({
+        id: `${label}-${i}`,
+        label,
+        x: center.x + (Math.random() * 2 - 1) * radius * 0.6,
+        y: center.y + (Math.random() * 2 - 1) * radius * 0.6,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        r: 20 + Math.random() * 5,
+      }))
+    setNodes(init)
+  }, [bank])
 
-/* --- Émojis dans les bulles --- */
-.node text {
-  pointer-events: none;
-  font-size: 20px;
-  text-shadow: 
-    0 0 3px rgba(0, 0, 0, 0.9),
-    0 0 6px rgba(0, 0, 0, 0.8),
-    0 0 12px rgba(0, 0, 0, 0.6);
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  filter: brightness(1.1);
-}
-.node:hover text {
-  transform: scale(1.3);
-  opacity: 1;
-  filter: brightness(1.3);
-}
+  // === animation fluide ===
+  useEffect(() => {
+    let stop = false
+    const animate = () => {
+      if (stop) return
+      setNodes(prev =>
+        prev.map(n => {
+          let { x, y, vx, vy, r } = n
+          x += vx
+          y += vy
+          const dx = x - center.x
+          const dy = y - center.y
+          const dist = Math.hypot(dx, dy)
+          if (dist > radius - r) {
+            const nx = dx / dist
+            const ny = dy / dist
+            x = center.x + nx * (radius - r)
+            y = center.y + ny * (radius - r)
+            const dot = vx * nx + vy * ny
+            vx -= 1.8 * dot * nx
+            vy -= 1.8 * dot * ny
+          }
+          return { ...n, x, y, vx, vy }
+        })
+      )
+      rafRef.current = requestAnimationFrame(animate)
+    }
+    rafRef.current = requestAnimationFrame(animate)
+    return () => {
+      stop = true
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
 
-/* --- Liste des bulles sélectionnées --- */
-.hublot__selected {
-  display: flex;
-  gap: 0.5rem;
-  margin: 0.8rem 0;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.hublot__chip {
-  background: rgba(0, 40, 45, 0.9);
-  border: 1px solid rgba(127, 255, 212, 0.4);
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  color: #7fffd4;
-  box-shadow: 0 0 10px rgba(127,255,212,0.2);
-  transition: all 0.3s ease;
-}
-.hublot__chip:hover {
-  background: rgba(127, 255, 212, 0.2);
-  transform: scale(1.15);
-}
-
-/* --- Bouton principal --- */
-.hublot__validate-btn {
-  background: linear-gradient(90deg, rgba(127,255,212,0.25), rgba(80,190,170,0.3));
-  color: #7fffd4;
-  border: 1px solid rgba(127,255,212,0.6);
-  border-radius: 14px;
-  padding: 0.6rem 1.4rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
-.hublot__validate-btn:hover {
-  background: rgba(127,255,212,0.35);
-  color: #002020;
-  box-shadow: 0 0 16px rgba(127,255,212,0.8);
-}
-.hublot__validate-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* --- Animations cosmiques --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes pulseHalo {
-  0%, 100% {
-    filter: drop-shadow(0 0 6px rgba(127,255,212,0.5));
-    opacity: 0.9;
+  function handleSelect(label) {
+    if (complete) return
+    if (selected.includes(label)) return
+    const next = [...selected, label].slice(0, 5)
+    setSelected(next)
+    if (next.length === 5) setComplete(true)
   }
-  50% {
-    filter: drop-shadow(0 0 18px rgba(127,255,212,0.9));
-    opacity: 1;
-  }
-}
 
-@keyframes auroraFlow {
-  0%, 100% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(60deg); }
+  function handleValidate() {
+    if (onComplete) onComplete({ tags: selected, echoMax })
+  }
+
+  return (
+    <div className="hublot-inline">
+      <h3>{step.symbol} Le souffle de {step.spirit_name}</h3>
+      <p className="subtitle">Attrape cinq mots qui résonnent avec toi 🌬️</p>
+
+      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size}>
+        <defs>
+          <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(127,255,212,0.25)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.4)" />
+          </radialGradient>
+        </defs>
+        <circle cx={center.x} cy={center.y} r={radius + 15} fill="url(#halo)" />
+        <text
+          x={center.x}
+          y={center.y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize="46"
+        >
+          {step.symbol}
+        </text>
+
+        {nodes.map(n => (
+          <g
+            key={n.id}
+            className="node"
+            transform={`translate(${n.x},${n.y})`}
+            onClick={() => handleSelect(n.label)}
+            style={{ cursor: complete ? "default" : "pointer" }}
+          >
+            <circle r={n.r} />
+            <text
+              dy=".35em"
+              textAnchor="middle"
+              fontSize="15"
+              fill="#eaffff"
+              style={{
+                opacity: selected.includes(n.label) ? 0.4 : 1,
+              }}
+            >
+              {n.label}
+            </text>
+          </g>
+        ))}
+      </svg>
+
+      <div className="hublot__selected">
+        {selected.map((w, i) => (
+          <div key={i} className="hublot__chip">
+            {i + 1}
+          </div>
+        ))}
+      </div>
+
+      {!complete && (
+        <button
+          className="hublot__validate-btn"
+          disabled={selected.length < 5}
+          onClick={() => setComplete(true)}
+        >
+          {selected.length < 5 ? "Sélectionne 5 mots…" : "🌟 Tisser ton étoile"}
+        </button>
+      )}
+
+      {complete && (
+        <div style={{ marginTop: "1rem" }}>
+          <h4 style={{ color: "#7fffd4" }}>🌟 Ton étoile est prête</h4>
+
+          <div style={{ marginTop: ".6rem" }}>
+            <h4 style={{ color: "#aefcf5" }}>💫 Nombre d’échos avant métamorphose</h4>
+            <input
+              type="range"
+              min="3"
+              max="9"
+              value={echoMax}
+              onChange={e => setEchoMax(Number(e.target.value))}
+              style={{ width: "80%", marginTop: ".4rem" }}
+            />
+            <div style={{ fontSize: ".9rem", opacity: 0.85 }}>
+              {echoMax} contributions avant métamorphose
+            </div>
+          </div>
+
+          <button className="hublot__validate-btn" onClick={handleValidate}>
+            ✅ Continuer
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }

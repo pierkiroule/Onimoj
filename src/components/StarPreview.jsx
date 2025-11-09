@@ -1,14 +1,25 @@
 // src/components/StarPreview.jsx
 import React from "react"
 
-export default function StarPreview({ words = [], centerEmoji = "✨", pulse = true }) {
+export default function StarPreview({
+  words = [],
+  centerEmoji = "✨",
+  pulse = true,
+  echoCount = 0,
+  echoMax = 6,
+}) {
   const items = Array.from({ length: 5 }, (_, i) => words[i] || "·")
 
+  const progress = Math.min(echoCount / echoMax, 1)
+  const remaining = Math.max(echoMax - echoCount, 0)
   const size = 260
   const cx = size / 2
   const cy = size / 2
   const R = 105
   const r = 48
+
+  const auraColor = progress < 1 ? "#7fffd4" : "#ffe57f"
+  const auraOpacity = 0.2 + progress * 0.4
 
   const pts = []
   for (let i = 0; i < 10; i++) {
@@ -23,16 +34,15 @@ export default function StarPreview({ words = [], centerEmoji = "✨", pulse = t
   const labelPoints = [0, 2, 4, 6, 8].map((i) => pts[i])
 
   return (
-    <div style={{ display: "inline-block", position: "relative" }}>
+    <div style={{ display: "inline-block", position: "relative", textAlign: "center" }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* halo central */}
         <defs>
           <radialGradient id="halo" cx="50%" cy="50%">
-            <stop offset="0%" stopColor="#7fffd4" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#7fffd4" stopOpacity="0" />
+            <stop offset="0%" stopColor={auraColor} stopOpacity={auraOpacity} />
+            <stop offset="100%" stopColor={auraColor} stopOpacity="0" />
           </radialGradient>
 
-          {/* effet de pulsation */}
           <radialGradient id="pulse" cx="50%" cy="50%">
             <stop offset="0%" stopColor="#aefcf5" stopOpacity="0.2" />
             <stop offset="100%" stopColor="#7fffd4" stopOpacity="0" />
@@ -52,16 +62,16 @@ export default function StarPreview({ words = [], centerEmoji = "✨", pulse = t
           />
         )}
 
-        {/* halo statique */}
+        {/* halo principal */}
         <circle cx={cx} cy={cy} r={R + 18} fill="url(#halo)" />
 
         {/* étoile */}
         <path
           d={d}
           fill="rgba(127,255,212,0.12)"
-          stroke="rgba(127,255,212,0.8)"
+          stroke={`rgba(127,255,212,${0.4 + progress * 0.6})`}
           strokeWidth="2"
-          filter="drop-shadow(0 0 6px rgba(127,255,212,0.35))"
+          filter={`drop-shadow(0 0 ${6 + 10 * progress}px ${auraColor})`}
         />
 
         {/* rayons internes */}
@@ -76,6 +86,23 @@ export default function StarPreview({ words = [], centerEmoji = "✨", pulse = t
             strokeWidth="1"
           />
         ))}
+
+        {/* cercle de progression Ricochet */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={R + 26}
+          fill="none"
+          stroke={auraColor}
+          strokeWidth="3"
+          strokeDasharray={`${2 * Math.PI * (R + 26)} ${2 * Math.PI * (R + 26)}`}
+          strokeDashoffset={2 * Math.PI * (R + 26) * (1 - progress)}
+          strokeLinecap="round"
+          style={{
+            transition: "stroke-dashoffset 1s ease",
+            opacity: 0.7,
+          }}
+        />
 
         {/* mots sur les pointes */}
         {labelPoints.map((p, i) => (
@@ -108,14 +135,28 @@ export default function StarPreview({ words = [], centerEmoji = "✨", pulse = t
           dominantBaseline="central"
           style={{
             fontSize: "36px",
-            filter: "drop-shadow(0 0 4px rgba(127,255,212,0.8))",
+            filter: `drop-shadow(0 0 ${4 + 4 * progress}px ${auraColor})`,
           }}
         >
           {centerEmoji}
         </text>
       </svg>
 
-      {/* animation pulse injectée en inline style */}
+      {/* texte Ricochet */}
+      <div
+        style={{
+          fontSize: "0.85rem",
+          color: progress < 1 ? "#aefcf5" : "#ffe57f",
+          marginTop: "0.4rem",
+          opacity: 0.9,
+        }}
+      >
+        {progress < 1
+          ? `Encore ${remaining} écho${remaining > 1 ? "s" : ""} avant métamorphose`
+          : "🌕 Devenu Sagesse Onirique"}
+      </div>
+
+      {/* animation pulse */}
       <style>{`
         @keyframes pulse {
           0%, 100% { transform: scale(1); opacity: 0.3; }

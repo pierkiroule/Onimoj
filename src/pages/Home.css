@@ -147,7 +147,36 @@
   gap: 0.8rem;
 }
 
-/* 🏅 BADGES ONIRIQUES (option home preview) */
+/* ⏳ SABLIER BORÉAL (cooldown 12h) */
+.boreal-hourglass {
+  margin: 1rem auto;
+  width: 50px;
+  height: 70px;
+  position: relative;
+  border: 2px solid rgba(127,255,212,0.5);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(127,255,212,0.3);
+  overflow: hidden;
+}
+.boreal-hourglass::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7fffd4;
+  box-shadow: 0 0 8px #7fffd4;
+  animation: borealBubble 1.8s ease-in-out infinite;
+}
+@keyframes borealBubble {
+  0% { transform: translate(-50%, 40px) scale(0.6); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(-50%, -40px) scale(1.2); opacity: 0; }
+}
+
+/* 🏅 BADGES MINI ONIRIQUES (preview ou profil) */
 .badge-mini {
   width: 70px;
   height: 70px;
@@ -162,7 +191,6 @@
   box-shadow: 0 0 10px rgba(255,230,150,0.5);
   animation: floatBadge 6s ease-in-out infinite;
 }
-
 @keyframes floatBadge {
   0% { transform: translateY(0); }
   50% { transform: translateY(-5px); }

@@ -19,7 +19,11 @@ export default function Revotheque({ userId }) {
     try {
       const { data, error } = await supabase
         .from("dreams")
-        .select("id, titre, contenu, tags, image_url, created_at, visible, expired_at, guardian_id, user_id")
+        .select(`
+          id, titre, contenu, tags, image_url, created_at,
+          visible, expired_at, guardian_id, user_id,
+          echo_count, echo_max
+        `)
         .eq("user_id", userId)
         .is("expired_at", null)
         .order("created_at", { ascending: false })
@@ -96,9 +100,7 @@ export default function Revotheque({ userId }) {
                 outline: "none",
               }}
             >
-              <div style={{ fontWeight: 700, color: "#aefcf5" }}>
-                {title}
-              </div>
+              <div style={{ fontWeight: 700, color: "#aefcf5" }}>{title}</div>
 
               {d.image_url && (
                 <img
@@ -157,6 +159,8 @@ export default function Revotheque({ userId }) {
               <StarPreview
                 words={(selected.tags || []).slice(0, 5)}
                 centerEmoji="💤"
+                echoCount={selected.echo_count || 0}
+                echoMax={selected.echo_max || 6}
               />
             </div>
 

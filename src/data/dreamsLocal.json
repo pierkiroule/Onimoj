@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "titre": "Rêve d’océan",
+    "contenu": "Une vague turquoise se referme sur un coquillage qui chante doucement au creux de la nuit.",
+    "tags": ["eau", "calme", "bleu", "écoute"],
+    "vitality": 0.8,
+    "image_url": "/assets/dreams/ocean.jpg",
+    "visible": true
+  },
+  {
+    "id": 2,
+    "titre": "Forêt d’étoiles",
+    "contenu": "Des arbres de lumière bruissent dans le vent cosmique, reliés par des fils d’argent.",
+    "tags": ["forêt", "étoile", "mystère", "connexion"],
+    "vitality": 0.6,
+    "image_url": "/assets/dreams/forest.jpg",
+    "visible": true
+  },
+  {
+    "id": 3,
+    "titre": "Montagne dorée",
+    "contenu": "Un sentier de sable chaud mène à une cime où respire un soleil intérieur.",
+    "tags": ["montagne", "or", "lumière", "ascension"],
+    "vitality": 0.7,
+    "image_url": "/assets/dreams/mountain.jpg",
+    "visible": true
+  },
+  {
+    "id": 4,
+    "titre": "Cité des bulles",
+    "contenu": "Les dômes translucides flottent au-dessus d’un lac de brume. Chaque bulle renferme un murmure ancien.",
+    "tags": ["ville", "bulle", "air", "mémoire"],
+    "vitality": 0.5,
+    "image_url": "/assets/dreams/city.jpg",
+    "visible": true
+  },
+  {
+    "id": 5,
+    "titre": "Jardin des murmures",
+    "contenu": "Des fleurs résonnent au passage du vent, chuchotant les souvenirs du matin.",
+    "tags": ["jardin", "fleur", "souvenir", "vent"],
+    "vitality": 0.9,
+    "image_url": "/assets/dreams/garden.jpg",
+    "visible": true
+  },
+  {
+    "id": 6,
+    "titre": "Lune intérieure",
+    "contenu": "Une sphère de lumière blanche palpite au centre du cœur. Chaque souffle la fait croître.",
+    "tags": ["lune", "respiration", "intériorité", "blanc"],
+    "vitality": 0.85,
+    "image_url": "/assets/dreams/moon.jpg",
+    "visible": true
+  },
+  {
+    "id": 7,
+    "titre": "Chemin des sons",
+    "contenu": "Des pas résonnent sur des pierres chantantes. Le paysage s’accorde au rythme intérieur.",
+    "tags": ["musique", "voyage", "son", "chemin"],
+    "vitality": 0.75,
+    "image_url": "/assets/dreams/soundpath.jpg",
+    "visible": true
+  },
+  {
+    "id": 8,
+    "titre": "Temple du vent",
+    "contenu": "Sous la voûte d’un ciel d’azur, le vent sculpte les pierres comme une prière.",
+    "tags": ["vent", "temple", "azur", "prière"],
+    "vitality": 0.65,
+    "image_url": "/assets/dreams/temple.jpg",
+    "visible": true
+  }
+]

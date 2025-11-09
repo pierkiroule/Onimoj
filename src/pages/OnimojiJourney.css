@@ -103,3 +103,40 @@
   background: rgba(127, 255, 212, 0.2);
   transform: scale(1.02);
 }
+.boreal-hourglass {
+  width: 80px;
+  height: 80px;
+  margin: 1rem auto;
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(127,255,212,0.3), rgba(0,50,60,0.25));
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(127,255,212,0.3);
+  animation: glowPulse 5s ease-in-out infinite;
+}
+
+.boreal-bubble {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(127,255,212,0.8);
+  opacity: 0.6;
+  animation: riseBubble 4s linear infinite;
+}
+
+.b1 { left: 20%; animation-delay: 0s; }
+.b2 { left: 50%; animation-delay: 1.2s; }
+.b3 { left: 70%; animation-delay: 2.4s; }
+
+@keyframes riseBubble {
+  0% { transform: translateY(40px) scale(0.7); opacity: 0.2; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-70px) scale(1.1); opacity: 0; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(127,255,212,0.3); }
+  50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(127,255,212,0.6); }
+}

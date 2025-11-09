@@ -10,11 +10,11 @@ import Notifications from "./components/Notifications"
 import Home from "./pages/Home"
 import HorizonSelect from "./pages/HorizonSelect"
 import OnimojiJourney from "./pages/OnimojiJourney"
-import MissionInuiteEditor from "./pages/MissionInuiteEditor"
+
 import DreamStarCreator from "./pages/DreamStarCreator"
 import Profil from "./pages/Profil"
-import DreamEcho from "./pages/DreamEcho"
-import EchoReso from "./pages/EchoReso"
+import EchoReso from "./pages/echoreso/Index.jsx"
+import Revotheque from "./pages/Revotheque"   // ✅ ajout
 import LaboLogin from "./pages/LaboLogin"
 import Labo from "./pages/Labo"
 import InuiteAdmin from "./pages/InuiteAdmin"
@@ -22,8 +22,7 @@ import Auth from "./pages/Auth"
 import Register from "./pages/Register"
 import TestSupabase from "./pages/TestSupabase"
 
-// 🌌 Nouveau composant
-import CalendrierOnirique from "./components/CalendrierOnirique"
+
 
 import "./App.css"
 
@@ -107,6 +106,12 @@ export default function App() {
       case "create":
         return <DreamStarCreator />
 
+      case "revotheque": // ✅ ajout du lien
+        return <Revotheque userId={session?.user?.id} />
+
+      case "echoreso":
+        return <EchoReso userId={session?.user?.id} />
+
       case "profil":
         return (
           <Profil
@@ -115,12 +120,6 @@ export default function App() {
             onNavigate={setPage}
           />
         )
-
-      case "echo-creation":
-        return <DreamEcho userId={session?.user?.id} />
-
-      case "echoreso":
-        return <EchoReso userId={session?.user?.id} />
 
       case "calendrier":
         return <CalendrierOnirique />

@@ -1,0 +1,6 @@
+[functions.expire-dreams]
+verify_jwt = false
+
+[functions.expire-dreams.schedule]
+# toutes les 15 minutes
+cron = "*/15 * * * *"

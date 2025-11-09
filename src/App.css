@@ -1,274 +1,111 @@
-/* 🌌 FOND COSMIQUE — profondeur et douceur */
-body {
+/* 🌌 App.css — Responsive universel Onimoji */
+
+html, body, .app-root {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at 50% 30%, #0b0b24 0%, #01000f 80%);
-  color: #f3f5ff;
-  font-family: 'Poppins', sans-serif;
+  height: 100%;
+  background: radial-gradient(circle at 50% 30%, #010a0f, #000);
+  color: #e9fffd;
+  font-family: "Poppins", "Inter", sans-serif;
   overflow-x: hidden;
-  overflow-y: auto;
-  letter-spacing: 0.02em;
-  scroll-behavior: smooth;
 }
 
-/* 🌠 FOND ANIMÉ — lueurs mouvantes */
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  width: 120%;
-  height: 120%;
-  top: -10%;
-  left: -10%;
-  background: radial-gradient(circle at 60% 40%, rgba(127,255,212,0.05), transparent 70%);
-  animation: cosmicFlow 14s ease-in-out infinite alternate;
-  z-index: 0;
-}
-body::after {
-  background: radial-gradient(circle at 40% 60%, rgba(106,90,205,0.08), transparent 80%);
-  animation-duration: 18s;
+/* Conteneur principal */
+.main-container {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
-@keyframes cosmicFlow {
-  from { transform: scale(1) translateY(0px); opacity: 0.6; }
-  to   { transform: scale(1.15) translateY(10px); opacity: 0.8; }
-}
-
-/* 🪐 STRUCTURE GLOBALE */
-.app-root {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  z-index: 1;
-}
-
-.app-container {
-  background: transparent !important;
-  padding: 2rem;
-  position: relative;
-  z-index: 2;
-}
-
-/* 🌠 TITRES PRINCIPAUX */
-.home-title {
-  font-size: 2.3rem;
+/* Titres et textes */
+h1, h2, h3 {
+  color: #7fffd4;
+  text-shadow: 0 0 10px rgba(127,255,212,0.4);
   margin-bottom: 0.6rem;
-  text-shadow: 0 0 14px #aabaff, 0 0 28px #6a5acd80;
-  animation: titleGlow 6s ease-in-out infinite alternate;
-  letter-spacing: 0.04em;
-  font-weight: 600;
 }
 
-.tagline {
-  font-style: italic;
-  color: #bcd0ff;
-  font-size: 1.05rem;
-  opacity: 0.9;
-  text-shadow: 0 0 8px #6666ff40;
-  margin-bottom: 1.4rem;
+p {
   line-height: 1.5;
-}
-
-/* 🧘‍♀️ TEXTES & PARAGRAPHES */
-.main p,
-.intro-zone {
-  max-width: 420px;
-  margin: 1.5rem auto;
-  line-height: 1.65;
-  color: #e4e6ff;
   font-size: 1rem;
-  text-shadow: 0 0 8px #3a3aff33;
-  font-weight: 300;
 }
 
-/* 🌠 BOUTON COSMIQUE */
-.dream-button {
-  background: linear-gradient(90deg, #6a5acd, #7fffd4);
+/* Grilles réactives */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Boutons universels */
+button {
+  background: linear-gradient(90deg, #7fffd4, #6a5acd);
   border: none;
-  border-radius: 2rem;
-  padding: 0.9rem 1.8rem;
-  color: #0b0b1a;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-top: 1.2rem;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  color: #111;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.4s ease;
-  box-shadow: 0 0 14px #7fffd466, 0 0 24px rgba(106,90,205,0.35);
-}
-.dream-button:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 24px #7fffd4, 0 0 48px #6a5acd;
-  letter-spacing: 0.025em;
+  font-family: inherit;
+  transition: all 0.25s ease;
 }
 
-/* 🌬️ TEXTE DOUX */
-.hint {
-  font-size: 0.9rem;
-  color: #b8c8ff;
-  margin-top: 1.2rem;
-  opacity: 0.85;
-  font-style: italic;
-  text-shadow: 0 0 5px #334;
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(127,255,212,0.5);
 }
 
-/* 🪶 PIED DE PAGE */
+/* Pied de page */
 .footer {
   font-size: 0.8rem;
-  opacity: 0.55;
+  text-align: center;
+  color: rgba(200, 255, 255, 0.6);
   margin-top: 2rem;
-  color: #99aaff;
-  text-align: center;
-  padding-bottom: 1rem;
-  transition: opacity 0.3s ease;
-}
-.footer:hover { opacity: 0.8; }
-
-/* ✨ ANIMATIONS DE LUMIÈRE */
-@keyframes titleGlow {
-  0% { text-shadow: 0 0 12px #99f, 0 0 28px #55f; color: #dfe6ff; }
-  100% { text-shadow: 0 0 28px #bbf, 0 0 48px #88f; color: #ffffff; }
+  padding-bottom: 5rem; /* espace menu mobile */
 }
 
-/* 🌌 ENTRÉE FLUIDE */
-.fade-in {
-  animation: fadeIn 1.4s ease forwards;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 💫 LOGO VERTICAL 🌘•° Onimoji */
-.home-logo {
-  display: flex;
-  flex-direction: column;       /* ✅ Vertical */
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-family: 'Poppins', sans-serif;
-  color: #aeeeff;
-  margin-bottom: 1.6rem;
-  opacity: 0;
-  animation: fadeInLogo 1.6s ease forwards;
-}
-
-/* 🌙 Symbole cosmique */
-.moon-symbol {
-  font-size: 2.8rem;
-  letter-spacing: 0.05em;
-  line-height: 1;
-  animation: moonPulse 6s ease-in-out infinite;
-  text-shadow: 0 0 15px rgba(127,255,212,0.6),
-               0 0 30px rgba(106,90,205,0.5);
-  margin-bottom: 0.3rem;
-  color: #aeeeff;
-}
-
-/* ✨ Nom Onimoji dessous */
-.brand-name {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #dff;
-  text-shadow: 0 0 8px rgba(127,255,212,0.5),
-               0 0 18px rgba(106,90,205,0.4);
-  animation: textGlow 6s ease-in-out infinite;
-}
-
-/* ✨ Apparition douce */
-@keyframes fadeInLogo {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 🌙 Respiration cosmique */
-@keyframes moonPulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
-    text-shadow: 0 0 15px rgba(127,255,212,0.4),
-                 0 0 30px rgba(106,90,205,0.3);
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 1;
-    text-shadow: 0 0 25px rgba(127,255,212,0.9),
-                 0 0 45px rgba(106,90,205,0.6);
-  }
-}
-
-/* 💫 Halo respirant du mot */
-@keyframes textGlow {
-  0%, 100% { opacity: 0.8; letter-spacing: 0.08em; }
-  50% { opacity: 1; letter-spacing: 0.12em; }
-}
-
-/* 📱 RESPONSIVE */
+/* 🌠 Mobile-first adjustments */
 @media (max-width: 600px) {
-  .home-title { font-size: 1.8rem; }
-  .tagline { font-size: 1rem; }
-  .dream-button { padding: 0.8rem 1.4rem; font-size: 1rem; }
-  .intro-zone, .main p { max-width: 90%; }
-  .moon-symbol { font-size: 2.2rem; }
-  .brand-name { font-size: 1.2rem; }
-}
-.moon-wrapper {
-  position: relative;
-  z-index: 10;
-  margin-top: -80px;
+  .main-container {
+    padding: 0.8rem;
+  }
+
+  h1, h2 {
+    font-size: 1.3rem;
+  }
+
+  button {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .grid-responsive {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.7rem;
+  }
 }
 
-/* 🌫️ CARTES GLASSMORPHIQUES — douceur et respiration */
-.card-glow {
-  max-width: 520px;
-  margin: 1.4rem auto;
-  padding: 1.4rem 1.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 1.2rem;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 0 12px rgba(127,255,212,0.06),
-              0 0 28px rgba(106,90,205,0.12);
-  text-align: left;
-  line-height: 1.6;
-  transition: all 0.4s ease;
-}
+/* 🌌 Desktop enrichi */
+@media (min-width: 900px) {
+  .main-container {
+    max-width: 900px;
+    padding: 2rem;
+  }
 
-.card-glow:hover {
-  box-shadow: 0 0 18px rgba(127,255,212,0.12),
-              0 0 36px rgba(106,90,205,0.2);
-  transform: translateY(-2px);
-}
+  h2 {
+    font-size: 1.8rem;
+  }
 
-/* 🩵 TITRES DANS LES CARTES */
-.card-glow h3 {
-  font-size: 1.2rem;
-  margin-bottom: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-shadow: 0 0 8px rgba(127,255,212,0.3);
-}
-
-/* 📖 TEXTE DES CARTES */
-.card-glow p {
-  color: #dde3ff;
-  font-weight: 300;
-  font-size: 0.95rem;
-  margin: 0;
-}
-
-.activity-block {
-  transition: all 0.3s ease;
-}
-.activity-header:hover {
-  background: rgba(127,255,212,0.1);
-}
-.activity-content {
-  background: rgba(255,255,255,0.03);
-  color: #eef;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  p {
+    font-size: 1.1rem;
+  }
 }

@@ -38,7 +38,8 @@ export default function HublotResonant({
       y: radius + (Math.random() * 2 - 1) * (hullR - 20),
       vx: (Math.random() * 1 + 0.3) * (Math.random() < 0.5 ? -1 : 1),
       vy: (Math.random() * 1 + 0.3) * (Math.random() < 0.5 ? -1 : 1),
-      r: 20
+      r: 20,
+      fading: false,
     }))
   }
 
@@ -48,12 +49,16 @@ export default function HublotResonant({
 
   // ==== CAPTURE ====
   function popBubble(id, label) {
-    if (complete) return
-    if (captured.includes(label)) return
-    const next = [...captured, label].slice(0, 5)
-    setCaptured(next)
-    setBubbles(prev => prev.filter(b => b.id !== id))
-    if (next.length === 5) setComplete(true)
+    if (complete || captured.includes(label)) return
+    setBubbles(prev =>
+      prev.map(b => (b.id === id ? { ...b, fading: true } : b))
+    )
+    setTimeout(() => {
+      const next = [...captured, label].slice(0, 5)
+      setCaptured(next)
+      setBubbles(prev => prev.filter(b => b.id !== id))
+      if (next.length === 5) setComplete(true)
+    }, 300)
   }
 
   // ==== REROLL ====
@@ -63,11 +68,12 @@ export default function HublotResonant({
 
   // ==== ANIMATION + COLLISIONS ====
   useEffect(() => {
+    let stopped = false
     function stepAnim() {
+      if (stopped) return
       setBubbles(prev => {
         const updated = [...prev]
 
-        // collisions entre bulles
         for (let i = 0; i < updated.length; i++) {
           for (let j = i + 1; j < updated.length; j++) {
             const a = updated[i]
@@ -88,7 +94,6 @@ export default function HublotResonant({
           }
         }
 
-        // rebonds sur bord
         return updated.map(b => {
           let { x, y, vx, vy, r } = b
           x += vx
@@ -113,7 +118,10 @@ export default function HublotResonant({
     }
 
     rafRef.current = requestAnimationFrame(stepAnim)
-    return () => cancelAnimationFrame(rafRef.current)
+    return () => {
+      stopped = true
+      cancelAnimationFrame(rafRef.current)
+    }
   }, [])
 
   // ==== STAR PREVIEW ====
@@ -168,17 +176,19 @@ export default function HublotResonant({
         {step.symbol} Le souffle de {step.spirit_name}
       </h3>
 
-      <p style={{
-        textAlign: "center",
-        fontSize: ".95rem",
-        color: "#bdefff",
-        opacity: 0.9,
-        maxWidth: 300,
-        margin: "0 auto 1rem"
-      }}>
-        Ferme un instant les yeux. Respire lentement.  
+      <p
+        style={{
+          textAlign: "center",
+          fontSize: ".95rem",
+          color: "#bdefff",
+          opacity: 0.9,
+          maxWidth: 300,
+          margin: "0 auto 1rem",
+        }}
+      >
+        Ferme les yeux. Respire lentement.  
         Les bulles qui apparaissent sont les mots de ton inconscient.  
-        Appuie sur celles qui vibrent avec toi — cinq d’entre elles formeront ton étoile du rêve.
+        Appuie sur celles qui vibrent avec toi — cinq d’entre elles formeront ton étoile.
       </p>
 
       {!complete && (
@@ -191,9 +201,11 @@ export default function HublotResonant({
               height: size,
               margin: "0 auto",
               borderRadius: "50%",
-              background: "radial-gradient(60% 60% at 50% 50%, #061520, #000)",
-              boxShadow: "0 0 20px rgba(100,180,255,0.4), inset 0 0 30px rgba(0,0,0,0.6)",
-              overflow: "hidden"
+              background:
+                "radial-gradient(60% 60% at 50% 50%, #061520, #000)",
+              boxShadow:
+                "0 0 20px rgba(100,180,255,0.4), inset 0 0 30px rgba(0,0,0,0.6)",
+              overflow: "hidden",
             }}
           >
             <div
@@ -203,7 +215,8 @@ export default function HublotResonant({
                 top: "50%",
                 transform: "translate(-50%, -50%)",
                 fontSize: "40px",
-                filter: "drop-shadow(0 0 6px rgba(150,200,255,0.4))"
+                filter: "drop-shadow(0 0 8px rgba(127,255,212,0.6))",
+                animation: "pulseCenter 3s ease-in-out infinite",
               }}
             >
               {step.symbol}
@@ -219,12 +232,15 @@ export default function HublotResonant({
                   top: b.y - b.r,
                   padding: ".3rem .6rem",
                   borderRadius: "999px",
-                  border: "1px solid rgba(150,200,255,0.5)",
-                  background: "rgba(120,170,255,0.1)",
+                  border: "1px solid rgba(127,255,212,0.5)",
+                  background: "rgba(127,255,212,0.08)",
                   color: "#e9fffd",
                   fontSize: ".85rem",
                   cursor: "pointer",
-                  boxShadow: "0 0 8px rgba(0,0,0,0.3)"
+                  boxShadow: "0 0 10px rgba(127,255,212,0.25)",
+                  opacity: b.fading ? 0 : 1,
+                  transform: b.fading ? "scale(0.7)" : "scale(1)",
+                  transition: "all 0.3s ease",
                 }}
               >
                 {b.label}
@@ -237,19 +253,40 @@ export default function HublotResonant({
             <div style={{ fontSize: ".9rem", opacity: 0.8 }}>
               ✨ Mots captés : {captured.length}/5
             </div>
-            <div style={{ marginTop: ".6rem", display: "flex", gap: ".5rem", flexWrap: "wrap", justifyContent: "center" }}>
+
+            <div
+              style={{
+                marginTop: ".6rem",
+                display: "flex",
+                gap: ".5rem",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
               {captured.map(t => (
-                <span key={t} style={{
-                  padding: ".25rem .6rem",
-                  borderRadius: "999px",
-                  background: "rgba(127,255,212,.12)",
-                  border: "1px solid rgba(127,255,212,.45)",
-                  fontSize: ".85rem"
-                }}>{t}</span>
+                <span
+                  key={t}
+                  style={{
+                    padding: ".25rem .6rem",
+                    borderRadius: "999px",
+                    background: "rgba(127,255,212,.12)",
+                    border: "1px solid rgba(127,255,212,.45)",
+                    fontSize: ".85rem",
+                  }}
+                >
+                  {t}
+                </span>
               ))}
             </div>
 
-            <div style={{ marginTop: ".9rem", display: "flex", gap: ".6rem", justifyContent: "center" }}>
+            <div
+              style={{
+                marginTop: ".9rem",
+                display: "flex",
+                gap: ".6rem",
+                justifyContent: "center",
+              }}
+            >
               <button
                 onClick={reroll}
                 style={{
@@ -258,11 +295,12 @@ export default function HublotResonant({
                   border: "1px solid rgba(127,255,212,.5)",
                   background: "rgba(127,255,212,.08)",
                   color: "#e9fffd",
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
               >
-                🎲 Relancer les bulles
+                🎲 Relancer
               </button>
+
               <button
                 disabled={captured.length < 5}
                 onClick={() => setComplete(true)}
@@ -270,9 +308,14 @@ export default function HublotResonant({
                   padding: ".55rem .9rem",
                   borderRadius: "10px",
                   border: "1px solid rgba(255,255,255,.15)",
-                  background: captured.length < 5 ? "rgba(255,255,255,.08)" : "rgba(110,255,141,.15)",
+                  background:
+                    captured.length < 5
+                      ? "rgba(255,255,255,.08)"
+                      : "rgba(110,255,141,.15)",
                   color: captured.length < 5 ? "#b7c9c6" : "#6eff8d",
-                  cursor: captured.length < 5 ? "not-allowed" : "pointer"
+                  cursor: captured.length < 5 ? "not-allowed" : "pointer",
+                  animation:
+                    captured.length === 5 ? "pulseCenter 2s ease-in-out infinite" : "none",
                 }}
               >
                 🌟 Tisser ton étoile
@@ -294,13 +337,20 @@ export default function HublotResonant({
               border: "1px solid rgba(127,255,212,.55)",
               background: "rgba(127,255,212,.12)",
               color: "#e9fffd",
-              cursor: "pointer"
+              cursor: "pointer",
             }}
           >
             ✅ Continuer
           </button>
         </div>
       )}
+
+      <style>{`
+        @keyframes pulseCenter {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+          50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }

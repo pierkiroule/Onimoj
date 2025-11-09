@@ -1,280 +1,223 @@
-// src/pages/Profil.jsx
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "../supabaseClient"
 import "./Home.css"
 
-export default function Profil({ user, onLogout, onNavigate }) {
-  const [mission, setMission] = useState(null)
-  const [bulles, setBulles] = useState([])
-  const [dreams, setDreams] = useState([])
+export default function Profil({ user, onLogout }) {
+  const [stats, setStats] = useState(null)
+  const [animLine, setAnimLine] = useState(0)
+  const [loadingPay, setLoadingPay] = useState(false)
   const [status, setStatus] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [activeDream, setActiveDream] = useState(null)
-  const [userText, setUserText] = useState("")
-  const channelRef = useRef(null)
 
   useEffect(() => {
-    channelRef.current = new BroadcastChannel("sky-sync")
-    return () => channelRef.current?.close()
-  }, [])
-
-  useEffect(() => {
-    if (user) {
-      fetchProgress(user.id)
-      fetchBulles(user.id)
-      fetchDreamImages(user.id)
-    }
+    if (user) fetchStats(user.id)
   }, [user])
 
-  async function fetchProgress(userId) {
-    const { data } = await supabase
-      .from("user_inuit_progress")
-      .select("*")
-      .eq("user_id", userId)
-      .single()
-    if (data) setMission(data)
-  }
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAnimLine((prev) => (prev < poeticLines.length ? prev + 1 : prev))
+    }, 1500)
+    return () => clearInterval(timer)
+  }, [])
 
-  async function fetchBulles(userId) {
-    const { data, error } = await supabase
-      .from("dream_stars")
-      .select("id, title, emojis, culture, created_at, completed")
-      .eq("creator_id", userId)
-      .eq("completed", true)
-      .order("created_at", { ascending: false })
-    if (!error) setBulles(data || [])
-  }
+  const poeticLines = [
+    "🌬️ Le vent du Nord t’invite à voyager.",
+    "❄️ Chaque rêve trace une onde nouvelle.",
+    "🌕 L’eau du monde te reflète en douceur."
+  ]
 
-  async function fetchDreamImages(userId) {
-    const { data, error } = await supabase
-      .from("revotheque_reves")
-      .select("id, titre, emoji, image_url, tags, texte, date_reve")
-      .eq("user_id", userId)
-      .not("image_url", "is", null)
-      .order("date_reve", { ascending: false })
-    if (!error) setDreams(data || [])
-  }
-
-  async function removeBulle(id) {
-    if (!confirm("Retirer cette bulle du ciel ?")) return
-    const { error } = await supabase.from("dream_stars").delete().eq("id", id)
-    if (!error) {
-      setBulles(prev => prev.filter(b => b.id !== id))
-      setStatus("🌀 Bulle retirée du ciel.")
-      channelRef.current?.postMessage({ type: "remove", id })
-    }
-  }
-
-  async function nextStep() {
-    if (!mission) return
-    const newStep = Math.min(mission.step_number + 1, 12)
-    const { error } = await supabase
-      .from("user_inuit_progress")
-      .update({ step_number: newStep })
-      .eq("user_id", user.id)
-    if (!error) {
-      setMission({ ...mission, step_number: newStep })
-      setStatus(`🌟 Étape ${newStep}/12 atteinte !`)
-    }
-  }
-
-  async function sendScript() {
-    if (!userText.trim()) return alert("Écris ton rêve avant d’envoyer 🌙")
+  // --- Statistiques ---
+  async function fetchStats(userId) {
     try {
-      await supabase.from("dream_challenges").insert({
-        user_id: user.id,
-        dream_id: activeDream.id,
-        texte: userText.trim(),
-        titre: activeDream.titre,
+      const [{ count: dreamsCount }, { count: echoesCount }] = await Promise.all([
+        supabase.from("dreams").select("*", { count: "exact", head: true }).eq("user_id", userId),
+        supabase.from("dream_echoes").select("*", { count: "exact", head: true }).eq("user_id", userId),
+      ])
+      setStats({
+        rêves: dreamsCount || 0,
+        échos: echoesCount || 0,
+        vitalité: Math.min(10, (dreamsCount + echoesCount) / 2),
+        résonances: Math.max(1, Math.round(Math.random() * 5 + dreamsCount / 2)),
       })
-      setUserText("")
-      setActiveDream(null)
-      alert("🌠 Ton rêve a été envoyé au Labo pour sélection !")
     } catch (e) {
-      console.error("Erreur envoi script:", e)
+      console.error("Erreur chargement stats:", e)
     }
   }
 
-  const renderBadges = progress => (
-    <div style={{ display: "flex", justifyContent: "center", gap: "0.3rem", marginTop: "0.5rem" }}>
-      {[...Array(12)].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            width: "16px",
-            height: "16px",
-            borderRadius: "50%",
-            background: i < progress ? "#6eff8d" : "#333",
-            border: "1px solid #777",
-          }}
-        />
-      ))}
-    </div>
-  )
+  // --- Paiement simulé ---
+  function handlePay() {
+    setLoadingPay(true)
+    setStatus("Traitement du voyage...")
+    setTimeout(() => {
+      setLoadingPay(false)
+      setStatus("🌕 Voyage onirique activé ! Bon rêve…")
+    }, 2000)
+  }
+
+  const dimensions = stats
+    ? Object.entries(stats).map(([k, v]) => ({
+        label: k,
+        value: v,
+        radius: 40 + v * 6,
+        color:
+          k === "rêves"
+            ? "rgba(127,255,212,0.5)"
+            : k === "échos"
+            ? "rgba(180,160,255,0.5)"
+            : k === "résonances"
+            ? "rgba(255,200,180,0.5)"
+            : "rgba(150,255,230,0.5)",
+      }))
+    : []
 
   return (
-    <div className="fade-in" style={{ padding: "1rem", color: "#eee", textAlign: "center" }}>
-      <h2>👤 Profil Onimoji</h2>
-      {user ? (
-        <p style={{ opacity: 0.8, fontSize: "0.9rem" }}>
-          {user.email ? `🌕 ${user.email}` : `🌀 ID : ${user.id.slice(0, 8)}...`}
-        </p>
-      ) : (
-        <p>Chargement...</p>
-      )}
-
-      {/* 🌍 Mission actuelle */}
-      {mission && (
-        <div style={missionCard}>
-          <h4>❄️ Mission Inuite</h4>
-          <p>Étape {mission.step_number}/12</p>
-          {renderBadges(mission.step_number)}
-          <button onClick={nextStep} style={btnGreen}>🌟 Étape suivante</button>
-        </div>
-      )}
-
-      {/* 🌕 Bulles */}
-      <h3 style={{ marginTop: "2rem" }}>🌕 Mes bulles</h3>
-      {bulles.length > 0 ? (
-        <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: ".8rem" }}>
-          {bulles.map(b => (
-            <div key={b.id} style={bulleCard}>
-              <h4 style={{ color: "#7fffd4" }}>{b.title}</h4>
-              <p>{b.emojis?.join(" ")}</p>
-              <p style={{ fontSize: ".8rem", opacity: .6 }}>
-                {new Date(b.created_at).toLocaleDateString("fr-FR")}
-              </p>
-              <button onClick={() => removeBulle(b.id)} style={btnRed}>
-                🌀 Retirer
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p style={{ opacity: .7 }}>Aucune bulle active.</p>
-      )}
-
-      {/* 🪞 Galerie des Résonances */}
-      <h3 style={{ marginTop: "2rem", color: "#7fffd4" }}>🪞 Défis Oniriques</h3>
-      <p style={{ fontSize: ".9rem", opacity: .8 }}>
-        Clique sur une image pour écrire ton propre rêve inspiré d’elle.
+    <div className="fade-in" style={{ padding: "1rem", color: "#e9fffd", textAlign: "center" }}>
+      <h2>👤 Profil Réso•°</h2>
+      <p style={{ opacity: 0.8, fontSize: ".9rem" }}>
+        {user?.email || `ID : ${user?.id?.slice(0, 8)}...`}
       </p>
-      {dreams.length > 0 ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: ".8rem",
-            marginTop: "1rem",
-          }}
-        >
-          {dreams.map(d => (
-            <div
-              key={d.id}
-              onClick={() => setActiveDream(d)}
-              style={{
-                cursor: "pointer",
-                background: "rgba(0,25,35,0.5)",
-                border: "1px solid rgba(127,255,212,0.3)",
-                borderRadius: "10px",
-                overflow: "hidden",
-                boxShadow: "0 0 8px rgba(127,255,212,0.15)",
-              }}
-            >
-              <img
-                src={d.image_url}
-                alt={d.titre}
-                style={{ width: "100%", height: "140px", objectFit: "cover" }}
-              />
-              <div style={{ padding: ".5rem" }}>
-                <h4 style={{ fontSize: ".9rem", color: "#aefcf5" }}>
-                  {d.emoji} {d.titre}
-                </h4>
-                <p style={{ fontSize: ".7rem", opacity: .6 }}>
-                  {new Date(d.date_reve).toLocaleDateString("fr-FR")}
-                </p>
+
+      {/* 🌬️ message poétique */}
+      <div style={introBox}>
+        <h3 style={{ color: "#7fffd4" }}>Tes ondes vivantes</h3>
+        {poeticLines.slice(0, animLine).map((line, i) => (
+          <p key={i} style={{ opacity: 0.9, fontSize: ".95rem" }}>{line}</p>
+        ))}
+      </div>
+
+      {/* 🌊 Cercles indépendants */}
+      {stats ? (
+        <div style={bubbleContainer}>
+          {dimensions.map((d, i) => (
+            <div key={i} style={{ ...bubble(d), animationDelay: `${i * 0.7}s` }}>
+              <div style={bubbleLabel}>
+                <p style={{ fontWeight: "bold", color: "#7fffd4" }}>{d.label}</p>
+                <p style={{ fontSize: "1.1rem", margin: 0 }}>{d.value}</p>
               </div>
             </div>
           ))}
+          <style>
+            {`
+              @keyframes bubblePulse {
+                0% { transform: scale(1); opacity: 0.7; }
+                50% { transform: scale(1.15); opacity: 1; }
+                100% { transform: scale(1); opacity: 0.7; }
+              }
+            `}
+          </style>
         </div>
       ) : (
-        <p style={{ opacity: .6 }}>Aucune image générée pour l’instant.</p>
+        <p style={{ opacity: 0.7 }}>Chargement des bulles...</p>
       )}
 
-      {/* 📝 Modale Défi */}
-      {activeDream && (
-        <div style={overlay}>
-          <div style={modal}>
-            <h3 style={{ color: "#7fffd4" }}>💭 Défi Onirique</h3>
-            <img
-              src={activeDream.image_url}
-              alt={activeDream.titre}
-              style={{ width: "100%", borderRadius: "8px", marginBottom: ".5rem" }}
-            />
-            <p style={{ fontSize: ".9rem", opacity: .8 }}>
-              Inspire-toi de cette image pour écrire un rêve, une vision ou un poème onirique.
-            </p>
-            <textarea
-              value={userText}
-              onChange={e => setUserText(e.target.value)}
-              rows={6}
-              placeholder="Écris ton rêve ici..."
-              style={{
-                width: "100%",
-                borderRadius: "10px",
-                padding: ".5rem",
-                border: "1px solid rgba(127,255,212,.3)",
-                background: "rgba(0,30,30,.6)",
-                color: "#e9fffd",
-                marginTop: ".5rem",
-              }}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".6rem" }}>
-              <button onClick={() => setActiveDream(null)} style={btnGrey}>❌ Fermer</button>
-              <button onClick={sendScript} style={btnGreen}>📩 Envoyer au Labo</button>
-            </div>
-          </div>
+      {/* 💠 Cercle “offrir un voyage” */}
+      <div style={payZone}>
+        <div className="pulse" style={payCircle}>
+          <p style={{ fontSize: "1.1rem", margin: 0 }}>💠 Offrir un voyage</p>
+          <p style={{ margin: ".3rem 0", fontSize: "1.3rem", color: "#7fffd4" }}>1,90 €</p>
+          <button onClick={handlePay} disabled={loadingPay} style={btnPay}>
+            {loadingPay ? "… Paiement" : "🌕 Lancer le voyage"}
+          </button>
+          {status && (
+            <p style={{ fontSize: ".8rem", marginTop: ".4rem", color: "#aefcf5" }}>{status}</p>
+          )}
         </div>
-      )}
 
-      {/* 🚪 Déconnexion */}
+        <style>
+          {`
+            @keyframes pulseWave {
+              0% { transform: scale(1); opacity: 0.8; }
+              50% { transform: scale(1.1); opacity: 1; }
+              100% { transform: scale(1); opacity: 0.8; }
+            }
+            .pulse {
+              animation: pulseWave 5s ease-in-out infinite;
+            }
+          `}
+        </style>
+      </div>
+
       <button onClick={onLogout} style={btnLogout}>🚪 Se déconnecter</button>
-
-      {/* 🧪 Accès Labo privé */}
-      {user?.id === "2d4955ad-4eb6-47c3-bfc9-8d76dedcbc97" && (
-        <p
-          onClick={() => onNavigate("labo-login")}
-          style={{
-            opacity: 0.5,
-            fontSize: "0.9rem",
-            marginTop: "1.2rem",
-            cursor: "pointer",
-          }}
-        >
-          🧪 Accès Labo (privé)
-        </p>
-      )}
     </div>
   )
 }
 
-// --- Styles (inchangés) ---
-const missionCard = {
-  background: "#223",
-  borderRadius: "10px",
-  padding: "1rem",
-  width: "90%",
-  margin: "1rem auto",
-}
-const bulleCard = {
-  background: "radial-gradient(circle, #0a0f15, #000)",
-  border: "1px solid #7fffd4",
+/* === Styles === */
+const introBox = {
+  background: "rgba(0,25,35,0.5)",
+  border: "1px solid rgba(127,255,212,0.3)",
   borderRadius: "12px",
-  padding: "0.8rem",
+  padding: "1rem",
+  margin: "1rem auto",
+  maxWidth: "600px",
+  boxShadow: "0 0 12px rgba(127,255,212,0.15)",
 }
-const btnGreen = { background: "#6eff8d", border: "none", borderRadius: "8px", padding: "0.4rem 0.8rem", cursor: "pointer" }
-const btnRed = { background: "#ff7070", border: "none", borderRadius: "6px", padding: ".3rem .8rem", cursor: "pointer" }
-const btnGrey = { background: "rgba(255,255,255,0.1)", border: "1px solid rgba(127,255,212,.3)", borderRadius: "8px", padding: ".4rem .8rem" }
-const btnLogout = { marginTop: "2rem", background: "#ff6b6b", border: "none", borderRadius: "8px", padding: ".5rem 1rem", color: "#fff", fontWeight: "bold" }
-const overlay = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", padding: "1rem", zIndex: 9999 }
-const modal = { background: "rgba(0,20,25,.95)", borderRadius: "12px", padding: "1rem", maxWidth: "420px", width: "100%", color: "#e9fffd", boxShadow: "0 0 20px rgba(127,255,212,0.2)" }
+
+const bubbleContainer = {
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "1.2rem",
+  marginTop: "1.5rem",
+  marginBottom: "2rem",
+}
+
+function bubble(d) {
+  return {
+    width: d.radius * 2,
+    height: d.radius * 2,
+    borderRadius: "50%",
+    background: `radial-gradient(circle at 30% 30%, ${d.color}, rgba(0,30,40,0.8))`,
+    boxShadow: `0 0 25px ${d.color}`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    animation: "bubblePulse 5s ease-in-out infinite",
+  }
+}
+
+const bubbleLabel = {
+  textAlign: "center",
+  color: "#e9fffd",
+}
+
+const payZone = {
+  display: "flex",
+  justifyContent: "center",
+  marginTop: "1rem",
+}
+
+const payCircle = {
+  width: 200,
+  height: 200,
+  borderRadius: "50%",
+  background: "rgba(0,40,50,0.7)",
+  border: "1.2px solid rgba(127,255,212,0.3)",
+  boxShadow: "0 0 25px rgba(127,255,212,0.4)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+}
+
+const btnPay = {
+  background: "#7fffd4",
+  border: "none",
+  borderRadius: "10px",
+  padding: ".5rem 1rem",
+  marginTop: ".4rem",
+  cursor: "pointer",
+  fontWeight: "bold",
+  color: "#001820",
+  boxShadow: "0 0 10px rgba(127,255,212,0.5)",
+}
+
+const btnLogout = {
+  marginTop: "2rem",
+  background: "#ff6b6b",
+  border: "none",
+  borderRadius: "8px",
+  padding: ".5rem 1rem",
+  color: "#fff",
+  fontWeight: "bold",
+}

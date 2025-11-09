@@ -1,27 +1,13 @@
+// src/pages/HorizonSelect.jsx
 import "../App.css"
 import { useEffect, useState } from "react"
 
 export default function HorizonSelect({ onChoose }) {
-  const [bubbles, setBubbles] = useState([])
   const [selected, setSelected] = useState(null)
 
-  useEffect(() => {
-    // 🫧 Génère quelques bulles oniriques
-    const newBubbles = Array.from({ length: 12 }).map((_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      size: 10 + Math.random() * 24,
-      duration: 10 + Math.random() * 8,
-      delay: Math.random() * 6,
-      opacity: 0.15 + Math.random() * 0.3,
-    }))
-    setBubbles(newBubbles)
-  }, [])
-
-  // 🌈 Animation au clic
   function handleChoose(culture, name) {
     setSelected(culture)
-    setTimeout(() => onChoose({ culture, name }), 800)
+    setTimeout(() => onChoose({ culture, name }), 1500)
   }
 
   return (
@@ -29,186 +15,178 @@ export default function HorizonSelect({ onChoose }) {
       className="fade-in"
       style={{
         textAlign: "center",
-        color: "#f3f5ff",
-        padding: "2rem 1rem",
+        color: "#e9fffd",
+        height: "100vh",
         position: "relative",
         overflow: "hidden",
-        minHeight: "85vh",
+        background: "linear-gradient(to bottom, #020910 40%, #031a22 90%)",
       }}
     >
-      {/* 🫧 Bulles flottantes */}
-      {bubbles.map((b) => (
-        <div
-          key={b.id}
-          className="floating-bubble"
-          style={{
-            left: `${b.left}%`,
-            width: `${b.size}px`,
-            height: `${b.size}px`,
-            opacity: b.opacity,
-            animationDuration: `${b.duration}s`,
-            animationDelay: `${b.delay}s`,
-          }}
-        />
-      ))}
-
-      {/* 🌍 Titre principal */}
-      <h2
-        style={{
-          fontSize: "1.8rem",
-          color: "#7fffd4",
-          textShadow: "0 0 14px rgba(127,255,212,0.5)",
-          marginBottom: "0.5rem",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        🌍 Choisis ton horizon culturel
-      </h2>
-
-      <p
-        style={{
-          opacity: 0.85,
-          fontSize: "1rem",
-          maxWidth: "420px",
-          margin: "0 auto 2rem",
-          zIndex: 2,
-          position: "relative",
-        }}
-      >
-        Chaque horizon ouvre un voyage de 12 défis-doux vers un monde onirique.
-      </p>
-
-      {/* 🌠 Boutons d’horizon */}
+      {/* 🌕 LUNE CENTRALE */}
       <div
         style={{
-          display: "grid",
-          gap: "1rem",
+          position: "absolute",
+          top: "12%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100px",
+          height: "100px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, #f9f9ff, #bfefff 70%, #8adfff 90%)",
+          boxShadow: "0 0 40px rgba(127,255,212,0.5)",
+          animation: "moonPulse 6s ease-in-out infinite",
+          zIndex: 3,
+        }}
+      ></div>
+
+      {/* 🌊 REFLETS HORIZONS */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "18%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          display: "flex",
           justifyContent: "center",
-          position: "relative",
-          zIndex: 2,
+          gap: "2.5rem",
         }}
       >
-        <button
-          className={`horizon-button ${
-            selected === "Inuite" ? "active" : ""
-          }`}
-          style={{
-            background: "rgba(127,255,212,0.18)",
-            color: "#7fffd4",
-            border: "1px solid rgba(127,255,212,0.4)",
-            animation: "horizonPulse 3.5s ease-in-out infinite",
-          }}
+        {/* ❄️ INUITE */}
+        <div
+          className={`reflet inuite ${selected === "Inuite" ? "active" : ""}`}
           onClick={() => handleChoose("Inuite", "Horizon Inuite")}
+          style={{
+            cursor: "pointer",
+          }}
         >
-          ❄️ Horizon Inuite — accessible
-        </button>
+          <div className="ellipse ellipse-inuite"></div>
+          <p className="horizon-title">❄️ Horizon Inuite</p>
+        </div>
 
-        <button className="horizon-button locked">
-          🏜️ Horizon Berbère — verrouillé 🔒
-        </button>
+        {/* 🏜️ BERBÈRE */}
+        <div className="reflet locked">
+          <div className="ellipse ellipse-berbere"></div>
+          <p className="horizon-title">🏜️ Horizon Berbère 🔒</p>
+        </div>
 
-        <button className="horizon-button locked">
-          🌳 Horizon Celtique — verrouillé 🔒
-        </button>
+        {/* 🌳 CELTIQUE */}
+        <div className="reflet locked">
+          <div className="ellipse ellipse-celtique"></div>
+          <p className="horizon-title">🌳 Horizon Celtique 🔒</p>
+        </div>
       </div>
 
-      {/* 🌬 Effet visuel d’entrée */}
+      {/* 🌫️ LÉGENDE */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "6%",
+          width: "100%",
+          textAlign: "center",
+          fontSize: "1rem",
+          opacity: 0.85,
+        }}
+      >
+        <p>Choisis ton horizon culturel</p>
+        <p style={{ fontSize: "0.9rem", opacity: 0.7 }}>
+          Chaque reflet ouvre un voyage de 12 gardiens du rêve.
+        </p>
+      </div>
+
+      {/* 🌬️ TRANSITION */}
       {selected && (
         <div className="dream-transition">
-          <p>✨ Entrée dans le rêve {selected}...</p>
+          <p>🌕 Le souffle du Nord t’accueille...</p>
         </div>
       )}
 
-      {/* ✨ Styles internes */}
+      {/* ✨ STYLES INTERNES */}
       <style>
         {`
-          /* 🫧 Bulles flottantes */
-          .floating-bubble {
-            position: absolute;
-            bottom: -40px;
-            background: radial-gradient(circle, rgba(127,255,212,0.45), rgba(106,90,205,0.12));
-            border-radius: 50%;
-            filter: blur(1px);
-            animation: floatUp linear infinite;
-          }
+        @keyframes moonPulse {
+          0%, 100% { box-shadow: 0 0 20px rgba(127,255,212,0.4); }
+          50% { box-shadow: 0 0 50px rgba(127,255,212,0.7); }
+        }
 
-          @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 0; }
-            10% { opacity: 1; }
-            50% { transform: translateY(-50vh) scale(1.05); opacity: 0.7; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-100vh) scale(0.95); opacity: 0; }
-          }
+        @keyframes floatWave {
+          0%, 100% { transform: scaleX(1); opacity: 0.8; }
+          50% { transform: scaleX(1.25); opacity: 1; }
+        }
 
-          /* 🌌 Boutons d’horizon */
-          .horizon-button {
-            padding: 1rem 1.6rem;
-            border-radius: 40px;
-            font-size: 1.05rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 10px rgba(127,255,212,0.15);
-            backdrop-filter: blur(6px);
-            width: 250px;
-            margin: 0 auto;
-          }
+        .ellipse {
+          width: 180px;
+          height: 40px;
+          border-radius: 50%;
+          filter: blur(2px);
+          animation: floatWave 6s ease-in-out infinite;
+        }
 
-          .horizon-button:hover:not(.locked) {
-            transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 0 18px rgba(127,255,212,0.4);
-            background: rgba(127,255,212,0.25);
-            color: #aff;
-          }
+        .ellipse-inuite {
+          background: radial-gradient(circle, rgba(127,255,212,0.5), rgba(0,50,70,0.3));
+          box-shadow: 0 0 20px rgba(127,255,212,0.3);
+        }
 
-          .horizon-button.locked {
-            background: rgba(255,255,255,0.05);
-            color: #888;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: not-allowed;
-          }
+        .ellipse-berbere {
+          background: radial-gradient(circle, rgba(255,215,150,0.15), rgba(60,40,0,0.2));
+        }
 
-          .horizon-button.active {
-            transform: scale(1.1);
-            background: rgba(127,255,212,0.3);
-            color: #fff;
-          }
+        .ellipse-celtique {
+          background: radial-gradient(circle, rgba(110,255,141,0.2), rgba(0,40,20,0.2));
+        }
 
-          @keyframes horizonPulse {
-            0%, 100% {
-              box-shadow: 0 0 10px rgba(127,255,212,0.3),
-                          0 0 20px rgba(106,90,205,0.15);
-            }
-            50% {
-              box-shadow: 0 0 18px rgba(127,255,212,0.6),
-                          0 0 28px rgba(106,90,205,0.25);
-            }
-          }
+        .reflet {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transition: transform 0.4s ease;
+        }
 
-          /* ✨ Transition de rêve */
-          .dream-transition {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, rgba(127,255,212,0.2), #000);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #7fffd4;
-            font-size: 1.4rem;
-            animation: dreamFade 1s ease forwards;
-            z-index: 20;
-          }
+        .reflet:hover:not(.locked) {
+          transform: scale(1.1);
+        }
 
-          @keyframes dreamFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-        `}
+        .reflet.locked {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .horizon-title {
+          margin-top: 0.5rem;
+          color: #aef;
+          font-size: 0.95rem;
+        }
+
+        .reflet.inuite.active .ellipse-inuite {
+          animation: pulseGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 20px rgba(127,255,212,0.4); transform: scale(1); }
+          100% { box-shadow: 0 0 60px rgba(127,255,212,0.8); transform: scale(1.15); }
+        }
+
+        .dream-transition {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle at center, rgba(127,255,212,0.15), #000);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #7fffd4;
+          font-size: 1.4rem;
+          animation: fadeIn 1.2s ease forwards;
+          z-index: 10;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}
       </style>
     </div>
   )

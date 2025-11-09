@@ -1,0 +1,113 @@
+// src/pages/Revotheque.jsx
+import { useEffect, useState } from "react"
+import { supabase } from "../supabaseClient"
+import "../styles/Revotheque.css" // ton fichier CSS
+import StarPreview from "../components/StarPreview"
+
+export default function Revotheque() {
+  const [dreams, setDreams] = useState([])
+  const [selected, setSelected] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    loadDreams()
+  }, [])
+
+  async function loadDreams() {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from("dreams")
+        .select("id, titre, contenu, tags, image_url, created_at, visible, expired_at, guardian_id")
+        .eq("visible", true)
+        .is("expired_at", null)
+        .order("created_at", { ascending: false })
+      if (error) throw error
+      setDreams(data || [])
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="revo-container">
+      <h2>💤 Rêvothèque collective</h2>
+      <p className="intro">
+        Les rêves nés des gardiens, partagés dans la trame du monde onirique.
+      </p>
+
+      {loading && <p className="loading">Chargement des songes…</p>}
+      {error && <p style={{ color: "#ff9999" }}>⚠️ {error}</p>}
+      {!loading && dreams.length === 0 && !error && (
+        <p>Aucun rêve actif pour l’instant 🌙</p>
+      )}
+
+      <div className="revo-list">
+        {dreams.map((dream) => (
+          <div
+            key={dream.id}
+            className="revo-card"
+            onClick={() => setSelected(dream)}
+          >
+            <div className="revo-header">
+              <div className="revo-emojis">💤</div>
+              <h3>{dream.titre || "Rêve sans titre"}</h3>
+            </div>
+            <div className="revo-spirit">
+              Gardien #{dream.guardian_id || "?"}
+            </div>
+            <div className="revo-date">
+              {new Date(dream.created_at).toLocaleDateString("fr-FR")}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* --- MODALE --- */}
+      {selected && (
+        <div className="revo-modal" onClick={() => setSelected(null)}>
+          <div
+            className="revo-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>💤 {selected.titre}</h3>
+
+            <div style={{ textAlign: "center", marginBottom: ".5rem" }}>
+              <StarPreview
+                words={(selected.tags || []).slice(0, 5)}
+                centerEmoji="💤"
+              />
+            </div>
+
+            {selected.image_url && (
+              <img
+                src={selected.image_url}
+                alt={selected.titre}
+                style={{
+                  width: "100%",
+                  borderRadius: "10px",
+                  marginTop: ".5rem",
+                  boxShadow: "0 0 20px rgba(127,255,212,.25)",
+                }}
+              />
+            )}
+
+            {selected.contenu && (
+              <div className="revo-dream">{selected.contenu}</div>
+            )}
+
+            <button
+              className="revo-close"
+              onClick={() => setSelected(null)}
+            >
+              ✨ Fermer
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

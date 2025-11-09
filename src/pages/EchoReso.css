@@ -1,107 +1,142 @@
-/* 🌌 Style global de la page */
-.echoreso-page {
-  text-align: center;
-  color: #e9fffd;
-  min-height: 100vh;
-  background: radial-gradient(circle at 50% 20%, #020d0f, #000);
-  overflow-x: hidden;
-  position: relative;
-  padding-bottom: 3rem;
-}
+import { useEffect, useState } from "react"
+import { supabase } from "../supabaseClient"
+import DreamNetwork from "../components/DreamNetwork"
 
-/* ✨ Animation d’entrée */
-.fade-in {
-  animation: fadeIn 1.2s ease-in-out;
-}
+export default function EchoReso({ userId }) {
+  const [meteo, setMeteo] = useState(null)
+  const [gallery, setGallery] = useState([])
+  const [loading, setLoading] = useState(true)
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  useEffect(() => {
+    loadMeteo()
+    loadGallery()
+  }, [])
 
-/* 🌙 Titre principal */
-.echoreso-title {
-  color: #7fffd4;
-  margin-top: 1rem;
-  text-shadow: 0 0 10px rgba(127, 255, 212, 0.4);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
+  // 🌀 Météo onirique — calculée à partir du réseau
+  async function loadMeteo() {
+    try {
+      const { data, error } = await supabase.from("v_dream_network").select("*")
+      if (error) throw error
+      if (!data || data.length === 0) {
+        setMeteo({
+          emoji: "🌫️",
+          humeur: "calme et diffuse",
+          total: 0,
+          avgFreq: 0,
+          mots: 0,
+        })
+        return
+      }
 
-/* 🪞 Hublot circulaire */
-.echoreso-hublot {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin: 2rem auto;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, #021014, #000);
-  box-shadow: 0 0 25px rgba(127, 255, 212, 0.3),
-              inset 0 0 20px rgba(127, 255, 212, 0.15);
-  animation: softPulse 8s ease-in-out infinite alternate;
-}
+      const freqs = data.map((d) => d.freq || 0)
+      const avg = freqs.reduce((a, b) => a + b, 0) / freqs.length
+      const diversity = new Set(data.map((d) => d.word)).size
 
-@keyframes softPulse {
-  from { box-shadow: 0 0 20px rgba(127,255,212,0.25); }
-  to { box-shadow: 0 0 35px rgba(127,255,212,0.45); }
-}
+      let humeur = "calme et diffuse"
+      let emoji = "🌫️"
+      if (avg > 15) { humeur = "dense et vibrante"; emoji = "🌌" }
+      else if (avg > 8) { humeur = "lumineuse et résonante"; emoji = "🌤️" }
+      else if (avg > 3) { humeur = "mouvante et fluide"; emoji = "💨" }
 
-/* 🌬️ Message central */
-.echoreso-core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: #7fffd4;
-  text-align: center;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
+      setMeteo({
+        emoji,
+        humeur,
+        avgFreq: avg.toFixed(1),
+        mots: diversity,
+        total: data.length,
+      })
+    } catch (err) {
+      console.warn("⚠️ Erreur météo :", err.message)
+      setMeteo({
+        emoji: "🌫️",
+        humeur: "silencieuse (hors ligne)",
+        total: 0,
+        avgFreq: 0,
+        mots: 0,
+      })
+    }
+  }
 
-/* 🧿 Boutons des esprits (émojis) */
-.echoreso-hublot button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #7fffd4;
-  transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
-  opacity: 0.9;
-}
+  // 🌠 Galerie des gardiens collectifs
+  async function loadGallery() {
+    try {
+      const { data, error } = await supabase
+        .from("onimoji")
+        .select("id, emoji, titre, texte, image_url, culture, created_at")
+        .eq("culture", "Collective")
+        .order("created_at", { ascending: false })
+      if (error) throw error
+      setGallery(data || [])
+    } catch (err) {
+      console.warn("⚠️ Erreur galerie :", err.message)
+      setGallery([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
-.echoreso-hublot button:hover {
-  transform: scale(1.3);
-  opacity: 1;
-  filter: drop-shadow(0 0 6px rgba(127,255,212,0.6));
-}
+  // 🌌 Rendu principal
+  return (
+    <div style={{ color: "#e9fffd", textAlign: "center", padding: "1rem" }}>
+      <h2 style={{ color: "#7fffd4" }}>🌌 ÉchoReso•°</h2>
+      <p style={{ opacity: 0.8 }}>
+        La constellation collective des Onimojis.
+      </p>
 
-/* 🌀 Modale (SpiritGraph) */
-.echoreso-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+      {meteo && (
+        <p style={{ fontSize: ".9rem", opacity: 0.85 }}>
+          {meteo.emoji} Météo onirique : <b>{meteo.humeur}</b> — {meteo.mots} mots reliés • moyenne {meteo.avgFreq}
+        </p>
+      )}
 
-/* 🌠 Pied de page */
-.echoreso-footer {
-  opacity: 0.6;
-  margin-top: 2rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.4px;
-}
+      {/* 🕸️ Réseau onirique */}
+      <DreamNetwork />
 
-/* 🌈 Scrollbar subtile pour esthétique */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(127,255,212,0.3);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(127,255,212,0.5);
+      {/* 🌠 Galerie */}
+      <h3 style={{ marginTop: "2rem", color: "#7fffd4" }}>🌠 Gardiens collectifs</h3>
+      {loading && <p>Chargement…</p>}
+      {gallery.length === 0 && !loading && (
+        <p style={{ opacity: 0.7 }}>Aucun gardien collectif encore.</p>
+      )}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+          gap: "1rem",
+          marginTop: "1rem",
+        }}
+      >
+        {gallery.map((g) => (
+          <div
+            key={g.id}
+            style={{
+              background: "rgba(0,25,35,0.5)",
+              border: "1px solid rgba(127,255,212,0.3)",
+              borderRadius: "10px",
+              padding: ".5rem",
+            }}
+          >
+            {g.image_url && (
+              <img
+                src={g.image_url}
+                alt={g.titre}
+                style={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  marginBottom: ".3rem",
+                }}
+              />
+            )}
+            <h4 style={{ margin: 0 }}>
+              {g.emoji} {g.titre}
+            </h4>
+            <p style={{ fontSize: ".8rem", opacity: 0.7, marginTop: ".2rem" }}>
+              {new Date(g.created_at).toLocaleDateString("fr-FR")}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

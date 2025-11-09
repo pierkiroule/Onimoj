@@ -1,15 +1,20 @@
+// src/pages/Profil.jsx
 import { useEffect, useState } from "react"
 import { supabase } from "../supabaseClient"
 import "./Home.css"
 
 export default function Profil({ user, onLogout }) {
   const [stats, setStats] = useState(null)
+  const [badges, setBadges] = useState([])
   const [animLine, setAnimLine] = useState(0)
   const [loadingPay, setLoadingPay] = useState(false)
   const [status, setStatus] = useState("")
 
   useEffect(() => {
-    if (user) fetchStats(user.id)
+    if (user) {
+      fetchStats(user.id)
+      fetchBadges(user.id)
+    }
   }, [user])
 
   useEffect(() => {
@@ -43,6 +48,22 @@ export default function Profil({ user, onLogout }) {
     }
   }
 
+  // --- Badges oniriques ---
+  async function fetchBadges(userId) {
+    try {
+      const { data } = await supabase
+        .from("dream_archive")
+        .select("id, guardian_name, generated_at, wisdom_generated")
+        .eq("generated_by", userId)
+        .eq("wisdom_generated", true)
+        .order("generated_at", { ascending: false })
+        .limit(8)
+      setBadges(data || [])
+    } catch (err) {
+      console.warn("Erreur chargement badges :", err)
+    }
+  }
+
   // --- Paiement simulé ---
   function handlePay() {
     setLoadingPay(true)
@@ -51,6 +72,16 @@ export default function Profil({ user, onLogout }) {
       setLoadingPay(false)
       setStatus("🌕 Voyage onirique activé ! Bon rêve…")
     }, 2000)
+  }
+
+  // --- Titre onirique selon progression ---
+  function titreOnirique(stats) {
+    if (!stats) return "🌙 Voyageur du Réso•°"
+    const total = (stats.rêves || 0) + (stats.échos || 0)
+    if (total > 50) return "🌕 Maître des Rêves"
+    if (total > 20) return "🌠 Gardien des Échos"
+    if (total > 5) return "✨ Voyageur Onirique"
+    return "🌑 Rêveur naissant"
   }
 
   const dimensions = stats
@@ -72,6 +103,9 @@ export default function Profil({ user, onLogout }) {
   return (
     <div className="fade-in" style={{ padding: "1rem", color: "#e9fffd", textAlign: "center" }}>
       <h2>👤 Profil Réso•°</h2>
+      <h3 style={{ color: "#ffd46b", marginTop: "-.5rem" }}>
+        {titreOnirique(stats)}
+      </h3>
       <p style={{ opacity: 0.8, fontSize: ".9rem" }}>
         {user?.email || `ID : ${user?.id?.slice(0, 8)}...`}
       </p>
@@ -84,7 +118,7 @@ export default function Profil({ user, onLogout }) {
         ))}
       </div>
 
-      {/* 🌊 Cercles indépendants */}
+      {/* 🌊 Cercles stats */}
       {stats ? (
         <div style={bubbleContainer}>
           {dimensions.map((d, i) => (
@@ -109,10 +143,57 @@ export default function Profil({ user, onLogout }) {
         <p style={{ opacity: 0.7 }}>Chargement des bulles...</p>
       )}
 
+      {/* 🏅 Badges oniriques */}
+      {badges.length > 0 && (
+        <div style={{ marginTop: "1rem" }}>
+          <h3 style={{ color: "#ffd46b" }}>🏅 Tes Sagesses révélées</h3>
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "1rem",
+            marginTop: ".6rem"
+          }}>
+            {badges.map(b => (
+              <div key={b.id} style={{
+                width: 90,
+                height: 90,
+                borderRadius: "50%",
+                background: "radial-gradient(circle at 30% 30%, #ffe38e, #553)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                color: "#111",
+                fontWeight: "bold",
+                boxShadow: "0 0 10px rgba(255,230,150,0.6)",
+                animation: "floatBadge 6s ease-in-out infinite",
+              }}>
+                <span style={{ fontSize: "1.3rem" }}>🌕</span>
+                <small style={{ fontSize: ".7rem", textAlign: "center" }}>
+                  {b.guardian_name?.slice(0, 10) || "Sagesse"}
+                </small>
+              </div>
+            ))}
+            <style>
+              {`
+                @keyframes floatBadge {
+                  0% { transform: translateY(0); }
+                  50% { transform: translateY(-6px); }
+                  100% { transform: translateY(0); }
+                }
+              `}
+            </style>
+          </div>
+        </div>
+      )}
+
       {/* 💠 Cercle “offrir un voyage” */}
       <div style={payZone}>
         <div className="pulse" style={payCircle}>
-          <p style={{ fontSize: "1.1rem", margin: 0 }}>💠 Offrir un voyage</p>
+          <p style={{ fontSize: "1.1rem", margin: 0 }}>
+            💠 S'offrir un voyage onirique au prix d'un croissant 🌜
+          </p>
           <p style={{ margin: ".3rem 0", fontSize: "1.3rem", color: "#7fffd4" }}>1,90 €</p>
           <button onClick={handlePay} disabled={loadingPay} style={btnPay}>
             {loadingPay ? "… Paiement" : "🌕 Lancer le voyage"}
@@ -121,7 +202,6 @@ export default function Profil({ user, onLogout }) {
             <p style={{ fontSize: ".8rem", marginTop: ".4rem", color: "#aefcf5" }}>{status}</p>
           )}
         </div>
-
         <style>
           {`
             @keyframes pulseWave {

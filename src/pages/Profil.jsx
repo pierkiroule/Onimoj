@@ -1,14 +1,16 @@
 // src/pages/Profil.jsx
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { supabase } from "../supabaseClient"
 import "./Home.css"
 
-export default function Profil({ user, onLogout }) {
+export default function Profil({ user, onLogout, onDisableTimer }) {
   const [stats, setStats] = useState(null)
   const [badges, setBadges] = useState([])
   const [animLine, setAnimLine] = useState(0)
   const [loadingPay, setLoadingPay] = useState(false)
   const [status, setStatus] = useState("")
+  const [timerMessage, setTimerMessage] = useState("")
+  const timerFeedbackTimeout = useRef(null)
 
   useEffect(() => {
     if (user) {
@@ -22,6 +24,15 @@ export default function Profil({ user, onLogout }) {
       setAnimLine((prev) => (prev < poeticLines.length ? prev + 1 : prev))
     }, 1800)
     return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (timerFeedbackTimeout.current) {
+        clearTimeout(timerFeedbackTimeout.current)
+        timerFeedbackTimeout.current = null
+      }
+    }
   }, [])
 
   const poeticLines = [
@@ -88,6 +99,25 @@ export default function Profil({ user, onLogout }) {
     if (total > 20) return "🌠 Gardien des Échos"
     if (total > 5) return "✨ Voyageur Onirique"
     return "🌑 Rêveur Naissant"
+  }
+
+  function handleDisableTimer() {
+    if (typeof onDisableTimer !== "function") {
+      setTimerMessage("Fonction non disponible.")
+      return
+    }
+    const confirmed =
+      typeof window === "undefined"
+        ? true
+        : window.confirm("Désactiver le sablier de 12h pour ce navigateur ?")
+    if (!confirmed) return
+    onDisableTimer()
+    setTimerMessage("🕰️ Sablier désactivé pour ce navigateur.")
+    if (timerFeedbackTimeout.current) clearTimeout(timerFeedbackTimeout.current)
+    timerFeedbackTimeout.current = setTimeout(() => {
+      setTimerMessage("")
+      timerFeedbackTimeout.current = null
+    }, 5000)
   }
 
   const dimensions = stats
@@ -221,6 +251,19 @@ export default function Profil({ user, onLogout }) {
         </div>
       </div>
 
+      <div style={timerBox}>
+        <h3 style={{ color: "#ffd46b", marginBottom: ".4rem" }}>🧪 Mode test production</h3>
+        <p style={{ fontSize: ".85rem", opacity: 0.8, marginBottom: ".6rem" }}>
+          Désactive le sablier de 12h sur cet appareil pour faciliter les essais en production.
+        </p>
+        <button onClick={handleDisableTimer} style={btnTimer}>
+          ⏱️ Désactiver le sablier (test)
+        </button>
+        {timerMessage && (
+          <p style={{ fontSize: ".8rem", color: "#aefcf5", marginTop: ".5rem" }}>{timerMessage}</p>
+        )}
+      </div>
+
       <button onClick={onLogout} style={btnLogout}>🚪 Se déconnecter</button>
 
       <style>{`
@@ -324,4 +367,27 @@ const btnLogout = {
   padding: ".5rem 1rem",
   color: "#fff",
   fontWeight: "bold",
+}
+
+const timerBox = {
+  marginTop: "1.5rem",
+  padding: "1rem",
+  background: "rgba(0,25,35,0.45)",
+  border: "1px dashed rgba(255, 212, 107, 0.4)",
+  borderRadius: "12px",
+  maxWidth: "400px",
+  marginLeft: "auto",
+  marginRight: "auto",
+  boxShadow: "0 0 18px rgba(255,212,107,0.15)",
+}
+
+const btnTimer = {
+  background: "rgba(255, 212, 107, 0.2)",
+  border: "1px solid rgba(255, 212, 107, 0.6)",
+  borderRadius: "8px",
+  padding: ".5rem 1rem",
+  color: "#ffd46b",
+  fontWeight: "bold",
+  cursor: "pointer",
+  boxShadow: "0 0 12px rgba(255, 212, 107, 0.25)",
 }

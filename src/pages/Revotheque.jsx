@@ -10,10 +10,18 @@ export default function Revotheque({ userId }) {
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
-    loadDreams()
-  }, [])
+    if (!userId) {
+      setLoading(false)
+      setDreams([])
+      setErrText("")
+      return
+    }
+    loadDreams(userId)
+  }, [userId])
 
-  async function loadDreams() {
+  async function loadDreams(currentUserId = userId) {
+    if (!currentUserId) return
+
     setErrText("")
     setLoading(true)
     try {
@@ -24,7 +32,7 @@ export default function Revotheque({ userId }) {
           visible, expired_at, guardian_id, user_id,
           echo_count, echo_max
         `)
-        .eq("user_id", userId)
+        .eq("user_id", currentUserId)
         .is("expired_at", null)
         .order("created_at", { ascending: false })
 

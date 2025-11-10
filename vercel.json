@@ -1,12 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install --legacy-peer-deps",
   "framework": "vite",
   "public": true,
 
+<<<<<<< HEAD
+=======
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "outputDirectory": "dist",
+
+>>>>>>> 252fa14 (✅ Fix build Vercel + base Vite + ajustements UI)
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }

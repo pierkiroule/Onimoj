@@ -161,8 +161,7 @@ export default function Home({ onStart, onLogin, onRegister }) {
       </div>
 
       <div className="tagline">
-        Embarquez dans une quête onirique pour découvrir la richesse culturelle
-        des rêves de vos gardiens du sommeil.
+        Embarquez dans une quête pour developper des ressources culturelles oniriques. Prenons soin des rêves transmis par les gardiens du sommeil.
       </div>
 
       {remaining > 0 ? (

@@ -1,6 +1,7 @@
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useRef, useState, useMemo } from "react"
 import * as THREE from "three"
+import { useThrottledEmitter } from "../modules/useDreamFragments"
 
 // === AUDIO ENGINE STABLE ===
 let ctx, buffer, src, gain, analyser, dataArray
@@ -46,12 +47,13 @@ async function toggleAudio(volume = 0.6, fade = 1.2) {
   return playing
 }
 
-export default function MeteoniriqueBoreale() {
+export default function MeteoniriqueBoreale({ onAudioLevelChange }) {
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 })
   const [isPlaying, setIsPlaying] = useState(false)
   const [bubbles, setBubbles] = useState([])
   const [words, setWords] = useState([])
   const [locked, setLocked] = useState(false)
+  const emitAudioLevel = useThrottledEmitter(onAudioLevelChange)
 
   const tagBank = ["onde", "flux", "souffle", "écho", "rêve", "aurore", "mémoire"]
 
@@ -98,6 +100,7 @@ export default function MeteoniriqueBoreale() {
           isPlaying={isPlaying}
           analyser={analyser}
           dataArray={dataArray}
+          onAudioLevel={emitAudioLevel}
         />
       </Canvas>
 
@@ -155,7 +158,7 @@ export default function MeteoniriqueBoreale() {
 }
 
 /* === PARTICLES + AURA DIFFUSE AUDIO-RÉACTIVE === */
-function RessoParticles({ touchPos, isPlaying, analyser, dataArray }) {
+function RessoParticles({ touchPos, isPlaying, analyser, dataArray, onAudioLevel }) {
   const group = useRef()
   const mat = useRef()
   const auraRef = useRef()
@@ -203,6 +206,7 @@ function RessoParticles({ touchPos, isPlaying, analyser, dataArray }) {
       analyser.getByteFrequencyData(dataArray)
       audioLevel = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 255
     }
+    onAudioLevel?.(audioLevel)
 
     const lvl = isPlaying ? 0.4 + audioLevel * 1.5 : 0.1
     const arr = []

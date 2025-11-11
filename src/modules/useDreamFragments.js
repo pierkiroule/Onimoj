@@ -206,13 +206,13 @@ export function useDreamFragments(options = {}) {
       )
       .subscribe()
 
-    return () => {
-      cancelled = true
-      if (typeof supabase?.removeChannel === "function" && channel) {
-        supabase.removeChannel(channel)
+      return () => {
+        cancelled = true
+        if (typeof supabase?.removeChannel === "function" && channel) {
+          supabase.removeChannel(channel)
+        }
       }
-    }
-  }, [guardianName, limit, userId])
+    }, [guardianId, limit, userId])
 
   const queue = useMemo(() => {
     if (!fragments?.length) return []

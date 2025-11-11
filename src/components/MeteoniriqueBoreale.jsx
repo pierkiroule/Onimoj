@@ -1,9 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber"
-import { useRef, useState, useMemo, useEffect } from "react"
+import { useRef, useState, useMemo } from "react"
 import * as THREE from "three"
 
-// 🎧 AUDIO ENGINE GLOBAL
-let ctx, buffer, src, gain
+// === AUDIO ENGINE STABLE ===
+let ctx, buffer, src, gain, analyser, dataArray
 let startTime = 0
 let offset = 0
 let playing = false
@@ -23,9 +23,12 @@ async function toggleAudio(volume = 0.6, fade = 1.2) {
   if (!playing) {
     src = ctx.createBufferSource()
     gain = ctx.createGain()
+    analyser = ctx.createAnalyser()
+    analyser.fftSize = 256
+    dataArray = new Uint8Array(analyser.frequencyBinCount)
     src.buffer = buffer
     src.loop = true
-    src.connect(gain).connect(ctx.destination)
+    src.connect(gain).connect(analyser).connect(ctx.destination)
     gain.gain.setValueAtTime(0, ctx.currentTime)
     gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + fade)
     src.start(0, offset % buffer.duration)
@@ -45,12 +48,12 @@ async function toggleAudio(volume = 0.6, fade = 1.2) {
 
 export default function MeteoniriqueBoreale() {
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 })
+  const [isPlaying, setIsPlaying] = useState(false)
   const [bubbles, setBubbles] = useState([])
   const [words, setWords] = useState([])
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [locked, setLocked] = useState(false) // évite double tap
+  const [locked, setLocked] = useState(false)
 
-  const tagBank = ["onde","flux","souffle","lien","écho","rêve","lumière","aurore"]
+  const tagBank = ["onde", "flux", "souffle", "écho", "rêve", "aurore", "mémoire"]
 
   async function handleTap(e) {
     if (locked) return
@@ -64,19 +67,17 @@ export default function MeteoniriqueBoreale() {
     const newState = !(await toggleAudio())
     setIsPlaying(newState)
 
-    // 🌟 bulles + mots
     const id = Date.now()
-    const emoji = ["💫","🌕","🌬️","✨","🌈"][Math.floor(Math.random()*5)]
-    setBubbles((p)=>[...p,{id,emoji,x,y}])
-    setTimeout(()=>setBubbles(p=>p.filter(b=>b.id!==id)),2500)
-    const word=tagBank[Math.floor(Math.random()*tagBank.length)]
-    const wid=`${id}-w`
-    setWords(p=>[...p,{id:wid,text:word,x,y,color:randomHSL()}])
-    setTimeout(()=>setWords(p=>p.filter(w=>w.id!==wid)),3000)
-    setTimeout(()=>setLocked(false),400) // évite double lancement
+    const emoji = ["💫","🌕","🌬️","✨","🌈"][Math.floor(Math.random() * 5)]
+    setBubbles((p) => [...p, { id, emoji, x, y }])
+    setTimeout(() => setBubbles((p) => p.filter((b) => b.id !== id)), 2500)
+    const word = tagBank[Math.floor(Math.random() * tagBank.length)]
+    const wid = `${id}-w`
+    setWords((p) => [...p, { id: wid, text: word, x, y, color: randomHSL() }])
+    setTimeout(() => setWords((p) => p.filter((w) => w.id !== wid)), 3000)
+    setTimeout(() => setLocked(false), 400)
   }
 
-  // 🧊 rendu
   return (
     <div
       onTouchStart={handleTap}
@@ -90,12 +91,17 @@ export default function MeteoniriqueBoreale() {
         userSelect:"none"
       }}
     >
-      <Canvas camera={{ position:[0,0,5] }}>
-        <ambientLight intensity={0.5}/>
-        <RessoParticles touchPos={touchPos} isPlaying={isPlaying}/>
+      <Canvas camera={{ position: [0, 0, 5] }}>
+        <ambientLight intensity={0.6}/>
+        <RessoParticles
+          touchPos={touchPos}
+          isPlaying={isPlaying}
+          analyser={analyser}
+          dataArray={dataArray}
+        />
       </Canvas>
 
-      {bubbles.map(b=>(
+      {bubbles.map((b) => (
         <span key={b.id} style={{
           position:"absolute",
           left:`${b.x*100}%`,
@@ -107,7 +113,7 @@ export default function MeteoniriqueBoreale() {
           pointerEvents:"none"
         }}>{b.emoji}</span>
       ))}
-      {words.map(w=>(
+      {words.map((w) => (
         <span key={w.id} style={{
           position:"absolute",
           left:`${w.x*100}%`,
@@ -130,7 +136,7 @@ export default function MeteoniriqueBoreale() {
         color:isPlaying?"#7fffd4":"#555",
         textShadow:"0 0 10px rgba(127,255,212,0.6)"
       }}>
-        {isPlaying?"🔊":"🔇"}
+          {isPlaying ? "🔊" : "🔇"}
       </div>
 
       <style>{`
@@ -148,81 +154,134 @@ export default function MeteoniriqueBoreale() {
   )
 }
 
-/* === Réseau boréal + sphère filaire === */
-function RessoParticles({ touchPos, isPlaying }) {
-  const group=useRef()
-  const pointMat=useRef()
-  const wireMat=useRef()
-  const count=80
+/* === PARTICLES + AURA DIFFUSE AUDIO-RÉACTIVE === */
+function RessoParticles({ touchPos, isPlaying, analyser, dataArray }) {
+  const group = useRef()
+  const mat = useRef()
+  const auraRef = useRef()
+  const count = 150
 
-  const positions=useMemo(()=>{
-    const arr=[]
-    for(let i=0;i<count;i++){
-      const r=1.2+Math.random()*0.8
-      const theta=Math.random()*Math.PI*2
-      const phi=Math.acos(2*Math.random()-1)
+  const positions = useMemo(() => {
+    const arr = []
+    for (let i = 0; i < count; i++) {
+      const r = 1.2 + Math.random() * 1.2
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
       arr.push({
-        base:new THREE.Vector3(
-          r*Math.sin(phi)*Math.cos(theta),
-          r*Math.sin(phi)*Math.sin(theta),
-          r*Math.cos(phi)
+        base: new THREE.Vector3(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.sin(phi) * Math.sin(theta),
+          r * Math.cos(phi)
         ),
-        amp:0.06+Math.random()*0.1,
-        freq:0.4+Math.random()*0.9,
-        phase:Math.random()*Math.PI*2
+        amp: 0.08 + Math.random() * 0.1,
+        freq: 0.3 + Math.random() * 1.2,
+        phase: Math.random() * Math.PI * 2,
       })
     }
     return arr
-  },[])
+  }, [])
 
-  useFrame(({clock})=>{
-    const t=clock.getElapsedTime()
-    const lvl=isPlaying?0.6+0.3*Math.sin(t*2)**2:0.1
-    const arr=[]
-    positions.forEach((p,i)=>{
-      const off=p.amp*Math.sin(t*p.freq+p.phase+i*0.25)
+  const auraPositions = useMemo(() => {
+    const pts = []
+    for (let i = 0; i < 80; i++) {
+      const r = Math.random() * 0.4
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
+      pts.push(
+        r * Math.sin(phi) * Math.cos(theta),
+        r * Math.sin(phi) * Math.sin(theta),
+        r * Math.cos(phi)
+      )
+    }
+    return new Float32Array(pts)
+  }, [])
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime()
+    let audioLevel = 0
+    if (analyser && dataArray) {
+      analyser.getByteFrequencyData(dataArray)
+      audioLevel = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 255
+    }
+
+    const lvl = isPlaying ? 0.4 + audioLevel * 1.5 : 0.1
+    const arr = []
+    positions.forEach((p, i) => {
+      const off = p.amp * Math.sin(t * p.freq + p.phase + i * 0.25 + audioLevel * 3)
       arr.push(
-        p.base.x+off*(1+lvl),
-        p.base.y+off*(1+lvl),
-        p.base.z+off*(1+lvl)
+        p.base.x + off * (1 + lvl * 1.6),
+        p.base.y + off * (1 + lvl * 1.6),
+        p.base.z + off * (1 + lvl * 1.6)
       )
     })
-    const geo=group.current.children[0].geometry
-    geo.attributes.position.array.set(new Float32Array(arr))
-    geo.attributes.position.needsUpdate=true
 
-    group.current.rotation.y+=0.001+touchPos.x*0.02
-    group.current.rotation.x+=0.0008+touchPos.y*0.015
-    const hue=(t*30+lvl*200)%360
-    pointMat.current.color.set(`hsl(${hue},90%,${65+lvl*10}%)`)
-    wireMat.current.color.set(`hsl(${(hue+200)%360},90%,70%)`)
-    wireMat.current.opacity=0.5
+    const geo = group.current.children[0].geometry
+    geo.attributes.position.array.set(new Float32Array(arr))
+    geo.attributes.position.needsUpdate = true
+
+    group.current.rotation.y += 0.002 + touchPos.x * 0.02
+    group.current.rotation.x += 0.001 + touchPos.y * 0.015
+
+    const hue = (t * 40 + lvl * 180) % 360
+    const light = 60 + audioLevel * 35
+    mat.current.color.set(`hsl(${hue},90%,${light}%)`)
+    mat.current.size = 0.05 + audioLevel * 0.25
+    mat.current.opacity = 0.5 + audioLevel * 0.5
+
+    if (auraRef.current) {
+      const hueA = (hue + 90) % 360
+      auraRef.current.material.color.set(`hsl(${hueA},100%,70%)`)
+      auraRef.current.material.opacity = 0.1 + audioLevel * 0.6
+      auraRef.current.scale.setScalar(0.8 + audioLevel * 1.2)
+    }
   })
 
-  return(
+  return (
     <group ref={group}>
       <points>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
             count={positions.length}
-            array={new Float32Array(positions.flatMap(p=>[p.base.x,p.base.y,p.base.z]))}
+            array={new Float32Array(
+              positions.flatMap((p) => [p.base.x, p.base.y, p.base.z])
+            )}
             itemSize={3}
           />
         </bufferGeometry>
-        <pointsMaterial ref={pointMat} size={0.06} transparent opacity={0.8} blending={THREE.AdditiveBlending}/>
+        <pointsMaterial
+          ref={mat}
+          size={0.06}
+          transparent
+          opacity={0.8}
+          blending={THREE.AdditiveBlending}
+        />
       </points>
-      <mesh>
-        <sphereGeometry args={[1,24,24]}/>
-        <meshBasicMaterial ref={wireMat} wireframe transparent blending={THREE.AdditiveBlending}/>
-      </mesh>
+
+      <points ref={auraRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={auraPositions.length / 3}
+            array={auraPositions}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          transparent
+          opacity={0.4}
+          size={0.15}
+          blending={THREE.AdditiveBlending}
+          color="#66ffff"
+        />
+      </points>
     </group>
   )
 }
 
-function randomHSL(){
-  const h=Math.floor(Math.random()*360)
-  const s=60+Math.random()*25
-  const l=60+Math.random()*20
-  return`hsl(${h},${s}%,${l}%)`
+function randomHSL() {
+  const h = Math.floor(Math.random() * 360)
+  const s = 60 + Math.random() * 25
+  const l = 60 + Math.random() * 20
+  return `hsl(${h},${s}%,${l}%)`
 }

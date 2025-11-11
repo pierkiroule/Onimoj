@@ -92,7 +92,7 @@ function buildFallbackFragments(limit = DEFAULT_LIMIT) {
 }
 
 export function useDreamFragments(options = {}) {
-  const { limit = DEFAULT_LIMIT, guardianName, userId } = options
+  const { limit = DEFAULT_LIMIT, guardianId, userId } = options
   const [fragments, setFragments] = useState(() =>
     buildFallbackFragments(Math.min(limit, MAX_FALLBACK))
   )
@@ -106,27 +106,25 @@ export function useDreamFragments(options = {}) {
       if (bootstrapDone.current && !navigator.onLine) return
       try {
         setLoading(true)
-        const fragmentsCollected = []
-
         if (typeof supabase?.from !== "function") {
           throw new Error("Supabase client indisponible")
         }
 
-        const dreamsQuery = supabase
+        const dreamsBuilder = supabase
           .from("dreams")
           .select(
-            "id, titre, contenu, color, guardian_id, guardian_name, tags, vitality, visible, expired_at, user_id"
+            "id, titre, contenu, color, guardian_id, tags, vitality, visible, expired_at, user_id"
           )
           .order("born_at", { ascending: false })
           .limit(limit)
 
-        const echoesQuery = supabase
+        const echoesBuilder = supabase
           .from("dream_echoes")
           .select("id, content, dream_id, created_at, user_id")
           .order("created_at", { ascending: false })
           .limit(Math.ceil(limit / 2))
 
-        const archiveQuery = supabase
+        const archiveBuilder = supabase
           .from("dream_archive")
           .select(
             "id, wisdom_message, wisdom_text, guardian_name, color, ricochet_level"
@@ -134,27 +132,36 @@ export function useDreamFragments(options = {}) {
           .order("archived_at", { ascending: false })
           .limit(Math.ceil(limit / 3))
 
-        const [{ data: dreamsData, error: dreamsError }, { data: echoesData, error: echoesError }, { data: archiveData, error: archiveError }] =
-          await Promise.all([dreamsQuery, echoesQuery, archiveQuery])
+        const [
+          { data: dreamsData, error: dreamsError },
+          { data: echoesData, error: echoesError },
+          { data: archiveData, error: archiveError },
+        ] = await Promise.all([
+          dreamsBuilder,
+          echoesBuilder,
+          archiveBuilder,
+        ])
 
         if (dreamsError) throw dreamsError
         if (echoesError) throw echoesError
         if (archiveError) throw archiveError
 
-        const filteredDreams = normaliseDreams(dreamsData).filter((item) => {
-          const matchesGuardian =
-            !guardianName ||
-            (item.guardian &&
-              String(item.guardian).toLowerCase() === guardianName.toLowerCase())
-          const matchesUser = !userId || item.user_id === userId
-          const isExpired = dreamsData?.find((dream) => `${dream.id}` === item.id?.split("-")[0])
-            ?.expired_at
-          return matchesGuardian && matchesUser && !isExpired
-        })
+        const filteredDreams = normaliseDreams(
+          (dreamsData || []).filter((dream) => {
+            const isExpired = Boolean(dream?.expired_at)
+            if (isExpired) return false
+            if (!dream || dream.visible === false) return false
+            if (guardianId && dream.guardian_id !== guardianId) return false
+            if (userId && dream.user_id !== userId) return false
+            return true
+          })
+        )
 
-        fragmentsCollected.push(...filteredDreams)
-        fragmentsCollected.push(...normaliseEchoes(echoesData))
-        fragmentsCollected.push(...normaliseArchive(archiveData))
+        const fragmentsCollected = [
+          ...filteredDreams,
+          ...normaliseEchoes(echoesData),
+          ...normaliseArchive(archiveData),
+        ]
 
         const weighted = weightFragments(fragmentsCollected).slice(0, limit)
         if (!cancelled && weighted.length) {

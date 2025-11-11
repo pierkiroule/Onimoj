@@ -5,10 +5,18 @@ export default defineConfig(({ mode }) => {
   // 🔹 Charge les variables .env (même sous Termux)
   const env = loadEnv(mode, process.cwd(), "")
 
-  const base =
+  const rawBase =
     env.VITE_BASE_PATH && env.VITE_BASE_PATH.trim().length > 0
-      ? env.VITE_BASE_PATH
-      : "./"
+      ? env.VITE_BASE_PATH.trim()
+      : ""
+  const normalizedBase = rawBase === "./" ? "/" : rawBase
+  const baseCandidate =
+    normalizedBase.length > 0
+      ? normalizedBase.startsWith("/") ? normalizedBase : `/${normalizedBase}`
+      : "/"
+  const base = baseCandidate.endsWith("/")
+    ? baseCandidate
+    : `${baseCandidate}/`
 
   console.log("🌍 ENV loaded:",
     env.VITE_SUPABASE_URL ? "✅ Supabase URL détectée" : "❌ Aucune URL",

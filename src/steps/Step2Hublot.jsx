@@ -1,30 +1,36 @@
-import { useEffect, useMemo, useState } from "react"
+// src/steps/Step2Hublot.jsx
+import React, { useState, useMemo } from "react"
 import { inuitWordBanksByIndex } from "../data/inuitWordBanks"
-import BubbleField from "./hublot/BubbleField"
-import StarPreview from "./StarPreview"
+import BubbleField from "../components/hublot/BubbleField"
+import StarPreview from "../components/StarPreview"
 
-export default function HublotResonant({
-  step = { step_number: 1, spirit_name: "Sila", symbol: "🌬️" },
-  candidateCount = 15,
-  onComplete,
-}) {
+/**
+ * ✨ Étape 2 : Hublot Résonant — Capture de mots oniriques
+ * @param {Object} props
+ * @param {Object} props.spirit - Gardien sélectionné
+ * @param {Function} props.onComplete - Callback renvoyant { tags, echoMax }
+ * @param {Function} props.onBack - Retour vers l’étape précédente
+ */
+export default function Step2Hublot({ spirit, onComplete, onBack }) {
   const [captured, setCaptured] = useState([])
   const [complete, setComplete] = useState(false)
   const [echoMax, setEchoMax] = useState(6)
 
+  // 📚 Sélection dynamique de la banque de mots
   const bank = useMemo(() => {
-    const list = (inuitWordBanksByIndex?.[step.step_number] || []).map((o) => o.fr)
+    const list = (inuitWordBanksByIndex?.[spirit.step_number] || []).map((o) => o.fr)
     return Array.from(new Set(list))
-  }, [step.step_number])
+  }, [spirit.step_number])
 
+  // 🔮 Capture d’un mot
   function handleCapture(label) {
     const next = [...captured, label].slice(0, 5)
     setCaptured(next)
     if (next.length === 5) setComplete(true)
   }
 
-  /* ---- Styles centralisés inline ---- */
-  const styles = {
+  // 🎨 Styles inline
+  const s = {
     container: {
       padding: "1rem",
       color: "#e9fffd",
@@ -54,24 +60,6 @@ export default function HublotResonant({
       color: "#aefcf5",
       letterSpacing: "0.02em",
     },
-    subtitle: {
-      color: "#7fffd4",
-      marginTop: ".6rem",
-      fontSize: "1.1rem",
-      fontWeight: 600,
-    },
-    rangeContainer: { marginTop: "1.2rem" },
-    rangeLabel: {
-      color: "#aefcf5",
-      marginBottom: "0.3rem",
-      fontWeight: 600,
-      letterSpacing: "0.02em",
-    },
-    range: {
-      width: "80%",
-      marginTop: ".4rem",
-      accentColor: "#7fffd4",
-    },
     btnPrimary: {
       marginTop: "1.3rem",
       padding: ".7rem 1.5rem",
@@ -85,43 +73,56 @@ export default function HublotResonant({
       boxShadow: "0 2px 10px rgba(127,255,212,0.25)",
       transition: "all 0.25s ease",
     },
+    range: {
+      width: "80%",
+      marginTop: ".4rem",
+      accentColor: "#7fffd4",
+    },
   }
 
   return (
-    <div style={styles.container}>
-      <h3 style={styles.title}>
-        {step.symbol} Le souffle de {step.spirit_name}
+    <div style={s.container}>
+      <h3 style={s.title}>
+        {spirit.symbol} Le souffle de {spirit.spirit_name}
       </h3>
 
       {!complete ? (
         <>
-          <p style={styles.paragraph}>
+          <p style={s.paragraph}>
             Ferme les yeux, respire. Les bulles sont les mots de ton inconscient.
             Appuie sur celles qui vibrent — cinq formeront ton étoile.
           </p>
 
           <BubbleField
             bank={bank}
-            symbol={step.symbol}
-            candidateCount={candidateCount}
+            symbol={spirit.symbol}
+            candidateCount={15}
             onCapture={handleCapture}
           />
 
-          <div style={styles.counter}>✨ Mots captés : {captured.length}/5</div>
+          <div style={s.counter}>✨ Mots captés : {captured.length}/5</div>
+
+          <button onClick={onBack} style={{ ...s.btnPrimary, marginTop: "1.5rem" }}>
+            ⬅️ Retour au cercle
+          </button>
         </>
       ) : (
         <div className="fade-in" style={{ marginTop: ".8rem" }}>
           <StarPreview
             words={captured}
-            centerEmoji={step.symbol}
+            centerEmoji={spirit.symbol}
             echoCount={echoMax / 2}
             echoMax={echoMax}
           />
 
-          <h4 style={styles.subtitle}>Ton étoile onirique est prête</h4>
+          <h4 style={{ color: "#7fffd4", marginTop: ".8rem" }}>
+            Ton étoile onirique est prête
+          </h4>
 
-          <div style={styles.rangeContainer}>
-            <h4 style={styles.rangeLabel}>💫 Nombre d’échos avant métamorphose</h4>
+          <div style={{ marginTop: "1.2rem" }}>
+            <h4 style={{ color: "#aefcf5", marginBottom: ".3rem" }}>
+              💫 Nombre d’échos avant métamorphose
+            </h4>
 
             <input
               type="range"
@@ -129,23 +130,17 @@ export default function HublotResonant({
               max="9"
               value={echoMax}
               onChange={(e) => setEchoMax(Number(e.target.value))}
-              style={styles.range}
+              style={s.range}
             />
 
-            <div
-              style={{
-                fontSize: ".9rem",
-                opacity: 0.85,
-                marginTop: ".3rem",
-              }}
-            >
+            <div style={{ fontSize: ".9rem", opacity: 0.85, marginTop: ".3rem" }}>
               {echoMax} contributions avant métamorphose
             </div>
           </div>
 
           <button
-            onClick={() => onComplete && onComplete({ tags: captured, echoMax })}
-            style={styles.btnPrimary}
+            onClick={() => onComplete({ tags: captured, echoMax })}
+            style={s.btnPrimary}
             onMouseEnter={(e) => {
               e.target.style.transform = "scale(1.04)"
               e.target.style.boxShadow = "0 4px 14px rgba(127,255,212,0.4)"
@@ -154,8 +149,6 @@ export default function HublotResonant({
               e.target.style.transform = "scale(1)"
               e.target.style.boxShadow = "0 2px 10px rgba(127,255,212,0.25)"
             }}
-            onTouchStart={(e) => (e.target.style.transform = "scale(0.97)")}
-            onTouchEnd={(e) => (e.target.style.transform = "scale(1)")}
           >
             ✅ Continuer
           </button>

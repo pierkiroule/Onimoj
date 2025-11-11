@@ -161,7 +161,7 @@ export default function Home({ onStart, onLogin, onRegister }) {
       </div>
 
       <div className="tagline">
-        Embarquez dans une quête pour developper des ressources culturelles oniriques. Prenons soin des rêves transmis par les gardiens du sommeil.
+         Co-créer des ressources culturelles oniriques pour sauver les gardiens du sommeil.
       </div>
 
       {remaining > 0 ? (
@@ -221,26 +221,11 @@ export default function Home({ onStart, onLogin, onRegister }) {
           style={{ background: "rgba(110,255,141,0.15)", color: "#6eff8d" }}
           onClick={onRegister}
         >
-          🌙 RÊVeille l'Écho•° du rêve qui sommeille en toi !
+          🌙 RÊVeiller l'Écho•° du gardien qui sommeille en toi !
         </button>
       </div>
 
-      <div style={{ marginTop: "1.5rem" }}>
-        <button
-          onClick={handleFullSeed}
-          style={{
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(127,255,212,0.4)",
-            borderRadius: "10px",
-            padding: ".6rem 1rem",
-            color: "#7fffd4",
-            cursor: "pointer",
-            fontSize: ".9rem",
-          }}
-        >
-          🧩 Découvrir les quêtes oniriques
-        </button>
-      </div>
+    
 
       <div className="footer" style={{ marginTop: "2rem" }}>
         <p>🌘 “Le rêve est la respiration de l’âme.” — <i>Bachelard</i></p>

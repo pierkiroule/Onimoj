@@ -1,7 +1,9 @@
 // src/pages/echoreso/Index.jsx
+import { useCallback, useState } from "react"
 import EchoResoFlow from "./EchoResoFlow"
 import BookOfWisdom from "./BookOfWisdom"
 import MeteoniriqueBoreale from "../../components/MeteoniriqueBoreale"
+import DreamFragmentOverlay from "../../components/DreamFragmentOverlay"
 
 export default function Index({ userId }) {
   return (
@@ -53,24 +55,8 @@ export default function Index({ userId }) {
         ✨ La MétéOnirique au travers de notre hublot échocréatif
       </h3>
 
-      {/* === 🪞 Hublot Météonorix === */}
-      <div
-        style={{
-          position: "relative",
-          width: "260px",
-          height: "260px",
-          borderRadius: "50%",
-          margin: "0 auto 2rem auto",
-          border: "1px solid rgba(127,255,212,0.25)",
-          background:
-            "radial-gradient(ellipse at center, #001020 0%, #000810 100%)",
-          boxShadow:
-            "0 0 25px rgba(127,255,212,0.25), inset 0 0 15px rgba(127,255,212,0.15)",
-          overflow: "hidden",
-        }}
-      >
-        <MeteoniriqueBoreale />
-      </div>
+        {/* === 🪞 Hublot Météonorix === */}
+        <HublotBlock userId={userId} />
 
       <p
         style={{
@@ -132,6 +118,43 @@ export default function Index({ userId }) {
         </p>
 
         <BookOfWisdom userId={userId} />
+      </div>
+    </div>
+  )
+}
+
+function HublotBlock({ userId }) {
+  const [audioIntensity, setAudioIntensity] = useState(0)
+
+  const handleAudioLevel = useCallback((value = 0) => {
+    setAudioIntensity(value)
+  }, [])
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "260px",
+        margin: "0 auto 2rem auto",
+      }}
+    >
+      <DreamFragmentOverlay audioIntensity={audioIntensity} userId={userId} />
+      <div
+        style={{
+          position: "relative",
+          width: "260px",
+          height: "260px",
+          borderRadius: "50%",
+          margin: "0 auto",
+          border: "1px solid rgba(127,255,212,0.25)",
+          background:
+            "radial-gradient(ellipse at center, #001020 0%, #000810 100%)",
+          boxShadow:
+            "0 0 25px rgba(127,255,212,0.25), inset 0 0 15px rgba(127,255,212,0.15)",
+          overflow: "hidden",
+        }}
+      >
+        <MeteoniriqueBoreale onAudioLevelChange={handleAudioLevel} />
       </div>
     </div>
   )

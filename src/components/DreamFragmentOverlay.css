@@ -1,0 +1,149 @@
+.dream-fragment-overlay {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  max-width: 360px;
+  padding: 0 1rem;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  z-index: 4;
+}
+
+.dream-fragment-overlay .fragment-card {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 52, 72, 0.92),
+    rgba(4, 20, 32, 0.88)
+  );
+  border: 1px solid rgba(127, 255, 212, 0.35);
+  border-radius: 18px;
+  padding: 0.85rem 1.2rem;
+  box-shadow: 0 10px 30px rgba(0, 20, 30, 0.45),
+    0 0 20px rgba(127, 255, 212, 0.18);
+  backdrop-filter: blur(12px);
+  animation: fragment-enter 0.6s ease forwards;
+}
+
+.dream-fragment-overlay .fragment-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(127, 255, 212, 0.85);
+}
+
+.dream-fragment-overlay .fragment-guardian {
+  font-weight: 600;
+  text-shadow: 0 0 14px rgba(127, 255, 212, 0.4);
+}
+
+.dream-fragment-overlay .fragment-source {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.dream-fragment-overlay .fragment-text {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #eafffb;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(127, 255, 212, 0.25);
+}
+
+.dream-fragment-overlay.intensity-high .fragment-card {
+  border-color: rgba(127, 255, 212, 0.55);
+  box-shadow: 0 12px 36px rgba(0, 30, 40, 0.5),
+    0 0 28px rgba(127, 255, 212, 0.28);
+}
+
+.dream-fragment-overlay.intensity-low .fragment-card {
+  border-color: rgba(127, 255, 212, 0.2);
+  background: linear-gradient(
+    180deg,
+    rgba(6, 32, 44, 0.9),
+    rgba(4, 18, 28, 0.86)
+  );
+}
+
+.dream-fragment-overlay.mood-surge .fragment-card {
+  animation: fragment-enter 0.45s ease forwards,
+    fragment-pulse 2.4s ease-in-out infinite;
+}
+
+.dream-fragment-overlay.mood-pulse .fragment-card {
+  animation: fragment-enter 0.6s ease forwards,
+    fragment-pulse 3.4s ease-in-out infinite;
+}
+
+.dream-fragment-overlay.mood-calm .fragment-card {
+  animation: fragment-enter 0.7s ease forwards;
+}
+
+.dream-fragment-overlay.tone-wisdom .fragment-card {
+  border-color: rgba(255, 227, 142, 0.4);
+  box-shadow: 0 10px 32px rgba(40, 24, 0, 0.48),
+    0 0 20px rgba(255, 227, 142, 0.25);
+}
+
+.dream-fragment-overlay.tone-wisdom .fragment-text {
+  color: #fff2cc;
+  text-shadow: 0 0 10px rgba(255, 227, 142, 0.35);
+}
+
+.dream-fragment-overlay.tone-echo .fragment-card {
+  border-color: rgba(138, 180, 255, 0.4);
+}
+
+.dream-fragment-overlay.tone-echo .fragment-text {
+  color: #d4e6ff;
+  text-shadow: 0 0 12px rgba(138, 180, 255, 0.4);
+}
+
+@keyframes fragment-enter {
+  from {
+    transform: translateY(12px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fragment-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 12px rgba(127, 255, 212, 0.24));
+  }
+  50% {
+    transform: translateY(-4px) scale(1.02);
+    filter: drop-shadow(0 0 16px rgba(127, 255, 212, 0.36));
+  }
+}
+
+@media (max-width: 600px) {
+  .dream-fragment-overlay {
+    width: 120%;
+    max-width: none;
+    bottom: calc(100% + 10px);
+    padding: 0 0.6rem;
+  }
+
+  .dream-fragment-overlay .fragment-card {
+    padding: 0.75rem 1rem;
+  }
+
+  .dream-fragment-overlay .fragment-text {
+    font-size: 0.85rem;
+  }
+}

@@ -1,7 +1,10 @@
 export const filBleuConfig = {
   version: "2.0.0",
+  autoStart: true,
+  storageKey: "filBleuProgress",
   storageKeyPrefix: "filBleuProgress:",
   tooltipSeenKey: "filBleuTooltipSeen",
+  minDelayBetweenStepsMs: 800,
 }
 
 export const filBleuGuides = {
@@ -243,3 +246,6 @@ export const filBleuGuides = {
     },
   },
 }
+
+// TODO: retirer cette export legacy une fois le nouveau FilBleuHelpCenter intégré.
+export const filBleuSteps = []

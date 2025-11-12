@@ -8,8 +8,9 @@ export default function Home({ onStart, onLogin, onRegister }) {
   const DELAY = 12 * 60 * 60 * 1000 // 12h
 
   const isDev =
-    import.meta.env.MODE === "development" ||
-    ["localhost", "127.0.0.1"].includes(window.location.hostname)
+    import.meta.env.DEV ||
+    (typeof window !== "undefined" &&
+      ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(window.location.hostname))
 
   // 🕰️ Vérifie le dernier rêve généré
   useEffect(() => {

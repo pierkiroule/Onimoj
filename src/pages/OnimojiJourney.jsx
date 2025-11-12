@@ -18,12 +18,24 @@ export default function OnimojiJourney({ userId }) {
   // 🕒 Timer local 12h
   const [remaining, setRemaining] = useState(0)
   const DELAY = 12 * 60 * 60 * 1000
+  const isDev =
+    import.meta.env.DEV ||
+    (typeof window !== "undefined" &&
+      ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(window.location.hostname))
 
   useEffect(() => {
+    if (typeof window === "undefined") return
+
+    if (isDev && localStorage.getItem("devCooldownOff") === "true") {
+      setRemaining(0)
+      return
+    }
+
     const last = parseInt(localStorage.getItem("lastDreamTime") || "0")
     const diff = DELAY - (Date.now() - last)
     if (diff > 0) setRemaining(diff)
-  }, [])
+    else setRemaining(0)
+  }, [isDev])
 
   useEffect(() => {
     if (!remaining) return
@@ -38,10 +50,6 @@ export default function OnimojiJourney({ userId }) {
     const sec = String(s % 60).padStart(2, "0")
     return `${h}:${m}:${sec}`
   }
-
-  const isDev =
-    import.meta.env.MODE === "development" ||
-    ["localhost", "127.0.0.1"].includes(window.location.hostname)
 
   // 🌬️ Sélection d’un gardien
   function handleSpiritCall() {
@@ -68,9 +76,18 @@ export default function OnimojiJourney({ userId }) {
 
   // 🌕 Blocage 12h après sauvegarde
   function handleDreamSaved() {
-    const now = Date.now()
-    localStorage.setItem("lastDreamTime", now.toString())
-    setRemaining(DELAY)
+    if (
+      isDev &&
+      typeof window !== "undefined" &&
+      localStorage.getItem("devCooldownOff") === "true"
+    ) {
+      localStorage.removeItem("lastDreamTime")
+      setRemaining(0)
+    } else {
+      const now = Date.now()
+      localStorage.setItem("lastDreamTime", now.toString())
+      setRemaining(DELAY)
+    }
     setStep(1)
     setSelectedSpirit(null)
     setTags([])

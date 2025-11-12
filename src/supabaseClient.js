@@ -12,22 +12,61 @@ console.log('🔑 KEY  →', SUPABASE_ANON_KEY ? '✅ présente' : '❌ absente'
 // 🛡️ Stub minimal (évite plantage hors ligne ou sans .env)
 function createSupabaseStub() {
   const missingEnvError = new Error('⚠️ Supabase non configuré (.env manquant)')
-  const selectable = {
-    limit: async () => ({ data: [], error: missingEnvError }),
-    eq: () => ({ order: async () => ({ data: [], error: missingEnvError }) }),
-    order: async () => ({ data: [], error: missingEnvError }),
+
+  const arrayResult = () => ({ data: [], error: missingEnvError })
+  const nullResult = () => ({ data: null, error: missingEnvError })
+
+  const createBuilder = (mode = 'select') => {
+    let promise =
+      mode === 'select'
+        ? Promise.resolve(arrayResult())
+        : Promise.resolve(nullResult())
+
+    const builder = {
+      eq: () => builder,
+      is: () => builder,
+      in: () => builder,
+      contains: () => builder,
+      order: () => builder,
+      limit: () => {
+        promise = Promise.resolve(arrayResult())
+        return builder
+      },
+      select: () => {
+        promise = Promise.resolve(arrayResult())
+        return builder
+      },
+      single: () => {
+        promise = Promise.resolve(nullResult())
+        return builder
+      },
+      maybeSingle: () => {
+        promise = Promise.resolve(nullResult())
+        return builder
+      },
+      then: (onFulfilled, onRejected) => promise.then(onFulfilled, onRejected),
+      catch: (onRejected) => promise.catch(onRejected),
+      finally: (onFinally) => promise.finally(onFinally),
+    }
+
+    const noopChainers = ['gte', 'lte', 'neq', 'like', 'ilike', 'range', 'orderBy']
+    noopChainers.forEach((fn) => {
+      builder[fn] = () => builder
+    })
+
+    return builder
   }
-  const updatable = {
-    eq: async () => ({ data: null, error: missingEnvError }),
-  }
+
+  const createMutationBuilder = () => createBuilder('mutation')
 
   return {
     from: () => ({
-      select: () => selectable,
-      insert: async () => ({ data: null, error: missingEnvError }),
-      update: () => updatable,
-      delete: async () => ({ error: missingEnvError }),
+      select: () => createBuilder('select'),
+      insert: () => createMutationBuilder(),
+      update: () => createMutationBuilder(),
+      delete: () => createMutationBuilder(),
     }),
+    rpc: async () => ({ data: null, error: missingEnvError }),
     auth: {
       getUser: async () => ({ data: { user: null }, error: missingEnvError }),
       getSession: async () => ({ data: { session: null }, error: missingEnvError }),

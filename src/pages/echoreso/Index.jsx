@@ -1,11 +1,17 @@
 // src/pages/echoreso/Index.jsx
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import EchoResoFlow from "./EchoResoFlow"
 import BookOfWisdom from "./BookOfWisdom"
 import MeteoniriqueBoreale from "../../components/MeteoniriqueBoreale"
 import DreamFragmentOverlay from "../../components/DreamFragmentOverlay"
+import FilBleuGuide from "../../components/FilBleuGuide"
+import { emitGuideEvent } from "../../guides/guideBus"
 
 export default function Index({ userId }) {
+  useEffect(() => {
+    emitGuideEvent("graph.visible")
+  }, [])
+
   return (
     <div
       style={{
@@ -55,8 +61,10 @@ export default function Index({ userId }) {
         ✨ La MétéOnirique au travers de notre hublot échocréatif
       </h3>
 
-        {/* === 🪞 Hublot Météonorix === */}
-        <HublotBlock userId={userId} />
+      {/* === 🪞 Hublot Météonorix === */}
+      <HublotBlock userId={userId} />
+
+      <FilBleuGuide allowReplay />
 
       <p
         style={{
@@ -125,10 +133,28 @@ export default function Index({ userId }) {
 
 function HublotBlock({ userId }) {
   const [audioIntensity, setAudioIntensity] = useState(0)
+  const [audioOn, setAudioOn] = useState(false)
 
   const handleAudioLevel = useCallback((value = 0) => {
     setAudioIntensity(value)
+    if (value > 0.25) emitGuideEvent("audio.pulse")
   }, [])
+
+  const handleHublotTouch = useCallback(() => {
+    emitGuideEvent("hublot.touch")
+  }, [])
+
+  const handleAudioPlay = useCallback(() => {
+    setAudioOn((prev) => {
+      if (!prev) emitGuideEvent("audio.play")
+      return true
+    })
+  }, [])
+
+  const handleAudioPause = useCallback(() => {
+    if (!audioOn) return
+    setAudioOn(false)
+  }, [audioOn])
 
   return (
     <div
@@ -153,8 +179,14 @@ function HublotBlock({ userId }) {
             "0 0 25px rgba(127,255,212,0.25), inset 0 0 15px rgba(127,255,212,0.15)",
           overflow: "hidden",
         }}
+        onPointerDown={handleHublotTouch}
+        onTouchStart={handleHublotTouch}
       >
-        <MeteoniriqueBoreale onAudioLevelChange={handleAudioLevel} />
+        <MeteoniriqueBoreale
+          onAudioLevelChange={handleAudioLevel}
+          onPlay={handleAudioPlay}
+          onPause={handleAudioPause}
+        />
       </div>
     </div>
   )

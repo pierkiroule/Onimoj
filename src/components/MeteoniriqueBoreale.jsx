@@ -19,7 +19,7 @@ async function ensureAudio() {
   }
 }
 
-async function toggleAudio(volume = 0.6, fade = 1.2) {
+async function toggleAudio({ volume = 0.6, fade = 1.2 } = {}) {
   await ensureAudio()
   if (!playing) {
     src = ctx.createBufferSource()
@@ -35,19 +35,39 @@ async function toggleAudio(volume = 0.6, fade = 1.2) {
     src.start(0, offset % buffer.duration)
     startTime = ctx.currentTime
     playing = true
-  } else {
-    const elapsed = ctx.currentTime - startTime
-    offset = (offset + elapsed) % buffer.duration
-    gain?.gain?.linearRampToValueAtTime(0, ctx.currentTime + fade)
-    setTimeout(() => {
-      try { src?.stop() } catch {}
-      playing = false
-    }, fade * 1000)
+    return true
   }
-  return playing
+
+  const elapsed = ctx.currentTime - startTime
+  offset = (offset + elapsed) % buffer.duration
+  const currentGain = gain?.gain
+  if (currentGain) {
+    try {
+      currentGain.cancelScheduledValues?.(ctx.currentTime)
+      currentGain.setValueAtTime(currentGain.value ?? 0, ctx.currentTime)
+      currentGain.linearRampToValueAtTime(0, ctx.currentTime + fade)
+    } catch (err) {
+      console.warn("Meteonirique: unable to ramp gain", err)
+    }
+  }
+  const sourceToStop = src
+  setTimeout(() => {
+    if (!sourceToStop) return
+    try {
+      sourceToStop.stop()
+    } catch (err) {
+      console.warn("Meteonirique: unable to stop source", err)
+    }
+  }, fade * 1000)
+  playing = false
+  return false
 }
 
-export default function MeteoniriqueBoreale({ onAudioLevelChange }) {
+export default function MeteoniriqueBoreale({
+  onAudioLevelChange,
+  onPlay,
+  onPause,
+}) {
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 })
   const [isPlaying, setIsPlaying] = useState(false)
   const [bubbles, setBubbles] = useState([])
@@ -66,8 +86,13 @@ export default function MeteoniriqueBoreale({ onAudioLevelChange }) {
     const y = (t.clientY - rect.top) / rect.height
     setTouchPos({ x: x - 0.5, y: y - 0.5 })
 
-    const newState = !(await toggleAudio())
-    setIsPlaying(newState)
+    const nextPlaying = await toggleAudio()
+    setIsPlaying(nextPlaying)
+    if (nextPlaying) {
+      onPlay?.()
+    } else {
+      onPause?.()
+    }
 
     const id = Date.now()
     const emoji = ["💫","🌕","🌬️","✨","🌈"][Math.floor(Math.random() * 5)]

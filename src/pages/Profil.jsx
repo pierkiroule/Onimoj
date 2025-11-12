@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "../supabaseClient"
 import "./Home.css"
+import FilBleuGuide from "../components/FilBleuGuide"
 
 export default function Profil({ user, onLogout, onDisableTimer }) {
   const [stats, setStats] = useState(null)
@@ -8,6 +9,8 @@ export default function Profil({ user, onLogout, onDisableTimer }) {
   const [loadingPay, setLoadingPay] = useState(false)
   const [status, setStatus] = useState("")
   const [timerMessage, setTimerMessage] = useState("")
+  const [filBleuActive, setFilBleuActive] = useState(false)
+  const [filBleuRunId, setFilBleuRunId] = useState(0)
 
   // --- Chargement des stats depuis la vue sécurisée ---
   useEffect(() => {
@@ -42,6 +45,21 @@ export default function Profil({ user, onLogout, onDisableTimer }) {
     }, 2000)
   }
 
+  function handleToggleTutorial() {
+    setFilBleuActive((active) => {
+      if (active) return false
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem("filBleuProgress")
+        } catch (err) {
+          console.warn("Impossible de réinitialiser le Fil Bleu:", err)
+        }
+      }
+      setFilBleuRunId((id) => id + 1)
+      return true
+    })
+  }
+
   // --- Désactivation du sablier ---
   function handleDisableTimer() {
     if (!onDisableTimer) return
@@ -69,19 +87,41 @@ export default function Profil({ user, onLogout, onDisableTimer }) {
 
   return (
     <div style={{ padding: "1rem", color: "#e9fffd", textAlign: "center" }}>
+      {filBleuActive && <FilBleuGuide key={filBleuRunId} allowReplay />}
       <h2>👤 Profil Réso•°</h2>
       <h3 style={{ color: "#ffd46b", marginTop: "-.5rem" }}>
         {stats?.dream_title || "🌙 Voyageur du Réso•°"}
       </h3>
       <p style={{ opacity: 0.8 }}>{user?.email}</p>
 
+      <button
+        onClick={handleToggleTutorial}
+        style={{
+          ...btnTutorial,
+          ...(filBleuActive
+            ? { background: "rgba(127,255,212,0.25)", color: "#061c24" }
+            : {}),
+        }}
+      >
+        {filBleuActive ? "Masquer le tuto Fil Bleu" : "🎓 Activer le Fil Bleu"}
+      </button>
+      {filBleuActive && (
+        <p style={{ marginTop: "0.4rem", fontSize: ".85rem", opacity: 0.7 }}>
+          Tutoriel Fil Bleu en cours ✨
+        </p>
+      )}
+
       {/* 🌬️ Dernier rêve partagé */}
       <div style={introBox}>
         <h3 style={{ color: "#7fffd4" }}>Dernier rêve partagé</h3>
         {dream?.titre ? (
           <>
-            <p>{dream.emoji || "💤"} <strong>{dream.titre}</strong></p>
-            <p>{dream.guardian_emoji || "🌕"} {dream.guardian_name || ""}</p>
+            <p>
+              {dream.emoji || "💤"} <strong>{dream.titre}</strong>
+            </p>
+            <p>
+              {dream.guardian_emoji || "🌕"} {dream.guardian_name || ""}
+            </p>
             <p style={{ fontSize: ".85rem", opacity: 0.8 }}>
               💫 {dream.echo_count || 0} échos
             </p>
@@ -135,7 +175,9 @@ export default function Profil({ user, onLogout, onDisableTimer }) {
         {timerMessage && <p style={{ color: "#aefcf5" }}>{timerMessage}</p>}
       </div>
 
-      <button onClick={onLogout} style={btnLogout}>🚪 Se déconnecter</button>
+      <button onClick={onLogout} style={btnLogout}>
+        🚪 Se déconnecter
+      </button>
     </div>
   )
 }
@@ -202,6 +244,17 @@ const payCircle = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
+}
+const btnTutorial = {
+  marginTop: "1rem",
+  background: "rgba(127,255,212,0.14)",
+  border: "1px solid rgba(127,255,212,0.45)",
+  borderRadius: "10px",
+  padding: ".55rem 1.4rem",
+  color: "#aefcf5",
+  fontWeight: "bold",
+  cursor: "pointer",
+  transition: "background .3s ease, color .3s ease",
 }
 const btnPay = {
   background: "#7fffd4",

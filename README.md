@@ -1,25 +1,25 @@
-# Project
+# Onimoji — Prototype Onirix
 
-This project is built with React + Vite.
+React + Vite prototype for the Onimoji experience. The app runs entirely on the client side with a minimal state router implemented in `src/App.jsx` and integrates with Supabase when credentials are available.
 
-## Flux pédagogique Inuit
+## Parcours principaux
 
-Le parcours de la mission Inuite introduit un module d’étape culturel avant l’interaction du hublot :
+- **OnimojiJourney (`src/pages/OnimojiJourney.jsx`)**  
+  Voyage en trois étapes : cercle des gardiens (`src/steps/Step1Circle.jsx`), hublot résonant (`src/steps/Step2Hublot.jsx`) et création onirique (`src/steps/Step3Creation.jsx`).  
+  Les données des 12 gardiens proviennent de `src/data/inuitSteps.js` et alimentent les composants `InuitCircle` et `BubbleField`.
 
-1. Étape courante chargée via Supabase depuis `mission_steps_inuite`.
-2. Affichage du module `ModuleInuitStep` (texte culturel, question, pratique, intégration).
-3. Clic sur « 🌌 Ouvrir le Hublot » pour lancer `HublotResonant` (sélection de 3 esprits).
-4. Validation renvoie un payload (titre, emojis, culture, esprit, step_number).
-5. Titrage + sauvegarde dans `dream_stars`, puis narration et quiz.
+- **EchoReso Hub (`src/pages/echoreso/Index.jsx`)**  
+  Interface communautaire combinant le flot interactif `EchoResoFlow.jsx` (visualisation D3), l’interface météo `MeteoniriqueBoreale.jsx` et le livre des sagesses (`BookOfWisdom.jsx`).
 
-### Fichiers clés
+- **Revothèque & Compagnons (`src/pages/Revotheque.jsx`, `src/pages/Profil.jsx`, etc.)**  
+  Composants spécialisés appuyés sur Supabase : `DreamFragmentOverlay`, `DreamGallery`, `StarPreview`…
 
-- `src/pages/MissionInuite.jsx` — orchestre le flux (étape, module, hublot, enregistrement, quiz).
-- `src/components/ModuleInuitStep.jsx` — présente le contenu culturel de l’étape.
-- `src/components/ModuleInuitStep.css` — styles du module inuit.
-- `src/components/HublotResonant.jsx` — hublot D3 de sélection (3 esprits).
-- `src/data/InuitNetwork.js` — nœuds/liens utilisés par le hublot.
+## Structure rapide
 
-### Données
+- `src/components/` — Composants réutilisables (StarField, BottomMenu, etc.).
+- `src/modules/` — Hooks métiers (`useDreamFragments`, `useDreamGenerator`, `useDreamSave`).
+- `src/pages/` — Vues à état, regroupées par domaine (`echoreso/`, `Profil.jsx`, `Labo.jsx`…).
+- `src/steps/` — Etapes du parcours Onimoji.
+- `src/data/` — Jeux de données locaux pour les parcours et le mode hors-ligne.
 
-Le contenu textuel (ex. `spirit_name`, `symbol`, `theme`, `description`, `question`, `practice`, `integration`) provient de la table `mission_steps_inuite` et est récupéré via Supabase dans `MissionInuite.jsx`.
+L’application peut fonctionner en mode « offline » : lorsqu’aucun accès Supabase n’est disponible, les modules retombent sur des données locales (`src/data/dreamsLocal.json`).

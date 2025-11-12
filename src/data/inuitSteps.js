@@ -1,36 +1,5 @@
 // src/data/inuitSteps.js
-// 🌌 Parent central — charge les 12 gardiens Inuit
-// JSON placés dans le même dossier
-
-export async function loadInuitSteps() {
-  const names = [
-    "Sila",
-    "Sedna",
-    "Qilak",
-    "Torngasuk",
-    "Nuliajuk",
-    "Tuktu",
-    "Qajaq",
-    "Amaruq",
-    "Aniu",
-    "Nanuq",
-    "Ayarnaq",
-    "Turnngaq"
-  ]
-
-  const loaded = await Promise.all(
-    names.map(name =>
-      fetch(`./${name}.json`).then(res => {
-        if (!res.ok) throw new Error(`Erreur chargement : ${name}`)
-        return res.json()
-      })
-    )
-  )
-
-  return loaded
-}
-
-// --- Import statique pour build Vite ou mobile sans fetch ---
+// 🌌 Import statique des 12 gardiens Inuit
 import Sila from "./Sila.json"
 import Sedna from "./Sedna.json"
 import Qilak from "./Qilak.json"

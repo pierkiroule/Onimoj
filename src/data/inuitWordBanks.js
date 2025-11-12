@@ -1,5 +1,5 @@
 // 🌬️ Banque bilingue cohérente — 12 esprits du Grand Nord
-export const inuitWordBanksBySlug = {
+const inuitWordBanksBySlug = {
   sila: [
   { fr: "Souffle", iu: "Sila" },
   { fr: "Vent", iu: "Anuri" },
@@ -166,18 +166,3 @@ export const inuitWordBanksBySlug = {
 export const inuitWordBanksByIndex = Object.fromEntries(
   Object.keys(inuitWordBanksBySlug).map((k, i) => [i + 1, inuitWordBanksBySlug[k]])
 )
-
-// 🎲 Tirage aléatoire de 5 couples {fr, iu}
-export function getWordPoolForStep(step) {
-  let pool = inuitWordBanksBySlug.sila
-
-  if (step?.file) {
-    const base = step.file.split("/").pop()
-    const slug = base.replace(/^\d+_/, "").replace(/\.json$/, "")
-    if (inuitWordBanksBySlug[slug]) pool = inuitWordBanksBySlug[slug]
-  } else if (step?.step_number && inuitWordBanksByIndex[step.step_number]) {
-    pool = inuitWordBanksByIndex[step.step_number]
-  }
-
-  return [...pool].sort(() => 0.5 - Math.random()).slice(0, 5)
-}

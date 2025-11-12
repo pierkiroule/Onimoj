@@ -3,31 +3,31 @@ import { useState, useEffect } from "react"
 const tutoTexts = {
   home: {
     title: "Accueil du Réso•°",
-    text: "Bienvenue dans le monde des résonances.\nDepuis ici, tu peux commencer ton exploration onirique, te connecter ou t’inscrire pour créer ton premier fragment de rêve.",
+    text: "Bienvenue dans le monde des résonances.\n- Connecte-toi pour rouvrir tes fragments.\n- Inscris-toi si c’est ta première traversée.\n- Clique sur « Commencer » pour choisir ton horizon.",
   },
   "mission-select": {
     title: "Choisir ton horizon",
-    text: "Chaque carte représente une culture onirique.\nPour le moment, seule la voie Inuite est ouverte. Sélectionne-la pour entrer dans ton premier voyage intérieur.",
+    text: "Chaque carte révèle une culture onirique.\n- Lis la description pour ressentir son ambiance.\n- Sélectionne la voie Inuite pour débloquer ton premier voyage.\nTu pourras revenir ici à tout moment depuis le menu bas.",
   },
   "onimoji-journey": {
     title: "Créer ton fragment",
-    text: "Modelise ton rêve : choisis ton archétype, ton onimoji et ton intention.\nChaque création nourrit la résonance collective du Réso•°.",
+    text: "Modélise ton rêve étape par étape.\n- Choisis ton archétype et précise ton intention.\n- Sélectionne l’onimoji qui reflète ton état.\n- Valide pour enregistrer le fragment et nourrir la constellation collective.",
   },
   echoreso: {
     title: "Réseau ÉchoReso",
-    text: "Observe les liens vivants entre les rêves.\nLe hublot central réagit à la matière sonore, et le graphe te montre comment les fragments s’appellent les uns les autres.",
+    text: "Observe les liens vivants entre les rêves.\n- Le hublot central réagit à ta voix ou aux sons importés.\n- Joue avec les contrôles pour ajuster la résonance.\n- Survole les nœuds pour suivre la vibration des fragments.",
   },
   revotheque: {
     title: "Revothèque personnelle",
-    text: "Ici, tes rêves reposent en mémoire.\nTu peux les rouvrir, les partager ou en créer de nouveaux.",
+    text: "Ici, tes rêves reposent en mémoire.\n- Ouvre un fragment pour revivre son récit.\n- Partage-le ou crée un doublon pour le transformer.\n- Utilise le bouton « + » pour lancer une nouvelle création.",
   },
   profil: {
     title: "Profil du voyageur",
-    text: "Visualise ton parcours onirique.\nTes créations, échos et voyages s’inscrivent ici comme des constellations de ton chemin intérieur.",
+    text: "Visualise ton parcours onirique.\n- Consulte tes constellations et statistiques.\n- Mets à jour ton identité de voyageur.\n- Déconnecte-toi ou change de page depuis le menu.",
   },
   default: {
     title: "Guide du Réso•°",
-    text: "Chaque page t’offre ses repères.\nCe bouton tuto•° reste discret, toujours à portée de main, pour t’aider à t’orienter.",
+    text: "Chaque page t’offre ses repères.\n- Ouvre le tuto pour une vue d’ensemble rapide.\n- Referme-le ensuite, il reste toujours accessible dans le coin supérieur gauche.",
   },
 }
 

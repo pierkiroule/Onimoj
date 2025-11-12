@@ -18,6 +18,10 @@ export default function OnimojiJourney({ userId }) {
   // 🕒 Timer local 12h
   const [remaining, setRemaining] = useState(0)
   const DELAY = 12 * 60 * 60 * 1000
+  const isDev =
+    import.meta.env.DEV ||
+    (typeof window !== "undefined" &&
+      ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(window.location.hostname))
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -46,10 +50,6 @@ export default function OnimojiJourney({ userId }) {
     const sec = String(s % 60).padStart(2, "0")
     return `${h}:${m}:${sec}`
   }
-
-  const isDev =
-    import.meta.env.MODE === "development" ||
-    ["localhost", "127.0.0.1"].includes(window.location.hostname)
 
   // 🌬️ Sélection d’un gardien
   function handleSpiritCall() {

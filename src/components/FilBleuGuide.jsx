@@ -41,6 +41,7 @@ function getStorageKey(page) {
 
 export default function FilBleuGuide({ page }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [activeStepId, setActiveStepId] = useState(null)
   const [showTooltip, setShowTooltip] = useState(false)
 
@@ -54,6 +55,25 @@ export default function FilBleuGuide({ page }) {
       window.localStorage.setItem(tooltipKey, "seen")
     } catch (err) {
       console.warn("FilBleuGuide: unable to persist tooltip state", err)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const mediaQuery = window.matchMedia("(max-width: 768px)")
+    const handleChange = (event) => setIsMobile(event.matches)
+    setIsMobile(mediaQuery.matches)
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange)
+    } else {
+      mediaQuery.addListener(handleChange)
+    }
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener("change", handleChange)
+      } else {
+        mediaQuery.removeListener(handleChange)
+      }
     }
   }, [])
 
@@ -196,73 +216,162 @@ export default function FilBleuGuide({ page }) {
         )}
       </div>
 
-      {isOpen && (
-        <div
-          id="filbleu-help-center"
-          style={overlayStyle}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="filbleu-modal-title"
-        >
-          <div style={modalStyle}>
-            <header style={modalHeaderStyle}>
-              <div>
-                <p style={modalOverlineStyle}>Fil Bleu — Centre d’aide</p>
-                <h2 id="filbleu-modal-title" style={modalTitleStyle}>
-                  {pages?.[page]?.title || "Voyage onirique"}
-                </h2>
-              </div>
-              <button type="button" onClick={handleClose} style={closeButtonStyle}>
-                ✕
-              </button>
-            </header>
-            <div style={modalContentStyle}>
-              <aside style={sidebarStyle} aria-label="Sections du guide">
-                {steps.map((step, idx) => (
-                  <button
-                    key={step.id}
-                    type="button"
-                    onClick={() => handleSelect(step.id)}
-                    className={step.id === activeStep?.id ? "active" : ""}
-                    style={{
-                      ...sidebarButtonStyle,
-                      ...(step.id === activeStep?.id
-                        ? sidebarButtonActiveStyle
-                        : null),
-                    }}
-                  >
-                    <span style={sidebarIndexStyle}>
-                      {(idx + 1).toString().padStart(2, "0")}
-                    </span>
-                    <span>{step.title}</span>
-                  </button>
-                ))}
-              </aside>
-
-              <article style={articleStyle}>
-                <div style={chipRowStyle}>
-                  <span style={scopeChipStyle(activeStep?.scope)}>
-                    {getScopeLabel(activeStep?.scope)}
-                  </span>
-                  <span style={stepPositionStyle}>
-                    {activeIndex + 1}/{steps.length}
-                  </span>
+        {isOpen && (
+          <div
+            id="filbleu-help-center"
+            style={{
+              ...overlayStyle,
+              ...(isMobile ? mobileOverlayStyle : null),
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="filbleu-modal-title"
+          >
+            <div
+              style={{
+                ...modalStyle,
+                ...(isMobile ? mobileModalStyle : null),
+              }}
+            >
+              <header style={modalHeaderStyle}>
+                <div>
+                  <p style={modalOverlineStyle}>Fil Bleu — Centre d’aide</p>
+                  <h2 id="filbleu-modal-title" style={modalTitleStyle}>
+                    {pages?.[page]?.title || "Voyage onirique"}
+                  </h2>
                 </div>
-                <h3 style={articleTitleStyle}>{activeStep?.title}</h3>
-                <p style={articleTextStyle}>{activeStep?.text}</p>
+                <button type="button" onClick={handleClose} style={closeButtonStyle}>
+                  ✕
+                </button>
+              </header>
+              <div
+                style={{
+                  ...modalContentStyle,
+                  ...(isMobile ? mobileModalContentStyle : null),
+                }}
+              >
+                {isMobile ? (
+                  <div style={accordionContainerStyle}>
+                    {steps.map((step, idx) => {
+                      const isStepActive = step.id === activeStep?.id
+                      return (
+                        <div key={step.id} style={accordionItemStyle}>
+                          <button
+                            type="button"
+                            onClick={() => handleSelect(step.id)}
+                            style={{
+                              ...accordionHeaderStyle,
+                              ...(isStepActive ? accordionHeaderActiveStyle : null),
+                            }}
+                            aria-expanded={isStepActive}
+                            aria-controls={`${step.id}-panel`}
+                          >
+                            <span style={accordionHeaderTextStyle}>
+                              <span style={sidebarIndexStyle}>
+                                {(idx + 1).toString().padStart(2, "0")}
+                              </span>
+                              <span>{step.title}</span>
+                            </span>
+                            <span style={accordionChevronStyle(isStepActive)}>▸</span>
+                          </button>
+                          {isStepActive && (
+                            <div
+                              id={`${step.id}-panel`}
+                              style={accordionPanelStyle}
+                            >
+                              <div style={chipRowStyle}>
+                                <span style={scopeChipStyle(step.scope)}>
+                                  {getScopeLabel(step.scope)}
+                                </span>
+                                <span style={stepPositionStyle}>
+                                  {idx + 1}/{steps.length}
+                                </span>
+                              </div>
+                              <h3 style={articleTitleStyle}>{step.title}</h3>
+                              <p style={articleTextStyle}>{step.text}</p>
+                              <div style={actionRowStyle}>
+                                <button
+                                  type="button"
+                                  onClick={handlePrev}
+                                  style={navButtonStyle}
+                                >
+                                  ← Précédent
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleReset}
+                                  style={resetButtonStyle}
+                                >
+                                  Revenir au début
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleNext}
+                                  style={navButtonStyle}
+                                >
+                                  Suivant →
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <>
+                    <aside style={sidebarStyle} aria-label="Sections du guide">
+                      {steps.map((step, idx) => (
+                        <button
+                          key={step.id}
+                          type="button"
+                          onClick={() => handleSelect(step.id)}
+                          className={step.id === activeStep?.id ? "active" : ""}
+                          style={{
+                            ...sidebarButtonStyle,
+                            ...(step.id === activeStep?.id
+                              ? sidebarButtonActiveStyle
+                              : null),
+                          }}
+                        >
+                          <span style={sidebarIndexStyle}>
+                            {(idx + 1).toString().padStart(2, "0")}
+                          </span>
+                          <span>{step.title}</span>
+                        </button>
+                      ))}
+                    </aside>
 
-                <div style={actionRowStyle}>
-                  <button type="button" onClick={handlePrev} style={navButtonStyle}>
-                    ← Précédent
-                  </button>
-                  <button type="button" onClick={handleReset} style={resetButtonStyle}>
-                    Revenir au début
-                  </button>
-                  <button type="button" onClick={handleNext} style={navButtonStyle}>
-                    Suivant →
-                  </button>
-                </div>
-              </article>
+                    <article style={articleStyle}>
+                      <div style={chipRowStyle}>
+                        <span style={scopeChipStyle(activeStep?.scope)}>
+                          {getScopeLabel(activeStep?.scope)}
+                        </span>
+                        <span style={stepPositionStyle}>
+                          {activeIndex + 1}/{steps.length}
+                        </span>
+                      </div>
+                      <h3 style={articleTitleStyle}>{activeStep?.title}</h3>
+                      <p style={articleTextStyle}>{activeStep?.text}</p>
+
+                      <div style={actionRowStyle}>
+                        <button type="button" onClick={handlePrev} style={navButtonStyle}>
+                          ← Précédent
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleReset}
+                          style={resetButtonStyle}
+                        >
+                          Revenir au début
+                        </button>
+                        <button type="button" onClick={handleNext} style={navButtonStyle}>
+                          Suivant →
+                        </button>
+                      </div>
+                    </article>
+                  </>
+                )}
             </div>
           </div>
         </div>
@@ -313,6 +422,11 @@ const overlayStyle = {
   padding: "1.5rem",
 }
 
+const mobileOverlayStyle = {
+  alignItems: "flex-start",
+  padding: "0.75rem",
+}
+
 const modalStyle = {
   width: "100%",
   maxWidth: "960px",
@@ -325,6 +439,12 @@ const modalStyle = {
   flexDirection: "column",
   maxHeight: "90vh",
   overflow: "hidden",
+}
+
+const mobileModalStyle = {
+  maxWidth: "100%",
+  maxHeight: "none",
+  height: "auto",
 }
 
 const modalHeaderStyle = {
@@ -366,6 +486,11 @@ const modalContentStyle = {
   overflow: "hidden",
 }
 
+const mobileModalContentStyle = {
+  flexDirection: "column",
+  overflowY: "auto",
+}
+
 const sidebarStyle = {
   width: "280px",
   borderRight: "1px solid rgba(127, 255, 212, 0.08)",
@@ -394,6 +519,63 @@ const sidebarButtonStyle = {
 const sidebarButtonActiveStyle = {
   background: "rgba(127, 255, 212, 0.12)",
   transform: "scale(1.02)",
+}
+
+const accordionContainerStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.75rem",
+  padding: "0.75rem 1rem 1.1rem",
+  overflowY: "auto",
+  flex: 1,
+}
+
+const accordionItemStyle = {
+  border: "1px solid rgba(127, 255, 212, 0.16)",
+  borderRadius: "14px",
+  background: "rgba(4, 25, 35, 0.6)",
+  overflow: "hidden",
+}
+
+const accordionHeaderStyle = {
+  background: "transparent",
+  border: "none",
+  color: "#eafffb",
+  padding: "0.85rem 1rem",
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "0.75rem",
+  cursor: "pointer",
+  textAlign: "left",
+}
+
+const accordionHeaderActiveStyle = {
+  background: "rgba(127, 255, 212, 0.12)",
+}
+
+const accordionHeaderTextStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.65rem",
+  fontSize: "0.95rem",
+}
+
+const accordionChevronStyle = (expanded) => ({
+  display: "inline-block",
+  fontSize: "1.2rem",
+  color: "#7fffd4",
+  transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+  transition: "transform 0.2s ease",
+})
+
+const accordionPanelStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.75rem",
+  padding: "0 1rem 1rem",
+  borderTop: "1px solid rgba(127, 255, 212, 0.1)",
 }
 
 const sidebarIndexStyle = {
@@ -462,6 +644,7 @@ const actionRowStyle = {
   alignItems: "center",
   marginTop: "auto",
   gap: "0.5rem",
+  flexWrap: "wrap",
 }
 
 const navButtonStyle = {

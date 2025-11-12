@@ -1,17 +1,11 @@
 // src/pages/echoreso/Index.jsx
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import EchoResoFlow from "./EchoResoFlow"
 import BookOfWisdom from "./BookOfWisdom"
 import MeteoniriqueBoreale from "../../components/MeteoniriqueBoreale"
 import DreamFragmentOverlay from "../../components/DreamFragmentOverlay"
-import FilBleuGuide from "../../components/FilBleuGuide"
-import { emitGuideEvent } from "../../guides/guideBus"
 
 export default function Index({ userId }) {
-  useEffect(() => {
-    emitGuideEvent("graph.visible")
-  }, [])
-
   return (
     <div
       style={{
@@ -63,8 +57,6 @@ export default function Index({ userId }) {
 
       {/* === 🪞 Hublot Météonorix === */}
       <HublotBlock userId={userId} />
-
-      <FilBleuGuide allowReplay />
 
       <p
         style={{
@@ -137,18 +129,12 @@ function HublotBlock({ userId }) {
 
   const handleAudioLevel = useCallback((value = 0) => {
     setAudioIntensity(value)
-    if (value > 0.25) emitGuideEvent("audio.pulse")
   }, [])
 
-  const handleHublotTouch = useCallback(() => {
-    emitGuideEvent("hublot.touch")
-  }, [])
+  const handleHublotTouch = useCallback(() => {}, [])
 
   const handleAudioPlay = useCallback(() => {
-    setAudioOn((prev) => {
-      if (!prev) emitGuideEvent("audio.play")
-      return true
-    })
+    setAudioOn(true)
   }, [])
 
   const handleAudioPause = useCallback(() => {

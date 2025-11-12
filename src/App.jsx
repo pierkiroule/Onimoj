@@ -6,6 +6,7 @@ import { supabase } from "./supabaseClient"
 import StarField from "./components/StarField"
 import BottomMenu from "./components/BottomMenu"
 import Notifications from "./components/Notifications"
+import FilBleuGuide from "./components/FilBleuGuide"
 
 // 📄 Pages
 import Home from "./pages/Home"
@@ -185,6 +186,7 @@ export default function App() {
   return (
     <div className="app-root">
       <StarField />
+      <FilBleuGuide page={page} />
 
       {/* ⚠️ Bandeau mode local */}
       {supabaseStatus.includes("offline") && (

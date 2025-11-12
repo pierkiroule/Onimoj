@@ -1,204 +1,486 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { filBleuConfig, filBleuSteps } from "../guides/filBleu"
-import { onGuideEvent } from "../guides/guideBus"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { filBleuConfig, filBleuGuides } from "../guides/filBleu"
 
-export default function FilBleuGuide({ enabled = true, allowReplay = false }) {
-  const [index, setIndex] = useState(0)
-  const [visible, setVisible] = useState(false)
-  const timerRef = useRef(null)
-  const step = filBleuSteps[index]
+const emptyArray = []
+const { common = emptyArray, pages = {} } = filBleuGuides
+const storagePrefix =
+  filBleuConfig.storageKeyPrefix || filBleuConfig.storageKey || "filBleuProgress:"
+const tooltipKey = filBleuConfig.tooltipSeenKey || "filBleuTooltipSeen"
 
-  // reprise progression
+function buildSteps(page) {
+  const baseSteps = (common ?? emptyArray).map((step) => ({
+    ...step,
+    scope: "common",
+  }))
+
+  const pageGuide = pages?.[page]
+  if (!pageGuide) return baseSteps
+
+  const summaryStep = pageGuide.summary
+    ? [
+        {
+          id: `${page}-overview`,
+          title: pageGuide.title ?? "Guide",
+          text: pageGuide.summary,
+          scope: "summary",
+        },
+      ]
+    : []
+
+  const pageSteps = (pageGuide.steps ?? emptyArray).map((step) => ({
+    ...step,
+    scope: "page",
+  }))
+
+  return [...baseSteps, ...summaryStep, ...pageSteps]
+}
+
+function getStorageKey(page) {
+  return `${storagePrefix}${page || "global"}`
+}
+
+export default function FilBleuGuide({ page }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [activeStepId, setActiveStepId] = useState(null)
+  const [showTooltip, setShowTooltip] = useState(false)
+
+  const steps = useMemo(() => buildSteps(page), [page])
+  const activeIndex = steps.findIndex((step) => step.id === activeStepId)
+  const activeStep = activeIndex >= 0 ? steps[activeIndex] : steps[0]
+
+  const markTooltipSeen = useCallback(() => {
+    if (typeof window === "undefined") return
+    try {
+      window.localStorage.setItem(tooltipKey, "seen")
+    } catch (err) {
+      console.warn("FilBleuGuide: unable to persist tooltip state", err)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    let hideTimeout
+    try {
+      const seen = window.localStorage.getItem(tooltipKey)
+      if (!seen) {
+        setShowTooltip(true)
+        hideTimeout = window.setTimeout(() => setShowTooltip(false), 6000)
+      }
+    } catch (err) {
+      console.warn("FilBleuGuide: unable to restore tooltip state", err)
+    }
+    return () => {
+      if (hideTimeout) window.clearTimeout(hideTimeout)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!steps.length) {
+      setActiveStepId(null)
+      return
+    }
+    const firstStep = steps[0]
+    setActiveStepId((current) => {
+      if (current && steps.some((step) => step.id === current)) return current
+      return firstStep?.id ?? null
+    })
+  }, [steps])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!steps.length || !activeStepId) return
+    try {
+      const key = getStorageKey(page)
+      window.localStorage.setItem(key, activeStepId)
+    } catch (err) {
+      console.warn("FilBleuGuide: unable to persist progress", err)
+    }
+  }, [page, activeStepId, steps.length])
+
   useEffect(() => {
     if (typeof window === "undefined") return
     try {
-      const saved = window.localStorage.getItem(filBleuConfig.storageKey)
-      if (saved) {
-        const parsed = parseInt(saved, 10)
-        if (!Number.isNaN(parsed) && parsed >= 0 && parsed < filBleuSteps.length) {
-          setIndex(parsed)
-        }
+      const key = getStorageKey(page)
+      const saved = window.localStorage.getItem(key)
+      if (saved && steps.some((step) => step.id === saved)) {
+        setActiveStepId(saved)
       }
     } catch (err) {
       console.warn("FilBleuGuide: unable to restore progress", err)
     }
-  }, [])
+  }, [page, steps])
 
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    try {
-      window.localStorage.setItem(filBleuConfig.storageKey, String(index))
-    } catch (err) {
-      console.warn("FilBleuGuide: unable to persist progress", err)
-    }
-  }, [index])
+  const handleOpen = () => {
+    markTooltipSeen()
+    setShowTooltip(false)
+    setIsOpen(true)
+  }
 
-  const clearTimers = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
-    }
-  }, [])
+  const handleClose = () => setIsOpen(false)
 
-  useEffect(() => clearTimers, [clearTimers])
+  const handlePrev = useCallback(() => {
+    if (!steps.length) return
+    const nextIndex = activeIndex > 0 ? activeIndex - 1 : steps.length - 1
+    setActiveStepId(steps[nextIndex]?.id ?? null)
+  }, [activeIndex, steps])
 
-  const scheduleAutoAdvance = useCallback(() => {
-    clearTimers()
-    if (!step) return
-    const delay = Math.max(
-      step.durationMs ?? 5000,
-      filBleuConfig.minDelayBetweenStepsMs ?? 0
-    )
-    timerRef.current = setTimeout(() => {
-      setVisible(false)
-      timerRef.current = setTimeout(() => {
-        setIndex((current) =>
-          Math.min(current + 1, filBleuSteps.length - 1)
-        )
-      }, 400)
-    }, delay)
-  }, [clearTimers, step])
+  const handleNext = useCallback(() => {
+    if (!steps.length) return
+    const nextIndex = activeIndex >= 0 ? (activeIndex + 1) % steps.length : 0
+    setActiveStepId(steps[nextIndex]?.id ?? null)
+  }, [activeIndex, steps])
 
-  useEffect(() => {
-    if (!enabled || !step) {
-      setVisible(false)
-      clearTimers()
-      return
-    }
+  const handleSelect = useCallback((id) => {
+    if (!steps.some((step) => step.id === id)) return
+    setActiveStepId(id)
+  }, [steps])
 
-    clearTimers()
-    setVisible(false)
-
-    if (step.trigger?.type === "event" && step.trigger.name) {
-      let completed = false
-      setVisible(true)
-
-      const unsubscribe = onGuideEvent(step.trigger.name, () => {
-        if (completed) return
-        completed = true
-        scheduleAutoAdvance()
-      })
-
-      return () => {
-        completed = true
-        clearTimers()
-        unsubscribe?.()
+  const handleReset = useCallback(() => {
+    if (!steps.length) return
+    setActiveStepId(steps[0]?.id ?? null)
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(getStorageKey(page))
+      } catch (err) {
+        console.warn("FilBleuGuide: unable to reset progress", err)
       }
     }
+  }, [page, steps])
 
-    let triggered = false
-
-    const handleTrigger = () => {
-      if (triggered) return
-      triggered = true
-      setVisible(true)
-      scheduleAutoAdvance()
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKey = (event) => {
+      if (event.key === "Escape") setIsOpen(false)
+      if (event.key === "ArrowRight") handleNext()
+      if (event.key === "ArrowLeft") handlePrev()
     }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [isOpen, handleNext, handlePrev])
 
-    if (step.trigger?.type === "onMountDelay") {
-      timerRef.current = setTimeout(
-        handleTrigger,
-        step.trigger.ms ?? 1000
-      )
-      return () => {
-        triggered = true
-        clearTimers()
-      }
-    }
-
-    handleTrigger()
-    return () => {
-      triggered = true
-      clearTimers()
-    }
-  }, [enabled, step, clearTimers, scheduleAutoAdvance])
-
-  const handleReplay = useCallback(() => {
-    if (typeof window === "undefined") return
-    window.localStorage.removeItem(filBleuConfig.storageKey)
-    setIndex(0)
-    setVisible(false)
-  }, [])
-
-  const placementStyle = useMemo(
-    () => getPlacementStyle(step?.placement),
-    [step?.placement]
-  )
-
-  if (!enabled || !step) return null
+  if (!steps.length) {
+    return null
+  }
 
   return (
     <>
       <div
         style={{
-          position: "absolute",
-          pointerEvents: "none",
-          zIndex: 5,
-          ...placementStyle.container,
+          position: "fixed",
+          top: "1rem",
+          left: "1rem",
+          zIndex: 1200,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: "0.5rem",
         }}
       >
-        <div
-          style={{
-            maxWidth: 420,
-            padding: ".7rem 1rem",
-            borderRadius: 14,
-            border: "1px solid rgba(127,255,212,.35)",
-            background:
-              "linear-gradient(180deg, rgba(6,28,36,.75), rgba(2,14,20,.72))",
-            color: "#eafffb",
-            fontSize: ".95rem",
-            lineHeight: 1.35,
-            boxShadow:
-              "0 8px 22px rgba(0,0,0,.35), 0 0 18px rgba(127,255,212,.18)",
-            backdropFilter: "blur(8px)",
-            opacity: visible ? 0.85 : 0,
-            transform: visible ? "translateY(0) scale(1)" : "translateY(6px) scale(.98)",
-            transition: "opacity .45s ease, transform .45s ease",
-            textAlign: "center",
-            pointerEvents: "none",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {step.text}
-        </div>
-      </div>
-      {allowReplay ? (
         <button
           type="button"
-          onClick={handleReplay}
-          style={{
-            position: "absolute",
-            left: 12,
-            bottom: 12,
-            background: "transparent",
-            color: "#7fffd4",
-            border: "none",
-            fontSize: ".75rem",
-            letterSpacing: ".5px",
-            opacity: 0.6,
-            cursor: "pointer",
-            textTransform: "uppercase",
-            fontFamily: "inherit",
-            pointerEvents: "auto",
-          }}
+          onClick={handleOpen}
+          onMouseEnter={markTooltipSeen}
+          onFocus={markTooltipSeen}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-controls="filbleu-help-center"
+          aria-label="Ouvrir le centre d’aide Fil Bleu"
+          style={helpButtonStyle}
         >
-          Fil Bleu ⟲
+          •° help
         </button>
-      ) : null}
+        {showTooltip && (
+          <div style={tooltipStyle} role="status">
+            Explore le guide Fil Bleu ✨
+          </div>
+        )}
+      </div>
+
+      {isOpen && (
+        <div
+          id="filbleu-help-center"
+          style={overlayStyle}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="filbleu-modal-title"
+        >
+          <div style={modalStyle}>
+            <header style={modalHeaderStyle}>
+              <div>
+                <p style={modalOverlineStyle}>Fil Bleu — Centre d’aide</p>
+                <h2 id="filbleu-modal-title" style={modalTitleStyle}>
+                  {pages?.[page]?.title || "Voyage onirique"}
+                </h2>
+              </div>
+              <button type="button" onClick={handleClose} style={closeButtonStyle}>
+                ✕
+              </button>
+            </header>
+            <div style={modalContentStyle}>
+              <aside style={sidebarStyle} aria-label="Sections du guide">
+                {steps.map((step, idx) => (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={() => handleSelect(step.id)}
+                    className={step.id === activeStep?.id ? "active" : ""}
+                    style={{
+                      ...sidebarButtonStyle,
+                      ...(step.id === activeStep?.id
+                        ? sidebarButtonActiveStyle
+                        : null),
+                    }}
+                  >
+                    <span style={sidebarIndexStyle}>
+                      {(idx + 1).toString().padStart(2, "0")}
+                    </span>
+                    <span>{step.title}</span>
+                  </button>
+                ))}
+              </aside>
+
+              <article style={articleStyle}>
+                <div style={chipRowStyle}>
+                  <span style={scopeChipStyle(activeStep?.scope)}>
+                    {getScopeLabel(activeStep?.scope)}
+                  </span>
+                  <span style={stepPositionStyle}>
+                    {activeIndex + 1}/{steps.length}
+                  </span>
+                </div>
+                <h3 style={articleTitleStyle}>{activeStep?.title}</h3>
+                <p style={articleTextStyle}>{activeStep?.text}</p>
+
+                <div style={actionRowStyle}>
+                  <button type="button" onClick={handlePrev} style={navButtonStyle}>
+                    ← Précédent
+                  </button>
+                  <button type="button" onClick={handleReset} style={resetButtonStyle}>
+                    Revenir au début
+                  </button>
+                  <button type="button" onClick={handleNext} style={navButtonStyle}>
+                    Suivant →
+                  </button>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
 
-function getPlacementStyle(placement = "bottom-center") {
-  switch (placement) {
-    case "top-center":
-      return { container: { top: 8, left: "50%", transform: "translateX(-50%)" } }
-    case "top-right":
-      return { container: { top: 8, right: 8 } }
-    case "bottom-left":
-      return { container: { bottom: 8, left: 12 } }
-    case "bottom-center":
-    default:
-      return { container: { bottom: 8, left: "50%", transform: "translateX(-50%)" } }
-  }
+function getScopeLabel(scope) {
+  if (scope === "page") return "Étape clé"
+  if (scope === "summary") return "Introduction"
+  return "Fil Bleu"
+}
+
+const helpButtonStyle = {
+  background: "rgba(8, 30, 38, 0.8)",
+  border: "1px solid rgba(127, 255, 212, 0.5)",
+  borderRadius: "999px",
+  color: "#aefcf5",
+  fontSize: "0.8rem",
+  letterSpacing: "0.6px",
+  padding: "0.35rem 0.9rem",
+  cursor: "pointer",
+  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.35)",
+  textTransform: "uppercase",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+}
+
+const tooltipStyle = {
+  background: "rgba(6, 28, 36, 0.92)",
+  border: "1px solid rgba(174, 252, 245, 0.5)",
+  color: "#eafffb",
+  fontSize: "0.75rem",
+  padding: "0.5rem 0.75rem",
+  borderRadius: "8px",
+  boxShadow: "0 10px 24px rgba(0, 0, 0, 0.45)",
+}
+
+const overlayStyle = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0, 10, 16, 0.6)",
+  backdropFilter: "blur(6px)",
+  zIndex: 1300,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "1.5rem",
+}
+
+const modalStyle = {
+  width: "100%",
+  maxWidth: "960px",
+  background: "linear-gradient(180deg, rgba(4, 19, 27, 0.96), rgba(2, 12, 18, 0.94))",
+  border: "1px solid rgba(127, 255, 212, 0.2)",
+  borderRadius: "18px",
+  boxShadow: "0 28px 80px rgba(0, 0, 0, 0.45)",
+  color: "#eafffb",
+  display: "flex",
+  flexDirection: "column",
+  maxHeight: "90vh",
+  overflow: "hidden",
+}
+
+const modalHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "1.4rem 1.6rem 1rem",
+  borderBottom: "1px solid rgba(127, 255, 212, 0.1)",
+}
+
+const modalOverlineStyle = {
+  fontSize: "0.7rem",
+  letterSpacing: "2px",
+  textTransform: "uppercase",
+  color: "rgba(174, 252, 245, 0.7)",
+  margin: 0,
+}
+
+const modalTitleStyle = {
+  margin: "0.35rem 0 0",
+  fontSize: "1.6rem",
+  fontWeight: 600,
+  letterSpacing: "0.5px",
+  color: "#aefcf5",
+}
+
+const closeButtonStyle = {
+  background: "transparent",
+  border: "none",
+  color: "#aefcf5",
+  fontSize: "1.2rem",
+  cursor: "pointer",
+  padding: "0.4rem",
+}
+
+const modalContentStyle = {
+  display: "flex",
+  flex: 1,
+  overflow: "hidden",
+}
+
+const sidebarStyle = {
+  width: "280px",
+  borderRight: "1px solid rgba(127, 255, 212, 0.08)",
+  padding: "1rem 0",
+  overflowY: "auto",
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.2rem",
+}
+
+const sidebarButtonStyle = {
+  background: "transparent",
+  border: "none",
+  color: "#eafffb",
+  textAlign: "left",
+  padding: "0.75rem 1.4rem",
+  display: "flex",
+  gap: "0.65rem",
+  alignItems: "center",
+  borderRadius: "12px",
+  cursor: "pointer",
+  fontSize: "0.9rem",
+  transition: "background 0.2s ease, transform 0.2s ease",
+}
+
+const sidebarButtonActiveStyle = {
+  background: "rgba(127, 255, 212, 0.12)",
+  transform: "scale(1.02)",
+}
+
+const sidebarIndexStyle = {
+  fontFamily: "monospace",
+  fontSize: "0.75rem",
+  opacity: 0.65,
+}
+
+const articleStyle = {
+  flex: 1,
+  padding: "1.4rem 1.6rem",
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  overflowY: "auto",
+}
+
+const chipRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.6rem",
+  marginBottom: "0.5rem",
+}
+
+const scopeChipStyle = (scope) => ({
+  background:
+    scope === "page"
+      ? "rgba(127, 255, 212, 0.18)"
+      : scope === "summary"
+      ? "rgba(255, 212, 107, 0.18)"
+      : "rgba(99, 139, 255, 0.18)",
+  color:
+    scope === "page"
+      ? "#7fffd4"
+      : scope === "summary"
+      ? "#ffd46b"
+      : "#99b5ff",
+  borderRadius: "999px",
+  padding: "0.2rem 0.8rem",
+  fontSize: "0.7rem",
+  letterSpacing: "1px",
+  textTransform: "uppercase",
+})
+
+const stepPositionStyle = {
+  fontSize: "0.8rem",
+  opacity: 0.6,
+}
+
+const articleTitleStyle = {
+  fontSize: "1.35rem",
+  margin: 0,
+  color: "#aefcf5",
+}
+
+const articleTextStyle = {
+  fontSize: "1rem",
+  lineHeight: 1.5,
+  color: "rgba(234, 255, 251, 0.92)",
+  whiteSpace: "pre-line",
+}
+
+const actionRowStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginTop: "auto",
+  gap: "0.5rem",
+}
+
+const navButtonStyle = {
+  background: "rgba(127, 255, 212, 0.18)",
+  border: "1px solid rgba(127, 255, 212, 0.35)",
+  color: "#aefcf5",
+  borderRadius: "10px",
+  padding: "0.45rem 1.2rem",
+  cursor: "pointer",
+  fontWeight: 600,
+  letterSpacing: "0.5px",
+}
+
+const resetButtonStyle = {
+  background: "transparent",
+  border: "1px dashed rgba(174, 252, 245, 0.35)",
+  color: "rgba(174, 252, 245, 0.75)",
+  borderRadius: "10px",
+  padding: "0.45rem 1.2rem",
+  cursor: "pointer",
+  fontSize: "0.85rem",
 }

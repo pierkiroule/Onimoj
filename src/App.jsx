@@ -31,6 +31,10 @@ export default function App() {
   const [checkingSession, setCheckingSession] = useState(true)
   const [dreamLock, setDreamLock] = useState(false)
   const DELAY = 12 * 60 * 60 * 1000 // 12h
+  const isDev =
+    import.meta.env.DEV ||
+    (typeof window !== "undefined" &&
+      ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(window.location.hostname))
 
   // 🔌 Vérifie connexion Supabase
   useEffect(() => {
@@ -68,18 +72,28 @@ export default function App() {
     initSession()
   }, [])
 
-  // 🕰️ Vérifie le sablier (localStorage)
-  useEffect(() => {
-    const last = parseInt(localStorage.getItem("lastDreamTime") || "0")
-    const diff = Date.now() - last
-    if (diff < DELAY) {
-      setDreamLock(true)
-      localStorage.setItem("dreamLock", "true")
-    } else {
-      setDreamLock(false)
-      localStorage.removeItem("dreamLock")
-    }
-  }, [session, page])
+    // 🕰️ Vérifie le sablier (localStorage)
+    useEffect(() => {
+      if (typeof window === "undefined") return
+
+      const devOverride =
+        isDev && localStorage.getItem("devCooldownOff") === "true"
+      if (devOverride) {
+        setDreamLock(false)
+        localStorage.removeItem("dreamLock")
+        return
+      }
+
+      const last = parseInt(localStorage.getItem("lastDreamTime") || "0")
+      const diff = Date.now() - last
+      if (diff < DELAY) {
+        setDreamLock(true)
+        localStorage.setItem("dreamLock", "true")
+      } else {
+        setDreamLock(false)
+        localStorage.removeItem("dreamLock")
+      }
+    }, [session, page, isDev])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -87,11 +101,15 @@ export default function App() {
     setPage("home")
   }
 
-  function disableDreamLock() {
-    localStorage.removeItem("lastDreamTime")
-    localStorage.removeItem("dreamLock")
-    setDreamLock(false)
-  }
+    function disableDreamLock() {
+      if (typeof window === "undefined") return
+      if (isDev) {
+        localStorage.setItem("devCooldownOff", "true")
+      }
+      localStorage.removeItem("lastDreamTime")
+      localStorage.removeItem("dreamLock")
+      setDreamLock(false)
+    }
 
   // 🧭 Routage principal
   const renderPage = () => {

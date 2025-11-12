@@ -47,6 +47,9 @@ export default function Profil({ user, onLogout, onDisableTimer }) {
     if (!onDisableTimer) return
     const ok = confirm("Désactiver le sablier de 12h pour ce navigateur ?")
     if (!ok) return
+    if (typeof window !== "undefined") {
+      localStorage.setItem("devCooldownOff", "true")
+    }
     onDisableTimer()
     setTimerMessage("🕰️ Sablier désactivé.")
     setTimeout(() => setTimerMessage(""), 4000)

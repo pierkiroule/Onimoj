@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useEffect, useState } from "react"
 import { supabase } from "./supabaseClient"
 
@@ -6,7 +5,7 @@ import { supabase } from "./supabaseClient"
 import StarField from "./components/StarField"
 import BottomMenu from "./components/BottomMenu"
 import Notifications from "./components/Notifications"
-import FilBleuGuide from "./components/FilBleuGuide"
+import TutoButton from "./components/TutoButton"
 
 // 📄 Pages
 import Home from "./pages/Home"
@@ -186,7 +185,7 @@ export default function App() {
   return (
     <div className="app-root">
       <StarField />
-      <FilBleuGuide page={page} />
+      <TutoButton page={page} />
 
       {/* ⚠️ Bandeau mode local */}
       {supabaseStatus.includes("offline") && (
@@ -215,8 +214,13 @@ export default function App() {
       <main className="main-container fade-in">{renderPage()}</main>
 
       {/* 🧭 Menu bas persistant */}
-      {(!checkingSession && (session || supabaseStatus.includes("offline") || dreamLock)) && (
-        <BottomMenu currentPage={page} onNavigate={setPage} dreamLock={dreamLock} />
+      {(!checkingSession &&
+        (session || supabaseStatus.includes("offline") || dreamLock)) && (
+        <BottomMenu
+          currentPage={page}
+          onNavigate={setPage}
+          dreamLock={dreamLock}
+        />
       )}
 
       {/* 🕰️ Statut bas-droit */}
@@ -257,7 +261,9 @@ export default function App() {
         )}
       </div>
 
-      <footer className="footer">© 2025 Onimoji • Prototype Onirix Beta One</footer>
+      <footer className="footer">
+        © 2025 Onimoji • Prototype Onirix Beta One
+      </footer>
 
       {/* ✨ Animation sablier boréal */}
       <style>{`

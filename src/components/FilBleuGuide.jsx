@@ -66,7 +66,26 @@ export default function FilBleuGuide({ enabled = true, allowReplay = false }) {
       return
     }
 
+    clearTimers()
     setVisible(false)
+
+    if (step.trigger?.type === "event" && step.trigger.name) {
+      let completed = false
+      setVisible(true)
+
+      const unsubscribe = onGuideEvent(step.trigger.name, () => {
+        if (completed) return
+        completed = true
+        scheduleAutoAdvance()
+      })
+
+      return () => {
+        completed = true
+        clearTimers()
+        unsubscribe?.()
+      }
+    }
+
     let triggered = false
 
     const handleTrigger = () => {
@@ -84,15 +103,6 @@ export default function FilBleuGuide({ enabled = true, allowReplay = false }) {
       return () => {
         triggered = true
         clearTimers()
-      }
-    }
-
-    if (step.trigger?.type === "event" && step.trigger.name) {
-      const unsubscribe = onGuideEvent(step.trigger.name, handleTrigger)
-      return () => {
-        triggered = true
-        clearTimers()
-        unsubscribe?.()
       }
     }
 

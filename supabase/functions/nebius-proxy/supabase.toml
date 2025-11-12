@@ -1,0 +1,9 @@
+[functions.nebius-proxy]
+verify_jwt = true
+
+[functions.nebius-proxy.environment]
+# 🔐 Clé Nebius côté serveur (à définir via Supabase CLI / tableau de bord)
+# NEBIUS_API_KEY = ""
+# Optionnel : surcharge des endpoints API
+# NEBIUS_CHAT_URL = "https://api.studio.nebius.com/v1/chat/completions"
+# NEBIUS_IMAGE_URL = "https://api.studio.nebius.com/v1/images/generations"

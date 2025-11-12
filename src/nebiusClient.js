@@ -1,104 +1,82 @@
 // src/nebiusClient.js
-// ⚡ Client universel Nebius Studio : texte + image onirique
+// ⚡ Client universel Nebius Studio (via Edge Function sécurisée)
 // Compatible mobile / cache local / prompts poétiques inuit
 
-const API_CHAT_URL =
-  import.meta.env.VITE_NEBIUS_API_URL ||
-  "https://api.studio.nebius.com/v1/chat/completions"
+import { supabase } from "./supabaseClient"
 
-const API_IMAGE_URL = "https://api.studio.nebius.com/v1/images/generations"
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "") ?? null
+const FUNCTION_ENDPOINT = SUPABASE_URL
+  ? `${SUPABASE_URL}/functions/v1/nebius-proxy`
+  : null
 
-const API_KEY =
-  import.meta.env.VITE_NEBIUS_API_KEY || import.meta.env.VITE_NEBIUS_KEY
+async function fetchAccessToken() {
+  try {
+    const { data } = await supabase.auth.getSession()
+    return data?.session?.access_token ?? null
+  } catch (err) {
+    console.warn("⚠️ Impossible de récupérer le token Supabase :", err)
+    return null
+  }
+}
+
+async function callNebiusProxy(payload) {
+  if (!FUNCTION_ENDPOINT) {
+    throw new Error("VITE_SUPABASE_URL non configurée : proxy Nebius inaccessible.")
+  }
+
+  const token = await fetchAccessToken()
+  if (!token) {
+    throw new Error("Utilisateur non authentifié : accès Nebius refusé.")
+  }
+
+  const res = await fetch(FUNCTION_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) {
+    let message = await res.text()
+    try {
+      const parsed = JSON.parse(message)
+      message = parsed?.message || parsed?.error || message
+    } catch {
+      // garde `message`
+    }
+    throw new Error(`Proxy Nebius indisponible (${res.status}) : ${message}`)
+  }
+
+  return res.json()
+}
 
 /**
  * 🧠 Fonction principale : génération textuelle poétique
  */
 export async function askNebius(prompt, options = {}) {
-  if (!API_KEY) {
-    console.error("⛔ Clé API Nebius absente. Définis VITE_NEBIUS_API_KEY.")
-    return ""
-  }
-
-  const body = {
-    model: options.model || "google/gemma-2-9b-it-fast",
-    messages: [
-      {
-        role: "system",
-        content:
-          options.systemPrompt ||
-          "Tu es un conteur du Grand Nord. Raconte des rêves courts, sensoriels et poétiques en français, inspirés de la tradition inuit. Utilise des mots simples, des images naturelles et évite les inventions lexicales.",
-      },
-      ...(Array.isArray(options.examples) ? options.examples : []),
-      { role: "user", content: [{ type: "text", text: prompt }] },
-    ],
-    temperature: options.temperature ?? 0.8,
-    stream: options.stream ?? false,
-    max_tokens: options.max_tokens,
-  }
-
   try {
-    const res = await fetch(API_CHAT_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-        ...(options.stream ? { Accept: "text/event-stream" } : {}),
+    const response = await callNebiusProxy({
+      type: "text",
+      prompt,
+      options: {
+        model: options.model,
+        temperature: options.temperature ?? 0.8,
+        max_tokens: options.max_tokens,
+        systemPrompt: options.systemPrompt,
+        examples: Array.isArray(options.examples) ? options.examples : undefined,
+        messages: Array.isArray(options.messages) ? options.messages : undefined,
       },
-      body: JSON.stringify(body),
     })
 
-    if (!res.ok) {
-      const errText = await res.text()
-      console.error("❌ Erreur Nebius:", errText)
-      return ""
-    }
-
-    // 🌀 Mode streaming
-    if (options.stream) {
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder("utf-8")
-      let fullText = ""
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = decoder.decode(value)
-        const tokens = extractTokens(chunk)
-        for (const token of tokens) {
-          fullText += token
-          options.onToken?.(token)
-        }
-      }
-      return cleanDreamText(fullText.trim())
-    }
-
-    // ✨ Réponse simple
-    const data = await res.json()
-    const raw =
-      data.choices?.[0]?.message?.content?.[0]?.text?.trim() ||
-      data.choices?.[0]?.message?.content?.trim() ||
-      ""
-    return cleanDreamText(raw)
+    const raw = response?.data?.text ?? ""
+    return cleanDreamText(String(raw ?? ""))
   } catch (err) {
-    console.error("⚠️ Erreur connexion Nebius:", err)
+    console.error("⚠️ Erreur proxy Nebius:", err)
     return ""
   }
-}
-
-/**
- * 🔤 Extraction des tokens texte depuis le flux SSE
- */
-function extractTokens(chunk) {
-  const tokens = []
-  const lines = chunk.split("\n").filter((l) => l.startsWith("data:"))
-  for (const line of lines) {
-    try {
-      const json = JSON.parse(line.replace("data:", "").trim())
-      const text = json?.choices?.[0]?.delta?.content?.[0]?.text
-      if (text) tokens.push(text)
-    } catch {}
-  }
-  return tokens
 }
 
 /**
@@ -118,12 +96,6 @@ function cleanDreamText(text) {
  * 🖼️ Génération d'image onirique (mobile + cache local)
  */
 export async function askNebiusImage(prompt) {
-  if (!API_KEY) {
-    console.error("❌ Clé Nebius manquante : VITE_NEBIUS_API_KEY")
-    alert("⚠️ Clé Nebius absente : ajoute-la dans ton fichier .env")
-    return null
-  }
-
   // 🌙 Vérifie si l'image existe déjà dans le cache
   const cacheKey = `nebius_${btoa(unescape(encodeURIComponent(prompt))).slice(0, 100)}`
   const cached = localStorage.getItem(cacheKey)
@@ -135,27 +107,20 @@ export async function askNebiusImage(prompt) {
   try {
     console.log("✨ Appel Nebius pour :", prompt)
 
-    const response = await fetch(API_IMAGE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
+    const response = await callNebiusProxy({
+      type: "image",
+      prompt,
+      options: {
         model: "black-forest-labs/flux-schnell",
-        prompt,
         size: "512x512",
-      }),
+      },
     })
 
-    if (!response.ok) throw new Error(`Erreur Nebius: ${response.statusText}`)
+    const result = response?.data ?? {}
+    console.log("🧠 Réponse Nebius proxy :", result)
 
-    const result = await response.json()
-    console.log("🧠 Réponse Nebius brute :", result)
-
-    const base64 = result.data?.[0]?.b64_json
-    const url = result.data?.[0]?.url
+    const base64 = result.base64
+    const url = result.url
 
     // 🧩 Cas 1 : base64
     if (base64) {
@@ -175,7 +140,7 @@ export async function askNebiusImage(prompt) {
     // 🚫 Cas d'erreur
     throw new Error("Réponse Nebius vide (ni b64_json ni url).")
   } catch (err) {
-    console.error("⚠️ Erreur Nebius Studio:", err)
+    console.error("⚠️ Erreur Nebius proxy:", err)
     return null
   }
 }

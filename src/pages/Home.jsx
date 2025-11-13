@@ -5,6 +5,7 @@ import { supabase } from "../supabaseClient"
 
 export default function Home({ onStart, onLogin, onRegister }) {
   const [remaining, setRemaining] = useState(0)
+  const [isOnimojiModalOpen, setIsOnimojiModalOpen] = useState(false)
   const DELAY = 12 * 60 * 60 * 1000 // 12h
 
   const isDev =
@@ -16,6 +17,15 @@ export default function Home({ onStart, onLogin, onRegister }) {
   useEffect(() => {
     checkCooldown()
   }, [])
+
+  useEffect(() => {
+    if (!isOnimojiModalOpen) return
+    function handleKey(event) {
+      if (event.key === "Escape") setIsOnimojiModalOpen(false)
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [isOnimojiModalOpen])
 
   async function checkCooldown() {
     try {
@@ -165,6 +175,10 @@ export default function Home({ onStart, onLogin, onRegister }) {
          Co-créer des ressources culturelles oniriques pour sauver les gardiens du sommeil.
       </div>
 
+        <button className="onimoji-info-button" onClick={() => setIsOnimojiModalOpen(true)}>
+          Onimoji et les fonctions psychoculturelles du rêve
+        </button>
+
       {remaining > 0 ? (
         <div style={borealBox}>
           <div style={{ fontSize: "0.9rem", color: "#aefcf5" }}>
@@ -264,6 +278,111 @@ export default function Home({ onStart, onLogin, onRegister }) {
         }
       `}
       </style>
+
+        {isOnimojiModalOpen && (
+          <div
+            className="onimoji-modal-overlay"
+            role="presentation"
+            onClick={() => setIsOnimojiModalOpen(false)}
+          >
+            <div
+              className="onimoji-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="onimoji-modal-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="onimoji-modal-close"
+                aria-label="Fermer"
+                onClick={() => setIsOnimojiModalOpen(false)}
+              >
+                ✕
+              </button>
+              <h2 id="onimoji-modal-title">Onimoji — S’inspirer des rêves et des esprits du Grand Nord</h2>
+              <p>
+                Dans la tradition inuit, les rêves ne sont pas de simples images intérieures. Ils sont des
+                passerelles : entre soi et le monde, entre l’humain, les animaux, les éléments. C’est une vision
+                partagée par des auteurs comme Devereux, Tobie Nathan, Barbara Tedlock : le rêve est une fonction
+                psychoculturelle, un tissage de symboles, de relations et de récits.
+              </p>
+              <p>
+                Onimoji s’inspire de cet esprit-là : des figures protectrices, simples et imaginales, qui vous
+                accompagnent au fil de la journée. Pas pour “gérer” votre sommeil — mais pour préparer doucement le
+                terrain intérieur où il pourra venir.
+              </p>
+              <ol className="onimoji-modal-list">
+                <li>
+                  <h3>1. Symbolique — La force d’une figure</h3>
+                  <p>
+                    Dans les cultures arctiques, chaque animal-esprit porte une énergie : vent (Sila), mer (Sedna),
+                    glace, renard, corbeau…
+                  </p>
+                  <p>
+                    → Onimoji vous propose une figure qui porte votre humeur du moment. Vous choisissez un allié,
+                    comme un esprit du climat intérieur. Comme dans le rêve : l’émotion prend une forme.
+                  </p>
+                </li>
+                <li>
+                  <h3>2. Narrative — Une micro-histoire qui guide</h3>
+                  <p>
+                    Chez les Inuit, les récits sont courts, clairs, utiles : ils orientent sans ordonner.
+                  </p>
+                  <p>
+                    → La mission Onimoji est une mini-intrigue, un geste symbolique. Comme dans le rêve : une histoire
+                    met de l’ordre sans effort.
+                  </p>
+                </li>
+                <li>
+                  <h3>3. Identitaire — Se sentir aligné avec son “intérieur”</h3>
+                  <p>
+                    Les figures inuit ne “disent pas qui être” : elles éclairent un chemin possible.
+                  </p>
+                  <p>
+                    → L’Onimoji choisi devient votre couleur d’humeur, votre météo intérieure. Comme dans le rêve : le
+                    soi se stabilise sans qu’on ait à y penser.
+                  </p>
+                </li>
+                <li>
+                  <h3>4. Relationnelle — Une présence-tiers douce</h3>
+                  <p>
+                    Dans les traditions arctiques, les esprits ne sont jamais intrusifs. Ils accompagnent en
+                    arrière-plan.
+                  </p>
+                  <p>
+                    → Onimoji est une présence imaginale, discrète, réconfortante. Comme dans le rêve : on n’est jamais
+                    vraiment seul.
+                  </p>
+                </li>
+                <li>
+                  <h3>5. Régulatrice — Digérer la journée</h3>
+                  <p>
+                    Chez les Inuit, les histoires et les esprits servent à absorber les tensions du vécu.
+                  </p>
+                  <p>
+                    → Les micro-gestes Onimoji (observer, souffler, nommer) libèrent de la place. Comme dans le rêve : la
+                    pression retombe.
+                  </p>
+                </li>
+                <li>
+                  <h3>6. Créative — Ouvrir un espace intérieur</h3>
+                  <p>Les paysages inuit sont vastes, ouverts, respirants.</p>
+                  <p>
+                    → Chaque Onimoji ouvre un monde intérieur : vent, neige, banquise, mer, lumière du nord. Comme dans
+                    le rêve : un espace s’ouvre et le repos devient possible.
+                  </p>
+                </li>
+              </ol>
+              <h3>La promesse Onimoji</h3>
+              <p>
+                S’inspirer des rêves et des métaphores inuit pour accompagner votre journée. Suggérer plutôt que
+                prescrire. Ouvrir des images plutôt que donner des règles. Et laisser votre inconscient faire son
+                travail naturel : tisser du calme, du sens, et préparer silencieusement le sommeil.
+              </p>
+            </div>
+          </div>
+        )}
     </div>
   )
 }

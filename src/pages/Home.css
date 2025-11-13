@@ -140,6 +140,108 @@
   box-shadow: 0 0 18px rgba(127,255,212,0.8);
 }
 
+.onimoji-info-button {
+  margin-top: 1.2rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(175, 240, 255, 0.35);
+  background: rgba(12, 26, 35, 0.55);
+  color: #bfefff;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  backdrop-filter: blur(6px);
+}
+
+.onimoji-info-button:hover {
+  background: rgba(26, 52, 64, 0.75);
+  box-shadow: 0 0 16px rgba(127, 255, 212, 0.25);
+  transform: translateY(-1px);
+}
+
+.onimoji-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.onimoji-modal {
+  position: relative;
+  background: rgba(7, 20, 30, 0.94);
+  border-radius: 18px;
+  border: 1px solid rgba(127, 255, 212, 0.2);
+  box-shadow: 0 0 30px rgba(127, 255, 212, 0.25);
+  padding: 2rem 1.8rem 1.8rem;
+  max-width: 680px;
+  width: min(100%, 680px);
+  max-height: 85vh;
+  overflow-y: auto;
+  color: #e7f9ff;
+}
+
+.onimoji-modal h2 {
+  font-size: 1.4rem;
+  color: #bdefff;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.onimoji-modal h3 {
+  font-size: 1.05rem;
+  color: #9eeae0;
+  margin: 1.2rem 0 0.6rem;
+  text-align: left;
+}
+
+.onimoji-modal p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #e5f7ff;
+  margin-bottom: 0.6rem;
+  text-align: left;
+}
+
+.onimoji-modal-list {
+  padding-left: 1.2rem;
+  margin: 1.4rem 0;
+}
+
+.onimoji-modal-list li {
+  margin-bottom: 1.2rem;
+}
+
+.onimoji-modal-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  border: none;
+  background: rgba(10, 25, 34, 0.8);
+  color: #c8f5ff;
+  font-size: 1.1rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.onimoji-modal-close:hover {
+  background: rgba(20, 60, 75, 0.95);
+  transform: scale(1.05);
+}
+
 /* 🪶 SOUS-BOUTONS */
 .dream-sub-buttons {
   display: flex;
